@@ -35,3 +35,12 @@ docker compose up -d --build
 2. Build the UI in `src/tools/<Name>.tsx` using `ToolWorkspace`; heavy work goes in a worker (`src/workers`).
 3. Register it in `src/tools/index.tsx` and set status `beta` (routed, noindex).
 4. Write its `ToolSEO` in `src/registry/seo/` and set status `live` (indexed, in sitemap and llms.txt).
+
+## Tests
+
+- `npm test`: unit tests (Vitest)
+- `npm run test:e2e`: build + Playwright (Chromium, Firefox, WebKit, Pixel 7, iPhone 14, axe)
+- `npm run test:perf`: Lighthouse CI
+- `npm run test:all`: everything (also runs in `.github/workflows/test.yml`)
+
+Results, bug list and details: [docs/QA-REPORT.md](docs/QA-REPORT.md).
