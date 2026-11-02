@@ -64,12 +64,19 @@ export const primary = (page: Page) => page.locator('[data-testid="primary-actio
 export const alert = (page: Page) => workspace(page).getByRole("alert");
 export const byTestId = (page: Page, id: string) => page.locator(`[data-testid="${id}"]:visible`);
 
+/** Waits until the tool is interactive (controls are disabled until hydration). */
+export async function ready(page: Page) {
+  await page.locator('section[aria-label="Tool"][data-ready]:visible').waitFor();
+}
+
 export async function upload(page: Page, files: string | string[]) {
+  await ready(page);
   await page.locator('[data-testid="file-input"]').last().setInputFiles(files);
 }
 
 /** Real drag-and-drop: builds a DataTransfer with the file inside the page and dispatches drop. */
 export async function dropFile(page: Page, path: string, type: string) {
+  await ready(page);
   const b64 = readFileSync(path).toString("base64");
   const name = path.split("/").pop()!;
   await page.locator('[data-testid="dropzone"]:visible').evaluate(
@@ -86,6 +93,7 @@ export async function dropFile(page: Page, path: string, type: string) {
 
 /** Paste a file from the "clipboard" (a synthetic ClipboardEvent, as the browser fires on Ctrl+V). */
 export async function pasteFile(page: Page, path: string, type: string) {
+  await ready(page);
   const b64 = readFileSync(path).toString("base64");
   const name = path.split("/").pop()!;
   await page.evaluate(

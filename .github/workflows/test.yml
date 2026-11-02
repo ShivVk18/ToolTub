@@ -1,0 +1,41 @@
+# Runs the full suite on every push and pull request. Everything is self-hosted inside the runner:
+# Valkey via a service container, LibreOffice from apt, browsers from Playwright. No external APIs.
+name: test
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    services:
+      valkey:
+        image: valkey/valkey:8-alpine
+        ports: ["6391:6379"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - name: LibreOffice for server-tool tests
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libreoffice-writer-nogui
+      - run: npx playwright install --with-deps chromium firefox webkit
+      - run: npm run lint
+      - run: npx tsc --noEmit
+      - run: npm run test:unit
+      - run: npm run build
+      # valkey-server/redis-server is not on the runner's PATH, so the server spec would skip; point it at the service instead.
+      - run: npx playwright test
+        env:
+          CI: "1"
+          SOFFICE_DIR: /usr/bin
+          E2E_EXTERNAL_REDIS: "1"
+      - run: npx lhci autorun --config=lighthouserc.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reports
+          path: |
+            playwright-report
+            .lighthouseci/reports

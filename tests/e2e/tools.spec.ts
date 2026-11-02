@@ -3,7 +3,7 @@ import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import {
   assertAccessible, assertMobileFriendly, downloadFrom, dropFile, fx, gen, guard, inspectImage,
-  output, pasteFile, pdfPages, primary, upload, useTheme, workspace, alert, byTestId,
+  output, pasteFile, pdfPages, primary, ready, upload, useTheme, workspace, alert, byTestId,
 } from "./helpers";
 
 // Routed tools, from the registry (kept in sync by the "routed tools" test below).
@@ -55,12 +55,14 @@ for (const t of TOOLS) {
       await assertMobileFriendly(page);
     });
 
-    test("keyboard: the first control in the tool is reachable with Tab and shows focus", async ({ page, isMobile }) => {
+    test("keyboard: the first control in the tool is reachable with Tab and shows focus", async ({ page, isMobile, browserName }) => {
       test.skip(isMobile, "keyboard test on desktop");
       await page.goto(`/${t.slug}`);
-      await expect(workspace(page)).toBeVisible();
+      await ready(page);
+      // Safari only tabs to buttons and links with Option+Tab (its default "Press Tab to highlight" setting).
+      const key = browserName === "webkit" ? "Alt+Tab" : "Tab";
       for (let i = 0; i < 40; i++) {
-        await page.keyboard.press("Tab");
+        await page.keyboard.press(key);
         const inTool = await page.evaluate(() => !!document.activeElement?.closest('section[aria-label="Tool"]'));
         if (inTool) {
           const outline = await page.evaluate(() => getComputedStyle(document.activeElement!).outlineStyle);
@@ -336,11 +338,19 @@ test.describe("JSON Formatter", () => {
       setter.call(el, v);
       el.dispatchEvent(new Event("input", { bubbles: true }));
     }, text);
-    // While it formats, the main thread must keep answering within 500 ms.
-    const t0 = Date.now();
-    await page.evaluate(() => new Promise((r) => requestAnimationFrame(r)));
-    expect(Date.now() - t0).toBeLessThan(500);
+    // While it formats (in a worker), the page must keep painting: no frame gap over 500 ms.
+    const maxGap = await page.evaluate(
+      () =>
+        new Promise<number>((resolve) => {
+          let last = performance.now(), max = 0;
+          const end = last + 3000;
+          const tick = (now: number) => { max = Math.max(max, now - last); last = now; if (now < end) requestAnimationFrame(tick); else resolve(max); };
+          requestAnimationFrame(tick);
+        }),
+    );
+    expect(maxGap).toBeLessThan(500);
     await expect(output(page)).toContainText("Valid JSON", { timeout: 30_000 });
+    await expect(output(page)).toContainText("Showing the first 200 KB");
   });
 });
 

@@ -11,13 +11,16 @@ import { JOBS_DIR, REDIS_PORT } from "../../playwright.config";
  * Worker runs with a shortened expiry (RETENTION_MS) so auto-delete can be tested.
  */
 const which = (bin: string) => { try { return execSync(`command -v ${bin}`, { encoding: "utf8" }).trim(); } catch { return ""; } };
-const REDIS = which("valkey-server") || which("redis-server");
+// CI provides Valkey as a service container (E2E_EXTERNAL_REDIS=1) instead of a local binary.
+const EXTERNAL_REDIS = !!process.env.E2E_EXTERNAL_REDIS;
+const REDIS = EXTERNAL_REDIS ? "external" : which("valkey-server") || which("redis-server");
 const SOFFICE_DIR = process.env.SOFFICE_DIR ?? (existsSync("/Applications/LibreOffice.app/Contents/MacOS/soffice") ? "/Applications/LibreOffice.app/Contents/MacOS" : which("soffice").replace(/\/soffice$/, ""));
 const RETENTION_MS = 6000;
 
 let redis: ChildProcess | undefined;
 let worker: ChildProcess | undefined;
 const startRedis = async () => {
+  if (EXTERNAL_REDIS) return;
   redis = spawn(REDIS, ["--port", String(REDIS_PORT), "--save", "", "--appendonly", "no"], { stdio: "ignore" });
   await new Promise((r) => setTimeout(r, 600));
 };
@@ -52,6 +55,7 @@ async function waitDone(request: import("@playwright/test").APIRequestContext, i
 }
 
 test("queue down: API answers 503 fast and the UI says 'temporarily unavailable'", async ({ request, page }) => {
+  test.skip(EXTERNAL_REDIS, "can't stop a CI service container from the test");
   const t0 = Date.now();
   const res = await post(request, pdf());
   expect(res.status()).toBe(503);

@@ -38,7 +38,7 @@ export default defineConfig({
     { name: "chromium", testIgnore: /(seo|links|api|server-tools|offline)\.spec\.ts/, use: { ...devices["Desktop Chrome"] } },
     { name: "firefox", testIgnore: /(seo|links|api|server-tools|offline)\.spec\.ts/, use: { ...devices["Desktop Firefox"] } },
     { name: "webkit", testIgnore: /(seo|links|api|server-tools|offline)\.spec\.ts/, use: { ...devices["Desktop Safari"] } },
-    { name: "mobile-pixel7", testMatch: /(tools|platform)\.spec\.ts/, use: { ...devices["Pixel 7"] } },
-    { name: "mobile-iphone14", testMatch: /(tools|platform)\.spec\.ts/, use: { ...devices["iPhone 14"] } },
+    { name: "mobile-pixel7", testMatch: /\/(tools|platform)\.spec\.ts$/, use: { ...devices["Pixel 7"] } },
+    { name: "mobile-iphone14", testMatch: /\/(tools|platform)\.spec\.ts$/, use: { ...devices["iPhone 14"] } },
   ],
 });
