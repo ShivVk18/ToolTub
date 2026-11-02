@@ -1,12 +1,13 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { convertQueue, JOBS_DIR, SERVER_TOOLS, type ServerTool } from "@/server/queue";
+import { queueUp, getQueue, JOBS_DIR, SERVER_TOOLS, type ServerTool } from "@/server/queue";
 
 /** GET /api/jobs/:id/file → the converted file. Files are deleted by the worker's sweeper after 1 hour. */
 export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   if (!/^[0-9a-f-]{36}$/.test(id)) return new Response("Not found", { status: 404 });
-  const job = await convertQueue.getJob(id);
+  if (!(await queueUp())) return new Response("Server tools are temporarily unavailable.", { status: 503 });
+  const job = await getQueue().getJob(id);
   if (!job || (await job.getState()) !== "completed") return new Response("Not ready", { status: 404 });
   const spec = SERVER_TOOLS[job.data.tool as ServerTool];
   try {

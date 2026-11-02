@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { convertQueue, JOBS_DIR, SERVER_TOOLS, workerAlive, type ServerTool } from "@/server/queue";
+import { getQueue, JOBS_DIR, SERVER_TOOLS, workerAlive, type ServerTool } from "@/server/queue";
 import { clientIp, rateLimit } from "@/server/rate-limit";
 
 /**
@@ -12,7 +12,9 @@ import { clientIp, rateLimit } from "@/server/rate-limit";
 export async function POST(req: Request) {
   try {
     return await handle(req);
-  } catch {
+  } catch (err) {
+    // Log the cause (never file names or contents) so outages are diagnosable; the user gets a 503.
+    console.error("[api/jobs] server tool unavailable:", err instanceof Error ? err.message : err);
     return Response.json({ error: "Server tools are temporarily unavailable. Please try again in a few minutes." }, { status: 503 });
   }
 }
@@ -43,6 +45,6 @@ async function handle(req: Request) {
   const dir = join(JOBS_DIR, id);
   await mkdir(dir, { recursive: true });
   await writeFile(join(dir, `input.${spec.ext}`), bytes);
-  await convertQueue.add(tool, { id, tool }, { jobId: id });
+  await getQueue().add(tool, { id, tool }, { jobId: id });
   return Response.json({ id }, { status: 202 });
 }
