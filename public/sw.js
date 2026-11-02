@@ -8,6 +8,21 @@ self.addEventListener("activate", (e) =>
   e.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((k) => k.startsWith("klipkit-v") && k !== VERSION).map((k) => caches.delete(k)))).then(() => self.clients.claim())),
 );
 
+// The first visit happens before this worker controls the page, so its HTML, JS and CSS were never
+// seen by "fetch" below. The page posts the URLs it already loaded; cache them now (same origin only).
+self.addEventListener("message", (e) => {
+  if (e.data?.type !== "cache-urls" || !Array.isArray(e.data.urls)) return;
+  const urls = e.data.urls.filter((u) => {
+    try {
+      const p = new URL(u, location.origin);
+      return p.origin === location.origin && !p.pathname.startsWith("/api/") && !p.pathname.startsWith("/models/");
+    } catch {
+      return false;
+    }
+  });
+  e.waitUntil(caches.open(VERSION).then((c) => Promise.all(urls.map((u) => c.add(u).catch(() => {})))));
+});
+
 self.addEventListener("fetch", (e) => {
   const url = new URL(e.request.url);
   if (e.request.method !== "GET" || url.origin !== location.origin || url.pathname.startsWith("/api/")) return;

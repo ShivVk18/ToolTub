@@ -18,6 +18,9 @@ export const metadata: Metadata = {
   manifest: "/manifest.webmanifest",
 };
 
+/** Registers the service worker, then hands it every same-origin URL this page already loaded (first-visit offline). */
+const swScript = `if("serviceWorker"in navigator)addEventListener("load",()=>{navigator.serviceWorker.register("/sw.js").then(()=>navigator.serviceWorker.ready).then(r=>{var u=[location.href].concat(performance.getEntriesByType("resource").map(e=>e.name).filter(n=>n.indexOf(location.origin)===0));r.active&&r.active.postMessage({type:"cache-urls",urls:u})}).catch(()=>{})})`;
+
 export const viewport: Viewport = { themeColor: THEME_COLOR, width: "device-width", initialScale: 1 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -35,7 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <div id="main" className="flex-1">{children}</div>
         <Footer />
         <CommandPalette index={searchIndex} />
-        <script dangerouslySetInnerHTML={{ __html: `if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("/sw.js"))` }} />
+        <script dangerouslySetInnerHTML={{ __html: swScript }} />
       </body>
     </html>
   );
