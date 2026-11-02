@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { GeistSans } from "geist/font/sans";
-import { GeistMono } from "geist/font/mono";
+import localFont from "next/font/local";
 import "./globals.css";
 import { Footer, Header } from "@/components/layout/Header";
 import { themeScript } from "@/components/layout/ThemeToggle";
@@ -10,7 +9,11 @@ import { siteGraph } from "@/lib/schema";
 import { ENTITY_DEFINITION, SITE_URL, THEME_COLOR } from "@/lib/site";
 import { searchIndex } from "@/registry/search-index";
 
-// Fonts: Geist (OFL-1.1) from the `geist` npm package, bundled and served from our own domain.
+// Font: Geist Sans (OFL-1.1), bundled and served from our own domain. display: "optional" means the
+// font is used only if it arrives within the first ~100 ms; otherwise the system font stays, so a late
+// font swap can't push back Largest Contentful Paint (measured: LCP 3.0 s → see docs/QA-REPORT.md).
+// Code uses the system monospace stack (saves a second 71 KB font on every page).
+const geistSans = localFont({ src: "../../node_modules/geist/dist/fonts/geist-sans/Geist-Variable.woff2", variable: "--font-geist-sans", display: "optional", weight: "100 900" });
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: { default: "KlipKit – Free, Private Online Tools", template: "%s | KlipKit" },
@@ -25,7 +28,7 @@ export const viewport: Viewport = { themeColor: THEME_COLOR, width: "device-widt
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable} antialiased`} suppressHydrationWarning>
+    <html lang="en" className={`${geistSans.variable} antialiased`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
