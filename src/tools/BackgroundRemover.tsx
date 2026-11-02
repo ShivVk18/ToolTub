@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Dropzone } from "@/components/workspace/Dropzone";
 import { ResultActions, useHandoff } from "@/components/workspace/ToolChrome";
 import { Field, ToolWorkspace, inputClass, useToolRun } from "@/components/workspace/ToolWorkspace";
@@ -24,6 +24,9 @@ export function BackgroundRemover({ slug, next }: ToolProps) {
   const [bg, setBg] = useState<"transparent" | "#ffffff" | "custom">("transparent");
   const [custom, setCustom] = useState("#3b82f6");
   const job = useToolRun<{ png: Blob; url: string; backend: string }>();
+  // Each result holds a full-resolution PNG behind an object URL: release it when replaced or unmounted.
+  const previewUrl = job.result?.url;
+  useEffect(() => () => { if (previewUrl) URL.revokeObjectURL(previewUrl); }, [previewUrl]);
 
   useHandoff((items) => items[0]?.blob && setFile(new File([items[0].blob], items[0].name, { type: items[0].type })));
 
