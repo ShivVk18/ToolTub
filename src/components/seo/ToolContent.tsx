@@ -35,7 +35,7 @@ export function ToolContent({ tool, faqs }: { tool: ToolDefinition; faqs?: FAQ[]
       {s.comparisonTable && (
         <section>
           <h2>{s.comparisonTable.caption}</h2>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto" tabIndex={0} role="region" aria-label={s.comparisonTable.caption}>
             <table>
               <thead><tr>{s.comparisonTable.headers.map((h) => <th key={h} scope="col">{h}</th>)}</tr></thead>
               <tbody>{s.comparisonTable.rows.map((r) => <tr key={r[0]}>{r.map((c, i) => (i === 0 ? <th key={i} scope="row">{c}</th> : <td key={i}>{c}</td>))}</tr>)}</tbody>

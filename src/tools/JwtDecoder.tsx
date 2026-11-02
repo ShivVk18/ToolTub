@@ -30,7 +30,7 @@ export function JwtDecoder({ slug, next }: ToolProps) {
       input={
         <div className="space-y-2">
           <textarea value={token} onChange={(e) => setToken(e.target.value)} spellCheck={false} aria-label="JWT" placeholder="Paste a JSON Web Token (eyJ…)" className="h-28 w-full resize-y break-all rounded-lg border border-border bg-bg p-3 font-mono text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring" />
-          <button className="text-xs text-fg-muted underline" onClick={() => setToken(SAMPLE)}>
+          <button className="inline-flex min-h-11 items-center text-xs text-fg-muted underline sm:min-h-0" onClick={() => setToken(SAMPLE)}>
             Try a sample
           </button>
         </div>

@@ -11,7 +11,7 @@ export const buttonVariants = cva(
         secondary: "border border-border bg-card hover:bg-muted",
         ghost: "hover:bg-muted",
       },
-      size: { sm: "h-8 px-3", md: "h-10 px-4", lg: "h-12 px-6 text-base" },
+      size: { sm: "h-11 sm:h-8 px-3", md: "h-11 sm:h-10 px-4", lg: "h-12 px-6 text-base" },
     },
     defaultVariants: { variant: "secondary", size: "md" },
   },

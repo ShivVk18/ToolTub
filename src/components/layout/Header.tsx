@@ -5,8 +5,8 @@ import { ThemeToggle } from "./ThemeToggle";
 export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-bg/80 backdrop-blur">
-      <div className="mx-auto flex h-14 max-w-6xl items-center gap-4 px-4">
-        <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
+      <div className="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4 sm:gap-4">
+        <Link href="/" className="flex min-h-11 items-center gap-2 font-semibold tracking-tight">
           <span className="grid size-7 place-items-center rounded-md bg-fg text-xs font-bold text-bg">K</span>
           KlipKit
         </Link>
@@ -17,7 +17,7 @@ export function Header() {
           <Link href="/video-tools" className="rounded-md px-2 py-1 hover:text-fg">Video</Link>
           <Link href="/creator-tools" className="rounded-md px-2 py-1 hover:text-fg">Creator</Link>
         </nav>
-        <SearchButton className="ml-auto h-9 w-44 sm:w-64" />
+        <SearchButton className="ml-auto h-11 w-40 sm:h-9 sm:w-64" />
         <ThemeToggle />
       </div>
     </header>

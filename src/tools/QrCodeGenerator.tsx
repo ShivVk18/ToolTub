@@ -49,7 +49,7 @@ export function QrCodeGenerator({ slug, preset, next }: ToolProps) {
         <div className="space-y-4">
           <div role="tablist" className="inline-flex rounded-lg bg-muted p-1 text-sm">
             {(["url", "text", "wifi", "vcard"] as Kind[]).map((k) => (
-              <button key={k} role="tab" aria-selected={kind === k} onClick={() => setKind(k)} className={`rounded-md px-3 py-1.5 ${kind === k ? "bg-card shadow-sm" : "text-fg-muted"}`}>
+              <button key={k} role="tab" aria-selected={kind === k} onClick={() => setKind(k)} className={`min-h-11 rounded-md px-3 py-1.5 sm:min-h-0 ${kind === k ? "bg-card shadow-sm" : "text-fg-muted"}`}>
                 {{ url: "Link", text: "Text", wifi: "Wi-Fi", vcard: "Contact" }[k]}
               </button>
             ))}

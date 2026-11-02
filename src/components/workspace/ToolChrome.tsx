@@ -32,7 +32,7 @@ export function FavouriteButton({ slug }: { slug: string }) {
   const fav = useKlip((s) => s.favourites.includes(slug));
   const toggle = useKlip((s) => s.toggleFavourite);
   return (
-    <button onClick={() => toggle(slug)} aria-pressed={fav} aria-label={fav ? "Remove from favourites" : "Add to favourites"} className="grid size-9 place-items-center rounded-lg hover:bg-muted">
+    <button onClick={() => toggle(slug)} aria-pressed={fav} aria-label={fav ? "Remove from favourites" : "Add to favourites"} className="grid size-11 place-items-center rounded-lg hover:bg-muted sm:size-9">
       <Star className={fav ? "size-4 fill-amber-400 text-amber-400" : "size-4"} aria-hidden />
     </button>
   );
@@ -96,14 +96,14 @@ export function ResultActions({
       )}
       {next && next.length > 0 && (
         <details className="relative">
-          <summary data-testid="send-next" className="flex h-10 cursor-pointer list-none items-center gap-2 rounded-lg border border-border px-4 text-sm hover:bg-muted">
+          <summary data-testid="send-next" className="flex h-11 sm:h-10 cursor-pointer list-none items-center gap-2 rounded-lg border border-border px-4 text-sm hover:bg-muted">
             Send to next tool <ArrowRight className="size-4" aria-hidden />
           </summary>
           <ul className="absolute z-10 mt-1 min-w-56 rounded-lg border border-border bg-card p-1 shadow-lg">
             {next.map((n) => (
               <li key={n.slug}>
                 <button
-                  className="w-full rounded-md px-3 py-2 text-left text-sm hover:bg-muted"
+                  className="min-h-11 w-full rounded-md px-3 py-2 text-left text-sm hover:bg-muted sm:min-h-0"
                   onClick={() => {
                     setHandoff({ from, items });
                     router.push(`/${n.slug}`);

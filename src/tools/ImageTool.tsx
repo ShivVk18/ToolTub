@@ -69,7 +69,7 @@ export function ImageTool({ slug, preset, next, mode }: ToolProps & { mode: Mode
             <span>
               {files.length} image{files.length > 1 && "s"} · {formatBytes(files.reduce((s, f) => s + f.size, 0))}
             </span>
-            <button className="text-fg-muted underline" onClick={() => (setFiles([]), job.reset())}>
+            <button className="inline-flex min-h-11 items-center text-fg-muted underline sm:min-h-0" onClick={() => (setFiles([]), job.reset())}>
               Change
             </button>
           </div>
