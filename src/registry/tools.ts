@@ -129,6 +129,13 @@ const rows: Row[] = [
   ["collage-maker", "Collage & Grid Maker", "Arrange photos into grids and collages.", "creator-tools", "P2", ["own"], DEV, [], M(25, "Per image"), [[IMG], [IMG]], ["photo collage", "photo grid"], ["social-image-resizer", "image-compressor"], "planned"],
 ];
 
+/** Meta descriptions for routed (beta) tools that don't have a full ToolSEO object yet. */
+const META: Record<string, string> = {
+  "pdf-to-word": "Convert a text-based PDF into an editable Word (DOCX) file. Processed on KlipKit's own server and deleted within one hour. Free, no sign-up, no watermark.",
+  "image-resizer": "Resize JPG, PNG and WebP images to an exact maximum width and height, in bulk. Runs in your browser, so photos are never uploaded. Free, no sign-up needed.",
+  "image-converter": "Convert images between JPG, PNG and WebP in bulk, right in your browser. Fast and private: nothing is uploaded, no sign-up, no watermark. Free forever.",
+};
+
 export const tools: ToolDefinition[] = rows.map(
   ([slug, name, tagline, hub, priority, buildType, processing, dependencies, limits, [inputs, outputs], synonyms, related, status = "planned"]) => ({
     slug,
@@ -147,6 +154,7 @@ export const tools: ToolDefinition[] = rows.map(
     synonyms,
     relatedTools: related,
     seo: seoBySlug[slug],
+    metaDescription: META[slug],
   }),
 );
 

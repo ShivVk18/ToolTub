@@ -1,4 +1,7 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+import { pageMetadata } from "@/lib/metadata";
+import { HOME_DESCRIPTION } from "@/lib/site";
 import { Code2, FileText, Sparkles } from "lucide-react";
 import { SearchButton } from "@/components/search/CommandPalette";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -8,6 +11,8 @@ import { categories } from "@/registry/categories";
 import { chains, isChainLive } from "@/registry/chains";
 import { getTool, routedTools, tools } from "@/registry/tools";
 import { searchIndex } from "@/registry/search-index";
+
+export const metadata: Metadata = pageMetadata({ path: "/", title: "KlipKit – Free Online Tools That Run on Your Device", description: HOME_DESCRIPTION, ogImage: "/og/home.png", ogAlt: "KlipKit: free online tools that run on your device", index: true });
 
 const POPULAR = ["compress-pdf", "image-compressor", "heic-to-jpg", "json-formatter", "jwt-decoder", "qr-code-generator", "background-remover", "pdf-to-word"];
 const ICONS = { productivity: FileText, developer: Code2, creator: Sparkles };

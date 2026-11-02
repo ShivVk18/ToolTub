@@ -74,7 +74,7 @@ export const qrCodeGenerator: ToolSEO = {
       keyword: "wifi qr code generator",
       h1: "Wi-Fi QR Code Generator",
       title: "Wi-Fi QR Code Generator – Free, Private | KlipKit",
-      description: "Make a QR code guests can scan to join your Wi-Fi. Created in your browser, password never uploaded. Free, no sign-up.",
+      description: "Make a QR code guests can scan to join your Wi-Fi without typing the password. Created in your browser, so the password is never uploaded. Free, no sign-up.",
       intro:
         "Let guests join your Wi-Fi by pointing their camera at a code. This page opens the QR Code Generator in Wi-Fi mode. Your network password is encoded in your browser and never sent to KlipKit.",
       preset: { type: "wifi" },

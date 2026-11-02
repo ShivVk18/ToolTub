@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const r = resolve((await params).slug);
   if (!r) return {};
   if (r.kind === "hub") {
-    return pageMetadata({ path: `/${r.hub.id}`, title: `${r.hub.h1} – Free & Private | KlipKit`, description: r.hub.description, ogImage: `/og/${r.hub.id}.png`, ogAlt: r.hub.h1, index: isHubIndexable(r.hub.id) });
+    return pageMetadata({ path: `/${r.hub.id}`, title: r.hub.title, description: r.hub.description, ogImage: `/og/${r.hub.id}.png`, ogAlt: r.hub.h1, index: isHubIndexable(r.hub.id) });
   }
   const t = r.tool;
   const s = t.seo;
@@ -51,7 +51,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return pageMetadata({
     path: `/${t.slug}`,
     title: s?.title ?? `${t.name} – Free & Private | KlipKit`,
-    description: s?.description ?? t.tagline,
+    description: s?.description ?? t.metaDescription ?? t.tagline,
     ogTitle: s?.ogTitle,
     ogDescription: s?.ogDescription,
     ogImage: `/og/${t.slug}.png`,

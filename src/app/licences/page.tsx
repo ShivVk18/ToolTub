@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/metadata";
 import { deps, platformDeps } from "@/registry/dependencies";
 
-export const metadata: Metadata = { title: "Open-source licences", description: "Every library and AI model KlipKit uses, with its licence. All self-hosted.", alternates: { canonical: "/licences" } };
+export const metadata: Metadata = pageMetadata({ path: "/licences", title: "Open-Source Licences – Libraries and Models | KlipKit", description: "Every open-source library and on-device AI model KlipKit uses, with its licence and download size. All self-hosted on klipkit.com with no third-party CDNs.", ogImage: "/og/licences.png", ogAlt: "Open-Source Licences – Libraries and Models", index: true });
 
 export default function Licences() {
   const rows = [...Object.values(deps), ...platformDeps];

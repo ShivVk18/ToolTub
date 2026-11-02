@@ -74,7 +74,7 @@ export const imageCompressor: ToolSEO = {
       keyword: "compress image to 50kb",
       h1: "Compress Image to 50 KB",
       title: "Compress Image to 50 KB Online Free | KlipKit",
-      description: "Reduce a photo or signature to under 50 KB for online forms. Runs in your browser, no upload, no sign-up.",
+      description: "Reduce a photo or signature to under 50 KB for exam, job and government forms. Runs in your browser: no upload, no sign-up, no watermark. Free.",
       intro:
         "Exam, job and government portals often cap photos and signatures at 50 KB. This page opens the Image Compressor with a 50 KB target set, so you only need to drop the image in and download the result.",
       preset: { targetKB: 50 },

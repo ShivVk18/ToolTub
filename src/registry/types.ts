@@ -130,6 +130,8 @@ export interface ToolDefinition {
   /** Extra words for Cmd+K search, e.g. "shrink pdf". */
   synonyms: string[];
   relatedTools: string[];
+  /** <meta description> for routed tools without full SEO content yet (140–160 chars). */
+  metaDescription?: string;
   /** Full SEO/AEO content. Required for status "live". */
   seo?: ToolSEO;
 }
@@ -152,6 +154,8 @@ export interface ChainPreset {
   slug: string;
   name: string;
   description: string;
+  /** 140–160 characters for <meta name="description">. */
+  metaDescription: string;
   steps: ChainStep[];
   input: IOType;
   answerQuestion: string;

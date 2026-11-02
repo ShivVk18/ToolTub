@@ -12,3 +12,7 @@ export const SAME_AS = [
 ];
 export const abs = (path: string) => `${SITE_URL}${path === "/" ? "" : path}`;
 export const SITE_UPDATED = "2026-11-02"; // bump on deploys that change hubs/home
+
+/** Home page meta description (140–160 chars). Starts with the entity definition's key facts. */
+export const HOME_DESCRIPTION =
+  "Free online tools that run on your device: compress PDFs and images, convert HEIC, format JSON, decode JWTs and more. No sign-up, no uploads, no watermarks.";

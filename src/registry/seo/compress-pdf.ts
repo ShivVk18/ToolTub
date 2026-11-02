@@ -73,7 +73,7 @@ export const compressPdf: ToolSEO = {
       keyword: "compress pdf to 100kb",
       h1: "Compress PDF to 100 KB",
       title: "Compress PDF to 100 KB Online Free | KlipKit",
-      description: "Reduce a PDF to under 100 KB for job portals and government forms. Runs in your browser, no upload, no sign-up, no watermark.",
+      description: "Reduce a PDF to under 100 KB for job portals, exam forms and government sites. Runs in your browser: no upload, no sign-up, no watermark. Free.",
       intro:
         "Many job, exam and visa portals reject PDFs above 100 KB. This page opens KlipKit's PDF compressor with a 100 KB target already set: drop your file in and it lowers image quality only as much as needed to fit.",
       preset: { targetKB: 100 },

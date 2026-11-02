@@ -12,6 +12,10 @@ function entries() {
   }
   for (const h of hubs) map.set(h.id, { title: h.h1, sub: h.description });
   for (const c of chains.filter(isChainLive)) map.set(`chain-${c.slug}`, { title: c.name, sub: c.description });
+  map.set("home", { title: "Free online tools that run on your device", sub: "PDFs, images, code and video. No sign-up, no uploads, no clutter." });
+  map.set("about", { title: "About KlipKit", sub: "Independent, self-hosted, free online tools." });
+  map.set("privacy", { title: "Privacy, in plain language", sub: "On your device first. Our own servers only when needed. Deleted within 1 hour." });
+  map.set("licences", { title: "Open-source licences", sub: "Every library and model KlipKit uses, all self-hosted." });
   return map;
 }
 

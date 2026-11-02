@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/metadata";
 import { people } from "@/registry/people";
 import { ENTITY_DEFINITION } from "@/lib/site";
 
-export const metadata: Metadata = { title: "About KlipKit", description: ENTITY_DEFINITION, alternates: { canonical: "/about" } };
+export const metadata: Metadata = pageMetadata({ path: "/about", title: "About KlipKit – Who Builds It and How | KlipKit", description: "KlipKit is an independent, self-hosted collection of free online tools. Learn who builds it, how tools run on your device, and why there are no third parties.", ogImage: "/og/about.png", ogAlt: "About KlipKit – Who Builds It and How", index: true });
 
 export default function About() {
   const f = people.founder;

@@ -81,6 +81,20 @@ describe("SEO/AEO content rules (every tool with content)", () => {
   it("never indexes a tool without content", () => {
     for (const t of live) expect(t.seo).toBeDefined();
   });
+  it("every routed page (tools, variants, hubs, chains) has a 140–160 char description and ≤ 60 char title", () => {
+    const bad: string[] = [];
+    const check = (where: string, d?: string, t?: string) => {
+      if (!d || d.length < 140 || d.length > 160) bad.push(`${where}: description ${d?.length ?? 0}`);
+      if (t && t.length > 60) bad.push(`${where}: title ${t.length}`);
+    };
+    for (const t of routedTools()) {
+      check(t.slug, t.seo?.description ?? t.metaDescription, t.seo?.title);
+      for (const v of t.seo?.longTailVariants ?? []) check(v.slug, v.description, v.title);
+    }
+    for (const h of hubs) check(h.id, h.description, h.title);
+    for (const c of chains) check(`chain/${c.slug}`, c.metaDescription, `${c.name} – Free Tool Chain | KlipKit`);
+    expect(bad).toEqual([]);
+  });
   it("every routed tool has a UI or is clearly marked beta", () => {
     for (const t of routedTools()) expect(["live", "beta"]).toContain(t.status);
   });

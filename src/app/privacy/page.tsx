@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = { title: "Privacy", description: "How KlipKit processes your files: on your device first, on our own servers only when needed, deleted after one hour.", alternates: { canonical: "/privacy" } };
+export const metadata: Metadata = pageMetadata({ path: "/privacy", title: "Privacy – How KlipKit Handles Your Files | KlipKit", description: "How KlipKit handles files: most tools run on your device and never upload anything. Server tools use our own servers and delete files within one hour.", ogImage: "/og/privacy.png", ogAlt: "Privacy – How KlipKit Handles Your Files", index: true });
 
 export default function Privacy() {
   return (

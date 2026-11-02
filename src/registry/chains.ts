@@ -10,6 +10,7 @@ export const chains: ChainPreset[] = [
     slug: "optimize-image-for-web",
     name: "Optimize image for web",
     description: "Resize to 1600 px wide, compress, and convert to WebP in one go.",
+    metaDescription: "Resize to 1600 px, compress and convert to WebP in one click. Runs on your device: no upload, no sign-up. Turns a 4 MB photo into about 300 KB for the web.",
     input: "image/*",
     steps: [
       { tool: "image-resizer", options: { maxWidth: 1600 } },
@@ -24,6 +25,7 @@ export const chains: ChainPreset[] = [
     slug: "instagram-ready-photo",
     name: "Instagram-ready photo",
     description: "Fit to 1080 × 1350 (4:5 portrait) and compress for a crisp upload.",
+    metaDescription: "Fit any photo to Instagram's 1080 × 1350 portrait size and compress it for a crisp upload. Runs on your device in one click: no upload, no sign-up needed.",
     input: "image/*",
     steps: [
       { tool: "image-resizer", options: { maxWidth: 1080, maxHeight: 1350 } },
@@ -37,6 +39,7 @@ export const chains: ChainPreset[] = [
     slug: "iphone-photo-to-small-jpg",
     name: "iPhone photo to small JPG",
     description: "Convert HEIC to JPG, then compress it for email or forms.",
+    metaDescription: "Convert an iPhone HEIC photo to JPG and compress it for email or upload forms in one click. Runs on your device, so photos are never uploaded. Free, no sign-up.",
     input: "image/heic",
     steps: [
       { tool: "heic-to-jpg", options: { mime: "image/jpeg" } },

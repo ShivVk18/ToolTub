@@ -17,7 +17,7 @@ interface PageMetaInput {
 
 /** One metadata builder for tools, variants, hubs and chains, so every page gets the same tags. */
 export function pageMetadata(m: PageMetaInput): Metadata {
-  const url = `${SITE_URL}${m.path}`;
+  const url = m.path === "/" ? SITE_URL : `${SITE_URL}${m.path}`;
   const ogTitle = m.ogTitle ?? m.title;
   const ogDescription = m.ogDescription ?? m.description;
   return {

@@ -73,7 +73,7 @@ export const heicToJpg: ToolSEO = {
       keyword: "heic to jpg windows",
       h1: "Convert HEIC to JPG on Windows",
       title: "Convert HEIC to JPG on Windows 10 & 11 – Free | KlipKit",
-      description: "Open and convert iPhone HEIC photos on Windows without installing anything. Free, private, runs in your browser.",
+      description: "Open and convert iPhone HEIC photos on Windows 10 and 11 without installing codecs or apps. Free and private: it runs in your browser, nothing is uploaded.",
       intro:
         "Windows does not open iPhone HEIC photos out of the box. Instead of installing codecs, drop the photos here: KlipKit converts them to JPG in your browser, so they open in every Windows app.",
       preset: { format: "jpeg" },
