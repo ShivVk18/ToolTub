@@ -26,7 +26,7 @@ export function ToolCard({ tool }: { tool: Pick<ToolDefinition, "slug" | "name" 
     </>
   );
   return soon ? (
-    <div className="h-full rounded-xl border border-dashed border-border p-4 opacity-70">{inner}</div>
+    <div className="h-full rounded-xl border border-dashed border-border p-4">{inner}</div>
   ) : (
     <Link href={`/${tool.slug}`} className="block h-full rounded-xl border border-border bg-card p-4 transition-colors hover:border-fg/30">
       {inner}

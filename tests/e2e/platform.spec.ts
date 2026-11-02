@@ -145,6 +145,7 @@ test.describe("Tool Chains", () => {
 test.describe("hubs and 404", () => {
   test("category hub lists live tools and coming-soon ones separately", async ({ page }) => {
     await page.goto("/image-tools");
+    await assertAccessible(page, "hub");
     await expect(page.locator("h1")).toHaveText("Free Image Tools");
     await expect(page.getByRole("link", { name: /Image Compressor/ })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Coming soon" })).toBeVisible();
