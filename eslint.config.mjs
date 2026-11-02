@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Third-party engines copied from node_modules at install time (minified, not our code).
+    "public/vendor/**",
+    "public/sw.js",
+    "worker/node_modules/**",
   ]),
 ]);
 
