@@ -86,7 +86,7 @@ Search-demand figures are estimates from the author's experience, **not measured
 | 28 | Unit Converter P2 | Convert units | D | unit converter (H) | do | Google's own answer box (hard to beat) | S | [Own] | — | Low SEO value; build for retention only | — |
 | 29 | Time Zone Converter P2 | Plan a meeting | W | time zone converter (H) | do | timeanddate, worldtimebuddy | S | [Own] Intl | — | Clean meeting planner | Timestamp |
 
-### 2.4 Developer (27)
+### 2.4 Developer (26)
 
 These are almost all [Own], need no server, carry no licence risk, and are where the privacy advantage is easiest to prove ("open the network tab").
 
@@ -105,7 +105,7 @@ These are almost all [Own], need no server, carry no licence risk, and are where
 | 40 | JSON ↔ CSV P1 | W | json to csv (M) | do | ConvertCSV | S | [Own] | Nested flattening options | JSON |
 | 41 | JSON → TS/Zod P1 | W | json to typescript (L–M) | do | quicktype (strong) | M | [Own] | Zod output | JSON |
 | 42 | Cron Generator P1 | W | crontab guru-type queries (M) | know | crontab.guru (strong) | M | [Own] | Builder + next 5 runs in local timezone | Timestamp |
-| 43 | API Tester P2 | W | online api tester (L–M) | do | Hoppscotch (strong, open source) | M | [Own], no relay | Simple; honest CORS note | JSON, cURL |
+| 43 | API Tester P2 | W | online api tester (L–M) | do | Hoppscotch (strong, open source) | M | [Own], no relay | Simple; honest CORS note | JSON, URL Encode |
 | 44 | HTML/CSS/JS Playground P1 | W | html editor online (H) | do | CodePen, JSFiddle | M | [Own] sandboxed iframe + CodeMirror MIT | No account needed to share (URL-encoded) | Minifier |
 | 45 | Color Converter P1 | W | hex to rgb (H) · contrast checker | do | WebAIM (strong) | S | [Own] | OKLCH + WCAG in one place | Palette |
 | 46 | Minifier/Beautifier P1 | W | js minifier (M) | do | Toptal, Code Beautify | S | [Lib] Terser BSD-2, Prettier MIT | Source maps | Playground |
@@ -118,7 +118,6 @@ These are almost all [Own], need no server, carry no licence risk, and are where
 | 53 | HTML Entities P2 | O | html escape (L–M) | do | freeformatter | S | [Own] | — | URL |
 | 54 | Number Base P2 | O | binary to decimal (H, students) | do | RapidTables | S | [Own] | Shows the working | — |
 | 55 | CSS Gradient/Shadow P2 | O | css gradient generator (M) | do | cssgradient.io (strong) | S | [Own] | OKLCH gradients | Color |
-| 56 | cURL to Code P2 | W | curl to python (L–M) | do | curlconverter (strong, open source) | M | [Own] | fetch/Python/Go in one view | API Tester |
 
 ### 2.5 Creator (22)
 
