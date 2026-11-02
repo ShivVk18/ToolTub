@@ -16,7 +16,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const c = getChain((await params).slug);
   if (!c) return {};
-  return pageMetadata({ path: `/chain/${c.slug}`, title: `${c.name} – Free Tool Chain | KlipKit`, description: `${c.description} Runs on your device, no upload, no sign-up.`, ogImage: `/og/chain-${c.slug}.png`, ogAlt: c.name, index: true });
+  return pageMetadata({ path: `/chain/${c.slug}`, title: `${c.name} – Free Tool Chain | KlipKit`, description: c.metaDescription, ogImage: `/og/chain-${c.slug}.png`, ogAlt: c.name, index: true });
 }
 
 export default async function ChainPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -38,7 +38,7 @@ export default async function ChainPage({ params }: { params: Promise<{ slug: st
         ))}
       </ol>
       <div className="mb-4"><PrivacyBadge processing={{ where: "device" }} /></div>
-      <ChainRunner steps={c.steps} accept={c.input === "image/heic" ? ".heic,.heif" : "image/*"} />
+      <ChainRunner steps={steps} accept={c.input === "image/heic" ? ".heic,.heif" : "image/*"} />
       <section className="prose-klip mx-auto mt-16 max-w-3xl">
         <h2>{c.answerQuestion}</h2>
         <p>{c.answerSummary}</p>

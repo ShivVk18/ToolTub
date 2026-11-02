@@ -22,7 +22,7 @@ async function runStep(step: ChainStep, input: Blob): Promise<Blob> {
   throw new Error(`Step ${step.tool} can't run in a chain yet.`);
 }
 
-export function ChainRunner({ steps, accept }: { steps: ChainStep[]; accept: string }) {
+export function ChainRunner({ steps, accept }: { steps: (ChainStep & { name: string })[]; accept: string }) {
   const [files, setFiles] = useState<File[]>([]);
   const job = useToolRun<{ before: number; items: Artifact[] }>();
 
@@ -33,7 +33,12 @@ export function ChainRunner({ steps, accept }: { steps: ChainStep[]; accept: str
         let blob: Blob = f;
         for (const [si, s] of steps.entries()) {
           onProgress({ ratio: (fi * steps.length + si) / (files.length * steps.length), label: `File ${fi + 1}/${files.length} · step ${si + 1}/${steps.length}: ${s.tool.replace(/-/g, " ")}` });
-          blob = await runStep(s, blob);
+          try {
+            blob = await runStep(s, blob);
+          } catch (e) {
+            // Say exactly which step failed (and on which file) instead of a bare decoder message.
+            throw new Error(`Step ${si + 1} (${s.name}) failed${files.length > 1 ? ` on ${f.name}` : ""}: ${(e as Error).message}`);
+          }
         }
         items.push({ name: renameExt(f.name, blob.type), type: blob.type, blob });
       }
@@ -53,7 +58,7 @@ export function ChainRunner({ steps, accept }: { steps: ChainStep[]; accept: str
         job.result && (
           <div className="space-y-3">
             <p className="text-lg font-semibold">{formatBytes(job.result.before)} → {formatBytes(after)}</p>
-            <ResultActions items={job.result.items} from="chain" />
+            <ResultActions items={job.result.items} from="chain" zipName="klipkit-chain.zip" />
           </div>
         )
       }
