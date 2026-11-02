@@ -8,9 +8,17 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
   if (!UUID.test(id)) return Response.json({ state: "unknown" }, { status: 404 });
   const job = await convertQueue.getJob(id);
   if (!job) return Response.json({ state: "unknown" }, { status: 404 });
-  const state = await job.getState();
+  const raw = await job.getState();
+  const state = raw === "delayed" || raw === "prioritized" ? "waiting" : raw;
+  // Queue position (1 = next). Waiting jobs are listed newest first, so count from the end.
+  let position: number | undefined;
+  if (state === "waiting") {
+    const waiting = await convertQueue.getWaiting();
+    const i = waiting.findIndex((j) => j.id === id);
+    position = i === -1 ? undefined : waiting.length - i;
+  }
   return Response.json(
-    { state: state === "delayed" || state === "prioritized" ? "waiting" : state, error: state === "failed" ? humanError(job.failedReason) : undefined },
+    { state, position, error: state === "failed" ? humanError(job.failedReason) : undefined },
     { headers: { "Cache-Control": "no-store" } },
   );
 }

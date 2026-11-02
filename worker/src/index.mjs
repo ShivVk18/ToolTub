@@ -13,7 +13,11 @@ import { promisify } from "node:util";
 
 const run = promisify(execFile);
 const JOBS_DIR = process.env.JOBS_DIR ?? "/data/jobs";
-const RETENTION_MS = 60 * 60 * 1000;
+// Overridable for tests (e2e uses a few seconds); production default is 1 hour.
+const RETENTION_MS = Number(process.env.RETENTION_MS ?? 60 * 60 * 1000);
+const SWEEP_INTERVAL_MS = Number(process.env.SWEEP_INTERVAL_MS ?? 5 * 60 * 1000);
+const HEARTBEAT_MS = Number(process.env.HEARTBEAT_MS ?? 5000);
+const HEARTBEAT_KEY = "klipkit:worker:heartbeat";
 const TIMEOUT_MS = 120_000;
 const connection = new IORedis(process.env.VALKEY_URL ?? "redis://valkey:6379", { maxRetriesPerRequest: null });
 
@@ -54,6 +58,11 @@ async function sweep() {
     if (s && now - s.mtimeMs > RETENTION_MS) await rm(p, { recursive: true, force: true });
   }
 }
-setInterval(sweep, 5 * 60 * 1000);
+setInterval(sweep, SWEEP_INTERVAL_MS);
 sweep();
+
+// Heartbeat: the web app refuses new server jobs (503) when no worker has checked in recently.
+const beat = () => connection.set(HEARTBEAT_KEY, String(Date.now()), "PX", HEARTBEAT_MS * 3).catch(() => {});
+setInterval(beat, HEARTBEAT_MS);
+await beat();
 console.log("klipkit-worker ready");

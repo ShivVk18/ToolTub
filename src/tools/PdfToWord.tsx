@@ -6,7 +6,7 @@ import { ToolWorkspace, useToolRun } from "@/components/workspace/ToolWorkspace"
 import { formatBytes } from "@/lib/utils";
 import type { ToolProps } from "./types";
 
-type JobState = { state: "waiting" | "active" | "completed" | "failed" | "unknown"; error?: string };
+type JobState = { state: "waiting" | "active" | "completed" | "failed" | "unknown"; position?: number; error?: string };
 
 /**
  * [Srv] PDF to Word. The file goes to KlipKit's own server only (LibreOffice in a sandboxed,
@@ -22,14 +22,21 @@ export function PdfToWord({ slug, next }: ToolProps) {
         onProgress({ label: "Uploading to KlipKit's server…" });
         const form = new FormData();
         form.append("file", file!);
-        const res = await fetch("/api/jobs?tool=pdf-to-word", { method: "POST", body: form });
+        const send = () => fetch("/api/jobs?tool=pdf-to-word", { method: "POST", body: form });
+        let res = await send();
+        // One automatic retry for a brief outage (e.g. the queue restarting) before showing an error.
+        if (res.status === 503) {
+          onProgress({ label: "Server busy, retrying…" });
+          await new Promise((r) => setTimeout(r, 2500));
+          res = await send();
+        }
         const body = await res.json();
         if (!res.ok) throw new Error(body.error ?? "Upload failed");
         const { id } = body as { id: string };
         for (let i = 0; i < 180; i++) {
           await new Promise((r) => setTimeout(r, 1000));
           const s: JobState = await (await fetch(`/api/jobs/${id}`)).json();
-          onProgress({ label: s.state === "waiting" ? "Waiting in the queue…" : "Converting on KlipKit's server…" });
+          onProgress({ label: s.state === "waiting" ? `Waiting in the queue${s.position ? ` (position ${s.position})` : ""}…` : "Converting on KlipKit's server…" });
           if (s.state === "completed") return (await fetch(`/api/jobs/${id}/file`)).blob();
           if (s.state === "failed") throw new Error(s.error ?? "Conversion failed");
         }

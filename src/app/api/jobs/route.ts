@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { convertQueue, JOBS_DIR, SERVER_TOOLS, type ServerTool } from "@/server/queue";
+import { convertQueue, JOBS_DIR, SERVER_TOOLS, workerAlive, type ServerTool } from "@/server/queue";
 import { clientIp, rateLimit } from "@/server/rate-limit";
 
 /**
@@ -22,7 +22,7 @@ async function handle(req: Request) {
   const spec = SERVER_TOOLS[tool];
   if (!spec) return Response.json({ error: "Unknown tool" }, { status: 400 });
 
-  const rl = await rateLimit(clientIp(req), "server-tools");
+  const rl = await rateLimit(clientIp(req), "server-tools", Number(process.env.RATE_LIMIT_MAX ?? 20));
   if (!rl.ok) return Response.json({ error: "Hourly limit reached for server tools" }, { status: 429 });
 
   const form = await req.formData();
@@ -35,6 +35,10 @@ async function handle(req: Request) {
     return Response.json({ error: "That file isn't a valid PDF" }, { status: 415 });
   }
 
+  // Queue up but no worker alive: say so now instead of letting the job wait forever.
+  if (!(await workerAlive())) throw new Error("no worker");
+
+  // The client's file name is never used on disk (path traversal safe): files are always input.<ext>.
   const id = randomUUID();
   const dir = join(JOBS_DIR, id);
   await mkdir(dir, { recursive: true });

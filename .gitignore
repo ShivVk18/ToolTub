@@ -43,3 +43,7 @@ public/vendor/
 public/models/*.onnx
 worker/node_modules
 tests/fixtures/generated/
+playwright-report/
+test-results/
+.lighthouseci/
+!.env.example
