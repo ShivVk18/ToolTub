@@ -32,7 +32,7 @@ export function FavouriteButton({ slug }: { slug: string }) {
   const fav = useKlip((s) => s.favourites.includes(slug));
   const toggle = useKlip((s) => s.toggleFavourite);
   return (
-    <button onClick={() => toggle(slug)} aria-pressed={fav} aria-label={fav ? "Remove from favourites" : "Add to favourites"} className="grid size-11 place-items-center rounded-lg hover:bg-muted sm:size-9">
+    <button onClick={() => toggle(slug)} aria-pressed={fav} aria-label={fav ? "Remove from favourites" : "Add to favourites"} className="grid size-11 shrink-0 place-items-center rounded-lg hover:bg-muted sm:size-9">
       <Star className={fav ? "size-4 fill-amber-400 text-amber-400" : "size-4"} aria-hidden />
     </button>
   );
