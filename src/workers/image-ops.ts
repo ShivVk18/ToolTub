@@ -72,18 +72,26 @@ export async function processImage(job: ImageJob): Promise<ImageResult> {
   }
   const target = job.targetKB * 1024;
   let best: Blob | null = null;
-  for (let round = 0; round < 8; round++) {
-    // Binary-search quality at the current dimensions.
+  // Encoders differ a lot (Safari's JPEGs are 20–70% larger than Chrome's at the same quality), so the
+  // loop measures instead of assuming: if even quality 0.3 is too big, scale by √(target/size), since
+  // file size grows roughly with pixel area, and try again.
+  for (let round = 0; round < 12 && width >= 16 && height >= 16; round++) {
+    const floor = await draw(src, width, height, mime, 0.3, job.background);
+    if (floor.size > target) {
+      const r = Math.min(0.9, Math.sqrt(target / floor.size) * 0.95);
+      width = Math.max(1, Math.round(width * r));
+      height = Math.max(1, Math.round(height * r));
+      continue;
+    }
+    // It fits at 0.3: binary-search the highest quality that still fits.
+    best = floor;
     let lo = 0.3, hi = 0.95;
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < 6; i++) {
       const mid = (lo + hi) / 2;
       const out = await draw(src, width, height, mime, mid, job.background);
       if (out.size <= target) { best = out; lo = mid; } else hi = mid;
     }
-    if (best) return { blob: best, width, height, keptOriginal: false, note };
-    // Still too big at quality 0.3: shrink dimensions by 15% and retry.
-    width = Math.round(width * 0.85);
-    height = Math.round(height * 0.85);
+    return { blob: best, width, height, keptOriginal: false, note };
   }
   const smallest = await draw(src, width, height, mime, 0.3, job.background);
   return { blob: smallest, width, height, keptOriginal: false, note: `Couldn't reach ${job.targetKB} KB; this is the smallest readable version.` };
