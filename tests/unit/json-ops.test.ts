@@ -1,8 +1,38 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { formatJson } from "@/workers/json-ops";
+import { formatJson, jsonErrorOffset } from "@/workers/json-ops";
 
 const fx = (n: string) => readFileSync(new URL(`../fixtures/generated/${n}`, import.meta.url), "utf8");
+
+describe("jsonErrorOffset (own locator for browsers without positions in errors)", () => {
+  it("returns -1 for valid JSON", () => {
+    for (const t of ['{"a":[1,2,{"b":null}]}', "[]", '"x"', "-1.5e3", ' { "u": "\\u00e9\\n" } ']) expect(jsonErrorOffset(t), t).toBe(-1);
+  });
+  it.each([
+    ['{"a":1,}', 7],
+    ["{'a':1}", 1],
+    ['{"a" 1}', 5],
+    ["[1,2", 4],
+    ['{"a":tru}', 5],
+    ["01", 1],
+    ['["\\x"]', 3],
+  ])("finds the error in %s at %i", (t, at) => expect(jsonErrorOffset(t)).toBe(at));
+  it("puts the trailing-comma fixture on line 7 even without a V8 position", () => {
+    const text = fx("invalid-line7.json");
+    const off = jsonErrorOffset(text);
+    expect(text.slice(0, off).split("\n").length).toBe(7);
+  });
+  it("agrees with V8 on where the first error is, across many broken inputs", () => {
+    const valid = JSON.stringify({ a: [1, 2, { b: "x", c: true }], d: null, e: -3.5 });
+    for (let cut = 1; cut < valid.length; cut++) {
+      for (const bad of [valid.slice(0, cut), valid.slice(0, cut) + "," + valid.slice(cut), valid.slice(0, cut) + "}" + valid.slice(cut)]) {
+        let v8: number | null = null;
+        try { JSON.parse(bad); continue; } catch (e) { const m = /position (\d+)/.exec(String(e)); v8 = m ? Number(m[1]) : null; }
+        if (v8 !== null) expect(jsonErrorOffset(bad), bad).toBe(v8);
+      }
+    }
+  });
+});
 
 describe("formatJson", () => {
   it("formats valid JSON with 2 spaces", () => {

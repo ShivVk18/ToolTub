@@ -7,6 +7,8 @@ import { jsonWorker } from "@/workers/clients";
 import type { ToolProps } from "./types";
 
 const SAMPLE = `{"name":"KlipKit","tools":78,"private":true,"categories":["productivity","developer","creator"],"limits":{"maxFileMb":50}}`;
+// Rendering megabytes of text into the page froze Safari; show a preview, keep the full result for copy/download.
+const PREVIEW_CHARS = 200_000;
 const WORKER_THRESHOLD = 1_000_000; // characters; above this, parse off the main thread
 
 /** [Own] JSON Formatter: formats as you type. No primary button needed: the result is always live. */
@@ -56,7 +58,7 @@ export function JsonFormatter({ slug, next }: ToolProps) {
             placeholder="Paste JSON here, or drop a .json file"
             className="h-56 w-full resize-y rounded-lg border border-border bg-bg p-3 font-mono text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
           />
-          <button className="text-xs text-fg-muted underline" onClick={() => setText(SAMPLE)}>
+          <button className="inline-flex min-h-11 items-center text-xs text-fg-muted underline sm:min-h-0" onClick={() => setText(SAMPLE)}>
             Try a sample
           </button>
         </div>
@@ -83,7 +85,10 @@ export function JsonFormatter({ slug, next }: ToolProps) {
         res?.ok && (
           <div className="space-y-3">
             <p className="text-sm text-emerald-600 dark:text-emerald-400">Valid JSON</p>
-            <pre className="max-h-[28rem] overflow-auto rounded-lg bg-muted p-3 font-mono text-sm">{res.output}</pre>
+            <pre className="max-h-[28rem] overflow-auto rounded-lg bg-muted p-3 font-mono text-sm">{res.output.length > PREVIEW_CHARS ? res.output.slice(0, PREVIEW_CHARS) : res.output}</pre>
+            {res.output.length > PREVIEW_CHARS && (
+              <p className="text-sm text-fg-muted">Showing the first 200 KB of {Math.round(res.output.length / 1024)} KB. Copy or download to get all of it.</p>
+            )}
             <ResultActions items={[{ name: "formatted.json", type: "application/json", text: res.output, blob: new Blob([res.output], { type: "application/json" }) }]} next={next} from={slug} />
           </div>
         )
