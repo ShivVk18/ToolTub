@@ -95,7 +95,10 @@ export function QrCodeGenerator({ slug, preset, next }: ToolProps) {
         </>
       }
       result={
-        svg && (
+        // Reserve the code's space while it renders, so the content below doesn't jump (CLS was 0.082).
+        payload && !svg ? (
+          <div className="size-48 rounded-lg border border-border bg-muted" aria-hidden />
+        ) : svg && (
           <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={`data:image/svg+xml;utf8,${encodeURIComponent(svg)}`} alt="Your QR code" className="size-48 rounded-lg border border-border" />
