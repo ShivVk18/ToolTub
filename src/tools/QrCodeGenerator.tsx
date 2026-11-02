@@ -5,14 +5,13 @@ import { ResultActions } from "@/components/workspace/ToolChrome";
 import { Field, ToolWorkspace, inputClass } from "@/components/workspace/ToolWorkspace";
 import type { Artifact } from "@/lib/store";
 import type { ToolProps } from "./types";
+import { vcardPayload, wifiPayload } from "@/lib/qr-payload";
 
 type Kind = "url" | "text" | "wifi" | "vcard";
-// Wi-Fi QR format escapes \ ; , : and " with a backslash.
 const dataUrlToBlob = (u: string) => {
   const [head, b64] = u.split(",");
   return new Blob([Uint8Array.from(atob(b64), (c) => c.charCodeAt(0))], { type: head.slice(5, head.indexOf(";")) });
 };
-const esc = (s: string) => s.replace(/([\;,:"])/g, "\\$1");
 
 /** [Lib] QR Code Generator (qrcode, MIT). Static codes only: data lives in the code, nothing to expire. */
 export function QrCodeGenerator({ slug, preset, next }: ToolProps) {
@@ -27,8 +26,8 @@ export function QrCodeGenerator({ slug, preset, next }: ToolProps) {
   const payload = useMemo(() => {
     if (kind === "url") return f.url.trim();
     if (kind === "text") return f.text;
-    if (kind === "wifi") return f.ssid ? `WIFI:T:${f.security};S:${esc(f.ssid)};P:${esc(f.password)};;` : "";
-    return f.name ? `BEGIN:VCARD\nVERSION:3.0\nFN:${f.name}\nTEL:${f.phone}\nEMAIL:${f.email}\nEND:VCARD` : "";
+    if (kind === "wifi") return wifiPayload(f.ssid, f.password, f.security as "WPA" | "WEP" | "nopass");
+    return vcardPayload(f.name, f.phone, f.email);
   }, [kind, f]);
 
   useEffect(() => {
