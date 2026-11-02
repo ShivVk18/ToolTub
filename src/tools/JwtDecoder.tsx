@@ -3,34 +3,7 @@ import { useMemo, useState } from "react";
 import { ResultActions } from "@/components/workspace/ToolChrome";
 import { ToolWorkspace } from "@/components/workspace/ToolWorkspace";
 import type { ToolProps } from "./types";
-
-const CLAIMS: Record<string, string> = {
-  iss: "Issuer — who created the token",
-  sub: "Subject — usually the user ID",
-  aud: "Audience — who the token is for",
-  exp: "Expires at",
-  nbf: "Not valid before",
-  iat: "Issued at",
-  jti: "Token ID — unique identifier",
-};
-const TIME_CLAIMS = ["exp", "nbf", "iat"];
-
-/** Base64URL → UTF-8 string, written in-house ([Own]). */
-const b64url = (s: string) => {
-  const b64 = s.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(s.length / 4) * 4, "=");
-  const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
-  return new TextDecoder().decode(bytes);
-};
-
-function decode(token: string) {
-  const parts = token.trim().replace(/^Bearer\s+/i, "").split(".");
-  if (parts.length < 2) throw new Error("A JWT has three parts separated by dots (header.payload.signature).");
-  try {
-    return { header: JSON.parse(b64url(parts[0])), payload: JSON.parse(b64url(parts[1])), signed: !!parts[2] };
-  } catch {
-    throw new Error("The header or payload isn't valid Base64URL-encoded JSON.");
-  }
-}
+import { JWT_CLAIMS as CLAIMS, JWT_TIME_CLAIMS as TIME_CLAIMS, decodeJwt as decode, expiryStatus } from "@/lib/jwt";
 
 const SAMPLE =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2F1dGgua2xpcGtpdC5jb20iLCJzdWIiOiJ1c2VyXzEyMyIsImF1ZCI6ImFwaSIsImlhdCI6MTc2MjAwMDAwMCwiZXhwIjoxNzYyMDAzNjAwLCJyb2xlIjoiZWRpdG9yIn0.c2lnbmF0dXJl";
@@ -48,8 +21,7 @@ export function JwtDecoder({ slug, next }: ToolProps) {
   }, [token]);
 
   // eslint-disable-next-line react-hooks/purity -- comparing against "now" is the point of the badge
-  const now = Date.now() / 1000;
-  const exp = decoded?.ok ? Number(decoded.payload.exp) : NaN;
+  const status = decoded?.ok ? expiryStatus(decoded.payload, Date.now() / 1000) : "none";
 
   return (
     <ToolWorkspace
@@ -68,8 +40,8 @@ export function JwtDecoder({ slug, next }: ToolProps) {
           <div className="space-y-4">
             <div className="flex flex-wrap gap-2 text-xs">
               <span className="rounded-full bg-muted px-2.5 py-1">alg: {String(decoded.header.alg)}</span>
-              {Number.isFinite(exp) &&
-                (exp < now ? (
+              {status !== "none" &&
+                (status === "expired" ? (
                   <span className="rounded-full bg-red-500/10 px-2.5 py-1 text-red-600 dark:text-red-400">Expired</span>
                 ) : (
                   <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 text-emerald-700 dark:text-emerald-400">Not expired</span>

@@ -1,35 +1,15 @@
 "use client";
-import Fuse from "fuse.js";
 import { Search, CornerDownLeft, Clock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { SearchEntry } from "@/registry/search-index";
 import { useKlip } from "@/lib/store";
 import { cn } from "@/lib/utils";
+import { createToolSearch } from "@/lib/search";
 
-/** Fuzzy search over the static registry, with synonyms ("shrink pdf" → Compress PDF). Opens with Cmd/Ctrl+K. */
+/** Fuzzy search over the static registry, with synonyms. Opens with Cmd/Ctrl+K. */
 export function useToolSearch(index: SearchEntry[]) {
-  const fuse = useMemo(
-    () =>
-      new Fuse(index, {
-        keys: [
-          { name: "name", weight: 3 },
-          { name: "synonyms", weight: 2 },
-          { name: "tagline", weight: 1 },
-        ],
-        threshold: 0.38,
-        ignoreLocation: true,
-      }),
-    [index],
-  );
-  return (q: string) =>
-    q.trim()
-      ? fuse
-          .search(q)
-          .map((r) => r.item)
-          .sort((a, b) => Number(b.available) - Number(a.available))
-          .slice(0, 8)
-      : [];
+  return useMemo(() => createToolSearch(index), [index]);
 }
 
 export function CommandPalette({ index }: { index: SearchEntry[] }) {

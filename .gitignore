@@ -42,3 +42,4 @@ next-env.d.ts
 public/vendor/
 public/models/*.onnx
 worker/node_modules
+tests/fixtures/generated/

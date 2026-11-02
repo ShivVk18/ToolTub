@@ -22,7 +22,7 @@ export interface ImageResult {
   note?: string;
 }
 
-const fit = (w: number, h: number, maxW = Infinity, maxH = Infinity) => {
+export const fit = (w: number, h: number, maxW = Infinity, maxH = Infinity) => {
   const r = Math.min(1, maxW / w, maxH / h);
   return { width: Math.max(1, Math.round(w * r)), height: Math.max(1, Math.round(h * r)) };
 };
