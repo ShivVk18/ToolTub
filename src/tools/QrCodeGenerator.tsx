@@ -101,7 +101,7 @@ export function QrCodeGenerator({ slug, preset, next }: ToolProps) {
             <img src={`data:image/svg+xml;utf8,${encodeURIComponent(svg)}`} alt="Your QR code" className="size-48 rounded-lg border border-border" />
             <div className="space-y-2">
               <p className="text-sm text-fg-muted">Static code · never expires · scan to test before printing</p>
-              <ResultActions items={items} next={next} from={slug} />
+              <ResultActions items={items} next={next} from={slug} separate />
             </div>
           </div>
         )

@@ -75,12 +75,12 @@ export function ToolWorkspace({ input, settings, advanced, action, status, progr
           </details>
         )}
         {action && (
-          <Button variant="primary" size="lg" className="w-full sm:w-auto" onClick={action.onClick} disabled={action.disabled || status === "working"}>
+          <Button data-testid="primary-action" variant="primary" size="lg" className="w-full sm:w-auto" onClick={action.onClick} disabled={action.disabled || status === "working"}>
             {status === "working" && <Loader2 className="size-4 animate-spin" aria-hidden />}
             {action.label}
           </Button>
         )}
-        <div aria-live="polite" className="space-y-4">
+        <div aria-live="polite" data-testid="tool-output" className="space-y-4">
           {status === "working" && (
             <div className="space-y-2">
               <p className="text-sm text-fg-muted">{progress?.label ?? "Working on your device…"}</p>

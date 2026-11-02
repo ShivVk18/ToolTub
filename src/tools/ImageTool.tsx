@@ -52,7 +52,9 @@ export function ImageTool({ slug, preset, next, mode }: ToolProps & { mode: Mode
 
   const before = job.result?.reduce((s, r) => s + r.file.size, 0) ?? 0;
   const after = job.result?.reduce((s, r) => s + r.out.blob.size, 0) ?? 0;
-  const artifacts: Artifact[] = job.result?.map((r) => ({ name: renameExt(r.file.name, r.out.blob.type), type: r.out.blob.type, blob: r.out.blob })) ?? [];
+  const suffix = mode === "compress" ? "-compressed" : mode === "resize" ? "-resized" : "";
+  const artifacts: Artifact[] =
+    job.result?.map((r) => ({ name: renameExt(r.file.name.replace(/(\.[^.]+)?$/, `${suffix}$1`), r.out.blob.type), type: r.out.blob.type, blob: r.out.blob })) ?? [];
 
   return (
     <ToolWorkspace
@@ -149,7 +151,7 @@ export function ImageTool({ slug, preset, next, mode }: ToolProps & { mode: Mode
                 </li>
               ))}
             </ul>
-            <ResultActions items={artifacts} next={next} from={slug} />
+            <ResultActions items={artifacts} next={next} from={slug} zipName="klipkit-images.zip" />
           </div>
         )
       }
