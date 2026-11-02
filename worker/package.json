@@ -1,0 +1,7 @@
+{
+  "name": "klipkit-worker",
+  "private": true,
+  "type": "module",
+  "scripts": { "start": "node src/index.mjs" },
+  "dependencies": { "bullmq": "^5.0.0", "ioredis": "^5.4.0" }
+}

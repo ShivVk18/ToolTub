@@ -1,0 +1,108 @@
+"use client";
+import { useMemo, useState } from "react";
+import { ResultActions } from "@/components/workspace/ToolChrome";
+import { ToolWorkspace } from "@/components/workspace/ToolWorkspace";
+import type { ToolProps } from "./types";
+
+const CLAIMS: Record<string, string> = {
+  iss: "Issuer — who created the token",
+  sub: "Subject — usually the user ID",
+  aud: "Audience — who the token is for",
+  exp: "Expires at",
+  nbf: "Not valid before",
+  iat: "Issued at",
+  jti: "Token ID — unique identifier",
+};
+const TIME_CLAIMS = ["exp", "nbf", "iat"];
+
+/** Base64URL → UTF-8 string, written in-house ([Own]). */
+const b64url = (s: string) => {
+  const b64 = s.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(s.length / 4) * 4, "=");
+  const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+  return new TextDecoder().decode(bytes);
+};
+
+function decode(token: string) {
+  const parts = token.trim().replace(/^Bearer\s+/i, "").split(".");
+  if (parts.length < 2) throw new Error("A JWT has three parts separated by dots (header.payload.signature).");
+  try {
+    return { header: JSON.parse(b64url(parts[0])), payload: JSON.parse(b64url(parts[1])), signed: !!parts[2] };
+  } catch {
+    throw new Error("The header or payload isn't valid Base64URL-encoded JSON.");
+  }
+}
+
+const SAMPLE =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2F1dGgua2xpcGtpdC5jb20iLCJzdWIiOiJ1c2VyXzEyMyIsImF1ZCI6ImFwaSIsImlhdCI6MTc2MjAwMDAwMCwiZXhwIjoxNzYyMDAzNjAwLCJyb2xlIjoiZWRpdG9yIn0.c2lnbmF0dXJl";
+
+/** [Own] JWT Decoder. Decodes only: it never verifies, stores or sends the token. */
+export function JwtDecoder({ slug, next }: ToolProps) {
+  const [token, setToken] = useState("");
+  const decoded = useMemo(() => {
+    if (!token.trim()) return null;
+    try {
+      return { ok: true as const, ...decode(token) };
+    } catch (e) {
+      return { ok: false as const, message: (e as Error).message };
+    }
+  }, [token]);
+
+  // eslint-disable-next-line react-hooks/purity -- comparing against "now" is the point of the badge
+  const now = Date.now() / 1000;
+  const exp = decoded?.ok ? Number(decoded.payload.exp) : NaN;
+
+  return (
+    <ToolWorkspace
+      status={decoded && !decoded.ok ? "error" : "idle"}
+      error={decoded && !decoded.ok ? { cause: decoded.message, fix: "Paste the whole token, with or without the “Bearer ” prefix." } : null}
+      input={
+        <div className="space-y-2">
+          <textarea value={token} onChange={(e) => setToken(e.target.value)} spellCheck={false} aria-label="JWT" placeholder="Paste a JSON Web Token (eyJ…)" className="h-28 w-full resize-y break-all rounded-lg border border-border bg-bg p-3 font-mono text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+          <button className="text-xs text-fg-muted underline" onClick={() => setToken(SAMPLE)}>
+            Try a sample
+          </button>
+        </div>
+      }
+      result={
+        decoded?.ok && (
+          <div className="space-y-4">
+            <div className="flex flex-wrap gap-2 text-xs">
+              <span className="rounded-full bg-muted px-2.5 py-1">alg: {String(decoded.header.alg)}</span>
+              {Number.isFinite(exp) &&
+                (exp < now ? (
+                  <span className="rounded-full bg-red-500/10 px-2.5 py-1 text-red-600 dark:text-red-400">Expired</span>
+                ) : (
+                  <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 text-emerald-700 dark:text-emerald-400">Not expired</span>
+                ))}
+              <span className="rounded-full bg-amber-500/10 px-2.5 py-1 text-amber-700 dark:text-amber-400">Signature not verified (decode only)</span>
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <h3 className="mb-1 text-sm font-medium">Header</h3>
+                <pre className="overflow-auto rounded-lg bg-muted p-3 font-mono text-sm">{JSON.stringify(decoded.header, null, 2)}</pre>
+              </div>
+              <div>
+                <h3 className="mb-1 text-sm font-medium">Payload</h3>
+                <pre className="overflow-auto rounded-lg bg-muted p-3 font-mono text-sm">{JSON.stringify(decoded.payload, null, 2)}</pre>
+              </div>
+            </div>
+            <table className="w-full text-sm">
+              <tbody>
+                {Object.entries(decoded.payload)
+                  .filter(([k]) => CLAIMS[k])
+                  .map(([k, v]) => (
+                    <tr key={k} className="border-t border-border">
+                      <td className="py-2 pr-4 font-mono">{k}</td>
+                      <td className="py-2 pr-4 text-fg-muted">{CLAIMS[k]}</td>
+                      <td className="py-2">{TIME_CLAIMS.includes(k) ? new Date(Number(v) * 1000).toLocaleString() : String(v)}</td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+            <ResultActions items={[{ name: "payload.json", type: "application/json", text: JSON.stringify(decoded.payload, null, 2) }]} next={next} from={slug} />
+          </div>
+        )
+      }
+    />
+  );
+}

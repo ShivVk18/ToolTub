@@ -1,0 +1,79 @@
+# KlipKit on one VPS. Everything self-hosted; licences in docs/STRATEGY.md §5.
+#   docker compose up -d --build
+# Networks: "edge" reaches the internet (Caddy only); "internal" has no internet access at all.
+services:
+  caddy:
+    image: caddy:2 # Apache-2.0, automatic HTTPS
+    restart: unless-stopped
+    ports: ["80:80", "443:443"]
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+    networks: [edge, internal]
+    depends_on: [app, umami]
+
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_SITE_URL: https://klipkit.com
+      VALKEY_URL: redis://valkey:6379
+      JOBS_DIR: /data/jobs
+      RATE_LIMIT_SALT: ${RATE_LIMIT_SALT:?set in .env}
+    volumes: [jobs:/data/jobs]
+    networks: [internal]
+    depends_on: [valkey]
+
+  worker:
+    build: ./worker
+    restart: unless-stopped
+    environment:
+      VALKEY_URL: redis://valkey:6379
+      JOBS_DIR: /data/jobs
+      CONCURRENCY: "1"
+    volumes: [jobs:/data/jobs]
+    networks: [internal] # no internet: LibreOffice can't fetch remote content embedded in documents
+    read_only: true
+    tmpfs: [/tmp, /home/klip]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    deploy:
+      resources:
+        limits: { cpus: "2", memory: 2g }
+
+  valkey:
+    image: valkey/valkey:8-alpine # BSD-3-Clause (Redis-compatible; avoids Redis 7.4+ RSAL/SSPL)
+    restart: unless-stopped
+    command: ["valkey-server", "--save", "", "--appendonly", "no", "--maxmemory", "256mb"]
+    networks: [internal]
+
+  umami:
+    image: ghcr.io/umami-software/umami:postgresql-latest # MIT, cookieless analytics
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://umami:${UMAMI_DB_PASSWORD:?}@umami-db:5432/umami
+      APP_SECRET: ${UMAMI_SECRET:?}
+    networks: [internal]
+    depends_on: [umami-db]
+
+  umami-db:
+    image: postgres:17-alpine # PostgreSQL licence
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: umami
+      POSTGRES_USER: umami
+      POSTGRES_PASSWORD: ${UMAMI_DB_PASSWORD:?}
+    volumes: [umami_db:/var/lib/postgresql/data]
+    networks: [internal]
+
+# Object storage: not needed on one VPS (shared "jobs" volume). MinIO is AGPL-3.0, so if you
+# outgrow one host use SeaweedFS (Apache-2.0) with an S3 lifecycle rule + this worker's 1-hour sweeper.
+volumes:
+  jobs:
+  caddy_data:
+  umami_db:
+
+networks:
+  edge:
+  internal:
+    internal: true

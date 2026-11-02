@@ -1,0 +1,15 @@
+# On-device models (self-hosted)
+
+Models are served from klipkit.com and never fetched from a model hub at runtime.
+
+| File | Model | Licence | Size | Used by |
+|---|---|---|---|---|
+| `isnet-general-use-int8.onnx` | ISNet general-use (DIS), int8-quantised | Apache-2.0 | ≈ 44 MB | Background Remover, Passport Photo Maker |
+
+How to add it (one time, at build or deploy):
+
+1. Download `isnet-general-use.onnx` from the DIS / rembg release assets and **check the licence file shipped with it**.
+2. Quantise: `python -m onnxruntime.quantization.preprocess` then `quantize_dynamic(..., weight_type=QUInt8)`.
+3. Save as `public/models/isnet-general-use-int8.onnx`. Serve with `Cache-Control: public, max-age=31536000, immutable`.
+
+Do NOT use BRIA RMBG-1.4/2.0 (non-commercial licence) or any model without a clear permissive licence.

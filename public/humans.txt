@@ -1,0 +1,8 @@
+/* TEAM */
+Founder and maintainer: Shivansh Saxena
+Site: https://klipkit.com/about
+
+/* SITE */
+Built in-house with Next.js, TypeScript and Tailwind CSS.
+Self-hosted on our own servers. No third-party APIs.
+Licences: https://klipkit.com/licences

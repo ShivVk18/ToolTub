@@ -1,0 +1,120 @@
+"use client";
+import { AlertTriangle, Loader2 } from "lucide-react";
+import { useCallback, useState, type ReactNode } from "react";
+import { Button } from "@/components/ui/button";
+
+export type RunStatus = "idle" | "working" | "done" | "error";
+export interface RunError {
+  cause: string;
+  fix?: string;
+}
+
+/** State machine shared by every tool: idle → working (progress) → done | error. */
+export function useToolRun<T>() {
+  const [status, setStatus] = useState<RunStatus>("idle");
+  const [progress, setProgress] = useState<{ ratio?: number; label?: string } | null>(null);
+  const [error, setError] = useState<RunError | null>(null);
+  const [result, setResult] = useState<T | null>(null);
+
+  const run = useCallback(async (fn: (onProgress: typeof setProgress) => Promise<T>, toError?: (e: Error) => RunError) => {
+    setStatus("working");
+    setError(null);
+    setProgress(null);
+    try {
+      const r = await fn(setProgress);
+      setResult(r);
+      setStatus("done");
+      return r;
+    } catch (e) {
+      const err = e instanceof Error ? e : new Error(String(e));
+      setError(toError?.(err) ?? { cause: err.message });
+      setStatus("error");
+    }
+  }, []);
+
+  const reset = useCallback(() => {
+    setStatus("idle");
+    setResult(null);
+    setError(null);
+  }, []);
+
+  return { status, progress, error, result, run, reset, setResult };
+}
+
+export interface ToolWorkspaceProps {
+  /** 3. Input zone: <Dropzone>, a text area, or a form. */
+  input: ReactNode;
+  /** 4. Simple settings with sensible defaults. */
+  settings?: ReactNode;
+  /** 4b. Advanced options, collapsed by default. */
+  advanced?: ReactNode;
+  /** 5. The one primary action. Omit for live tools (JSON formatter, QR) that update as you type. */
+  action?: { label: string; onClick: () => void; disabled?: boolean };
+  status: RunStatus;
+  progress?: { ratio?: number; label?: string } | null;
+  error?: RunError | null;
+  /** 6–7. Success state: preview, before/after, Download / Copy / Send to next tool. */
+  result?: ReactNode;
+}
+
+/**
+ * The single workspace template every tool uses (brief §4.2, items 3–7).
+ * Items 1–2 (H1, privacy badge) and 8–9 (related tools, SEO block) are rendered by the server page,
+ * so they are in the HTML even before JavaScript runs.
+ */
+export function ToolWorkspace({ input, settings, advanced, action, status, progress, error, result }: ToolWorkspaceProps) {
+  return (
+    <section aria-label="Tool" className="rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-6">
+      <div className="space-y-5">
+        {input}
+        {settings && <div className="flex flex-wrap items-end gap-4">{settings}</div>}
+        {advanced && (
+          <details className="group rounded-lg border border-border px-4 py-2 text-sm">
+            <summary className="cursor-pointer select-none text-fg-muted">Advanced options</summary>
+            <div className="flex flex-wrap items-end gap-4 py-3">{advanced}</div>
+          </details>
+        )}
+        {action && (
+          <Button variant="primary" size="lg" className="w-full sm:w-auto" onClick={action.onClick} disabled={action.disabled || status === "working"}>
+            {status === "working" && <Loader2 className="size-4 animate-spin" aria-hidden />}
+            {action.label}
+          </Button>
+        )}
+        <div aria-live="polite" className="space-y-4">
+          {status === "working" && (
+            <div className="space-y-2">
+              <p className="text-sm text-fg-muted">{progress?.label ?? "Working on your device…"}</p>
+              <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+                <div
+                  className={progress?.ratio === undefined ? "h-full w-1/3 animate-pulse rounded-full bg-fg" : "h-full rounded-full bg-fg transition-[width]"}
+                  style={progress?.ratio !== undefined ? { width: `${Math.round(progress.ratio * 100)}%` } : undefined}
+                />
+              </div>
+            </div>
+          )}
+          {status === "error" && error && (
+            <div role="alert" className="flex gap-3 rounded-lg border border-red-500/30 bg-red-500/5 p-4 text-sm">
+              <AlertTriangle className="mt-0.5 size-4 shrink-0 text-red-500" aria-hidden />
+              <div>
+                <p className="font-medium">{error.cause}</p>
+                {error.fix && <p className="mt-1 text-fg-muted">{error.fix}</p>}
+              </div>
+            </div>
+          )}
+          {result}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export function Field({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <label className="flex flex-col gap-1.5 text-sm">
+      <span className="text-fg-muted">{label}</span>
+      {children}
+    </label>
+  );
+}
+
+export const inputClass = "h-10 rounded-lg border border-border bg-bg px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring";

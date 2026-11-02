@@ -1,0 +1,16 @@
+klipkit.com {
+	encode zstd gzip
+	# Uploads for server tools: cap the body at the largest tool limit.
+	request_body /api/* {
+		max_size 55MB
+	}
+	reverse_proxy app:3000
+}
+
+www.klipkit.com {
+	redir https://klipkit.com{uri} permanent
+}
+
+stats.klipkit.com {
+	reverse_proxy umami:3000
+}

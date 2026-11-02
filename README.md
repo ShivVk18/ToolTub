@@ -1,36 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# KlipKit
 
-## Getting Started
+Free online tools that run on your device. Next.js 16 (App Router, SSG), self-hosted, no third-party APIs.
 
-First, run the development server:
+- Strategy, tool list, architecture, SEO/AEO/GEO plan: [docs/STRATEGY.md](docs/STRATEGY.md)
+- Single source of truth: [src/registry/](src/registry/) (tools, SEO content, chains, dependencies + licences)
+
+## Run locally
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install          # also copies browser engines into public/vendor
+npm run dev          # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Server tools (PDF to Word) need Valkey/Redis and the worker:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+redis-server --port 6379 &                                   # or: docker run -p 6379:6379 valkey/valkey:8-alpine
+cd worker && npm install && PATH="/Applications/LibreOffice.app/Contents/MacOS:$PATH" JOBS_DIR=/tmp/klip-jobs node src/index.mjs
+JOBS_DIR=/tmp/klip-jobs npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The Background Remover needs the self-hosted model: see [public/models/README.md](public/models/README.md).
 
-## Learn More
+## Production
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+cp .env.example .env   # fill in secrets
+docker compose up -d --build
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Add a tool
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Add a row in `src/registry/tools.ts` (status `planned`).
+2. Build the UI in `src/tools/<Name>.tsx` using `ToolWorkspace`; heavy work goes in a worker (`src/workers`).
+3. Register it in `src/tools/index.tsx` and set status `beta` (routed, noindex).
+4. Write its `ToolSEO` in `src/registry/seo/` and set status `live` (indexed, in sitemap and llms.txt).
