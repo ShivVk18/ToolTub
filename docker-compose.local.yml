@@ -1,0 +1,9 @@
+# Local smoke test of the production containers without Caddy/HTTPS:
+#   docker compose -f docker-compose.yml -f docker-compose.local.yml up -d app worker valkey umami umami-db
+# The app is published on http://127.0.0.1:3400 only (the worker stays on the internal network).
+services:
+  app:
+    ports: ["127.0.0.1:3400:3000"]
+    networks: [internal, edge]
+    environment:
+      NEXT_PUBLIC_SITE_URL: http://127.0.0.1:3400
