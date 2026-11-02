@@ -1,6 +1,6 @@
 "use client";
 import { AlertTriangle, Loader2 } from "lucide-react";
-import { useCallback, useState, type ReactNode } from "react";
+import { useCallback, useState, useSyncExternalStore, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 
 export type RunStatus = "idle" | "working" | "done" | "error";
@@ -62,10 +62,18 @@ export interface ToolWorkspaceProps {
  * Items 1–2 (H1, privacy badge) and 8–9 (related tools, SEO block) are rendered by the server page,
  * so they are in the HTML even before JavaScript runs.
  */
+const noop = () => () => {};
+/** false during server render and hydration, true once React is interactive. */
+const useInteractive = () => useSyncExternalStore(noop, () => true, () => false);
+
 export function ToolWorkspace({ input, settings, advanced, action, status, progress, error, result }: ToolWorkspaceProps) {
+  // The tool is server-rendered, so on a slow connection it is visible before JavaScript runs. A file
+  // picked, text typed or option changed in that window was silently lost (React reset it on hydration).
+  // A disabled <fieldset> blocks every control until the page is interactive, with no layout shift.
+  const interactive = useInteractive();
   return (
-    <section aria-label="Tool" className="rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-6">
-      <div className="space-y-5">
+    <section aria-label="Tool" data-ready={interactive ? "" : undefined} aria-busy={!interactive} className="rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-6">
+      <fieldset disabled={!interactive} className="min-w-0 space-y-5">
         {input}
         {settings && <div className="flex flex-wrap items-end gap-4">{settings}</div>}
         {advanced && (
@@ -103,7 +111,7 @@ export function ToolWorkspace({ input, settings, advanced, action, status, progr
           )}
           {result}
         </div>
-      </div>
+      </fieldset>
     </section>
   );
 }
@@ -117,4 +125,4 @@ export function Field({ label, children }: { label: string; children: ReactNode 
   );
 }
 
-export const inputClass = "h-10 rounded-lg border border-border bg-bg px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring";
+export const inputClass = "h-11 sm:h-10 rounded-lg border border-border bg-bg px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring";
