@@ -36,14 +36,16 @@ export function Hero({
   const [placeholder, setPlaceholder] = useState('Try “generate 10 UUIDs” — or paste anything');
   const [mirrorHtml, setMirrorHtml] = useState('');
   const [recents, setRecents] = useState<string[]>([]);
+  const [mounted, setMounted] = useState(false);
 
   const askInputRef = useRef<HTMLInputElement>(null);
   const h1Ref = useRef<HTMLHeadingElement>(null);
   const squigRef = useRef<SVGSVGElement>(null);
   const squigPathRef = useRef<SVGPathElement>(null);
 
-  // Load recents
+  // Load recents strictly client-only after mount (B8, B5)
   useEffect(() => {
+    setMounted(true);
     try {
       const stored = localStorage.getItem('kk.recents');
       if (stored) {
@@ -147,34 +149,24 @@ export function Hero({
 
   return (
     <section id="hero" aria-label="Drop a file">
-      <div className="eyebrow inline-flex items-center gap-[10px] px-[16px] py-[8px] rounded-full border border-line bg-panel backdrop-blur-[10px] text-[15px] text-muted select-none">
-        <b className="text-accent font-semibold">✦</b> 76 tools · Runs on your device · Free forever
+      <div className="eyebrow">
+        <b>✦</b> 76 tools · Runs on your device · Free forever
       </div>
 
-      <h1
-        ref={h1Ref}
-        id="h1"
-        className="font-serif font-medium text-center tracking-[-0.025em] leading-[1.02] text-[clamp(48px,5.9vw,112px)] mt-[22px] relative px-4"
-      >
-        <span className="l1 block">
+      <h1 ref={h1Ref} id="h1">
+        <span className="l1">
           {line1Words.map((w, i) => (
             <React.Fragment key={w + i}>
-              <span
-                className="w inline-block opacity-0 translate-y-[0.35em] blur-[10px] animate-[wordIn_0.9s_cubic-bezier(.2,.8,.2,1)_forwards]"
-                style={{ animationDelay: `${0.15 + i * 0.07}s` }}
-              >
+              <span className="w" style={{ animationDelay: `${0.15 + i * 0.07}s` }}>
                 {w}
               </span>{' '}
             </React.Fragment>
           ))}
         </span>
-        <span className="l2 block italic text-muted">
+        <span className="l2">
           {line2Words.map((w, i) => (
             <React.Fragment key={w + i}>
-              <span
-                className="w inline-block opacity-0 translate-y-[0.35em] blur-[10px] animate-[wordIn_0.9s_cubic-bezier(.2,.8,.2,1)_forwards]"
-                style={{ animationDelay: `${0.15 + 0.32 + i * 0.07}s` }}
-              >
+              <span className="w" style={{ animationDelay: `${0.15 + 0.32 + i * 0.07}s` }}>
                 {w}
               </span>{' '}
             </React.Fragment>
@@ -190,7 +182,6 @@ export function Hero({
           </defs>
           <path id="squigP" ref={squigPathRef} />
         </svg>
-        <span className="sr-only"> — Free online tools that run on your device.</span>
       </h1>
 
       <div
@@ -205,10 +196,9 @@ export function Hero({
             onOrbSlotClick();
           }
         }}
-        className="w-[clamp(170px,13.2vw,240px)] h-[clamp(170px,13.2vw,240px)] mt-[clamp(28px,3.8vh,48px)] flex-none cursor-pointer rounded-full outline-none focus-visible:ring-4 focus-visible:ring-accent"
       />
 
-      <p id="hint" className="hint mt-[clamp(24px,3.2vh,36px)] text-[18px] text-muted text-center min-h-[26px] transition-colors px-4">
+      <p id="hint" className="hint">
         {hintText || 'Drop a file, paste text or code, or just ask:'}
       </p>
 
@@ -248,33 +238,33 @@ export function Hero({
         </button>
       </div>
 
-      {/* Sample chips + Dashed alt chips */}
-      <div id="samples" className="samples flex gap-[10px] mt-[18px] flex-wrap justify-center px-4 items-center">
+      {/* Sample chips + Dashed alt chips (B6) */}
+      <div id="samples" className="samples">
         {Object.entries(SAMPLES)
           .filter(([k]) => ['pdf', 'image', 'audio'].includes(k))
           .map(([k, s]) => (
             <button
               key={k}
               type="button"
+              className="chip"
               data-sample={k}
               onClick={(e) => onPickSample(k, e)}
-              className="chip inline-flex items-center gap-[9px] h-[44px] px-[18px] rounded-full bg-solid border border-line text-[16px] font-medium shadow-[0_6px_18px_-12px_rgba(0,0,0,0.25)] transition-[transform,border-color,box-shadow,background] duration-250 hover:-translate-y-[2px] hover:border-line2 hover:shadow-[0_12px_26px_-14px_rgba(0,0,0,0.3)] active:scale-[0.96]"
             >
               <span
-                className="dot w-[9px] h-[9px] rounded-[3px]"
+                className="dot"
                 style={{ background: KINDS[k as keyof typeof KINDS]?.c }}
               />
               {s.label}
             </button>
           ))}
 
-        <div className="sep" aria-hidden="true" />
+        <span className="sep" aria-hidden="true" />
 
         {/* Dashed Alt Chips */}
         <button
           type="button"
           data-alt="0"
-          className="chip alt inline-flex items-center gap-[9px] h-[44px] px-[18px] rounded-full border border-line text-[15px] font-medium transition-[transform,border-color,background] hover:-translate-y-[2px] hover:border-line2 active:scale-[0.96]"
+          className="chip alt"
           onClick={() =>
             onPasteText?.('{"user":{"id":42,"name":"Asha Rao","roles":["admin"],"active":true}}')
           }
@@ -285,7 +275,7 @@ export function Hero({
         <button
           type="button"
           data-alt="1"
-          className="chip alt inline-flex items-center gap-[9px] h-[44px] px-[18px] rounded-full border border-line text-[15px] font-medium transition-[transform,border-color,background] hover:-translate-y-[2px] hover:border-line2 active:scale-[0.96]"
+          className="chip alt"
           onClick={() =>
             onPasteText?.(
               'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkFzaGEgUmFvIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
@@ -298,19 +288,32 @@ export function Hero({
         <button
           type="button"
           data-alt="2"
-          className="chip alt inline-flex items-center gap-[9px] h-[44px] px-[18px] rounded-full border border-line text-[15px] font-medium transition-[transform,border-color,background] hover:-translate-y-[2px] hover:border-line2 active:scale-[0.96]"
+          className="chip alt"
           onClick={() => onSubmitAsk?.('generate 10 uuids')}
         >
           <span style={{ color: 'var(--accent)' }}>✦</span> Generate UUIDs
         </button>
       </div>
 
-      <div id="recents" className="recents mt-[14px] text-[14px] text-muted flex gap-[8px] items-center min-h-[30px] flex-wrap justify-center px-4">
-        {recents.length > 0 && (
+      {/* Recents row - client only, max 3 items, ellipsis max 220px (B8) */}
+      <div id="recents" className="recents">
+        {mounted && recents.length > 0 && (
           <>
             <span>Recent:</span>
-            {recents.map((r) => (
-              <span key={r} className="r px-[12px] py-[5px] rounded-full bg-panel border border-line max-w-[200px] truncate inline-block align-middle" title={r}>
+            {recents.slice(0, 3).map((r) => (
+              <span
+                key={r}
+                className="r"
+                style={{
+                  maxWidth: '220px',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  display: 'inline-block',
+                  verticalAlign: 'middle',
+                }}
+                title={r}
+              >
                 {r}
               </span>
             ))}
