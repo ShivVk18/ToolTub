@@ -31,6 +31,8 @@ function resolve(slug: string): Resolved | undefined {
   if (hub) return { kind: "hub", hub };
 }
 
+export const instant = false;
+
 export function generateStaticParams() {
   const variants = routedTools().flatMap((t) => t.seo?.longTailVariants?.map((v) => v.slug) ?? []);
   return [...routedTools().map((t) => t.slug), ...variants, ...hubs.map((h) => h.id)].map((slug) => ({ slug }));

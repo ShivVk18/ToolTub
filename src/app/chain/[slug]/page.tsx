@@ -9,6 +9,8 @@ import { chainGraph } from "@/lib/schema";
 import { pageMetadata } from "@/lib/metadata";
 import { ChainRunner } from "./ChainRunner";
 
+export const instant = false;
+
 export function generateStaticParams() {
   return chains.filter(isChainLive).map((c) => ({ slug: c.slug }));
 }

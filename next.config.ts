@@ -5,9 +5,14 @@ import type { NextConfig } from "next";
  * CSP allows only our own origin. 'unsafe-inline' scripts are required because pages are static (SSG):
  * nonces would force every page to render per request. Third-party script origins stay blocked.
  */
+const isDev = process.env.NODE_ENV === "development";
+const scriptSrc = isDev
+  ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'"
+  : "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'";
+
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'",
+  scriptSrc,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self'",
