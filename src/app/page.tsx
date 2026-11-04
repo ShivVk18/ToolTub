@@ -72,8 +72,8 @@ export default function Home() {
       {/* Main Interactive Stage matching KlipKit_UI.html */}
       <HomeStage />
 
-      {/* Server-Rendered SEO Content, FAQ, Tool Chains and Categories */}
-      <div className="mx-auto max-w-5xl px-4 py-16 space-y-16 border-t border-line mt-12 text-ink">
+      {/* Server-Rendered SEO Content, FAQ, Tool Chains and Categories preserved for search/screen-readers */}
+      <div className="sr-only">
         <p className="text-center text-sm font-medium text-ink2">
           No sign-up · Runs on your device · Free forever
         </p>

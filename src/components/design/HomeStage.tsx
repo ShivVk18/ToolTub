@@ -477,7 +477,7 @@ export function HomeStage() {
 
   return (
     <>
-      <div id="stage" className="relative z-[2] min-h-[max(100vh,780px)] overflow-x-clip">
+      <div id="stage">
         {/* Hero Section */}
         <Hero
           onPickSample={handlePickSample}
