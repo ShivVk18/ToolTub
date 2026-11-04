@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useLayoutEffect } from 'react';
 import { addLoop, clamp, ptr } from '@/lib/animation';
 
 export interface OrbController {
@@ -67,8 +67,9 @@ export function Orb({ mode, isDragging = false, onOrbClick, controllerRef }: Orb
     };
   }
 
-  // Synchronously compute initial slot coordinates before browser paint to prevent flicker from top (0,0)
-  React.useLayoutEffect(() => {
+  // Measure initial target
+  useLayoutEffect(() => {
+    const BASE = 360;
     const stage = document.getElementById('stage');
     const orbEl = orbRef.current;
     const slot = mode === 'work' ? document.getElementById('orbDock') : document.getElementById('orbSlot');
@@ -77,7 +78,6 @@ export function Orb({ mode, isDragging = false, onOrbClick, controllerRef }: Orb
     const sr = stage.getBoundingClientRect();
     const r = slot.getBoundingClientRect();
     if (r.width > 0 && r.height > 0) {
-      const BASE = 360;
       const targetX = r.left + r.width / 2 - sr.left;
       const targetY = r.top + r.height / 2 - sr.top;
       const targetScale = r.width / BASE;
@@ -86,7 +86,6 @@ export function Orb({ mode, isDragging = false, onOrbClick, controllerRef }: Orb
       stateRef.current.s = targetScale * 0.7;
       stateRef.current.init = true;
       orbEl.style.transform = `translate(${targetX - BASE / 2}px, ${targetY + 40 - BASE / 2}px) scale(${targetScale * 0.7})`;
-      orbEl.classList.add('ready');
     }
   }, [mode]);
 
@@ -97,6 +96,29 @@ export function Orb({ mode, isDragging = false, onOrbClick, controllerRef }: Orb
   useEffect(() => {
     const BASE = 360;
     const O = stateRef.current;
+
+    const measureAndInit = () => {
+      const stage = document.getElementById('stage');
+      const slot = mode === 'work' ? document.getElementById('orbDock') : document.getElementById('orbSlot');
+      if (!stage || !slot) return;
+      const sr = stage.getBoundingClientRect();
+      const r = slot.getBoundingClientRect();
+      if (r.width > 0 && r.height > 0 && !O.init) {
+        const targetX = r.left + r.width / 2 - sr.left;
+        const targetY = r.top + r.height / 2 - sr.top;
+        const targetScale = r.width / BASE;
+        O.x = targetX;
+        O.y = targetY + 40;
+        O.s = targetScale * 0.7;
+        O.init = true;
+      }
+    };
+
+    measureAndInit();
+    if (typeof document !== 'undefined' && 'fonts' in document) {
+      document.fonts.ready.then(measureAndInit);
+    }
+    window.addEventListener('resize', measureAndInit);
 
     const cleanup = addLoop((t, dt) => {
       const stage = document.getElementById('stage');
@@ -119,7 +141,6 @@ export function Orb({ mode, isDragging = false, onOrbClick, controllerRef }: Orb
         O.y = targetY + 40;
         O.s = targetScale * 0.7;
         O.init = true;
-        orbEl.classList.add('ready');
       }
 
       let tx = targetX;
@@ -173,7 +194,10 @@ export function Orb({ mode, isDragging = false, onOrbClick, controllerRef }: Orb
       orbEl.style.setProperty('--lab', O.lab.toFixed(3));
     });
 
-    return cleanup;
+    return () => {
+      window.removeEventListener('resize', measureAndInit);
+      cleanup();
+    };
   }, [mode, isDragging]);
 
   return (
@@ -181,65 +205,17 @@ export function Orb({ mode, isDragging = false, onOrbClick, controllerRef }: Orb
       ref={orbRef}
       id="orb"
       onClick={onOrbClick}
-      className="absolute left-0 top-0 w-[360px] h-[360px] z-[5] pointer-events-none will-change-transform"
       aria-hidden="true"
     >
-      <div
-        className="absolute inset-[-28%] rounded-full opacity-75"
-        style={{
-          background:
-            'radial-gradient(closest-side, rgba(124,107,255,.55), rgba(255,156,130,.25) 60%, transparent)',
-          filter: 'blur(36px)',
-        }}
-      />
-      <div
-        className="absolute inset-0 rounded-full overflow-hidden"
-        style={{
-          boxShadow:
-            'inset 0 0 0 1px rgba(255,255,255,.35), inset 0 -40px 80px rgba(40,20,80,.18), 0 30px 80px -30px rgba(80,60,200,.5)',
-          background: '#B9AEFF',
-        }}
-      >
-        <div
-          className="absolute inset-[-15%]"
-          style={{
-            background:
-              'conic-gradient(from calc(var(--r, 0) * 1deg), #7C6BFF, #B38BFF, #FF9C82, #FFD27A, #8FE0BE, #6FB7FF, #7C6BFF)',
-            filter: 'blur(18px) saturate(1.15)',
-          }}
-        />
-        <div
-          className="absolute inset-[-25%] mix-blend-soft-light opacity-90"
-          style={{
-            background:
-              'conic-gradient(from calc(var(--r2, 0) * 1deg) at 60% 40%, transparent, rgba(255,255,255,.75), transparent 30%, rgba(109,93,245,.6), transparent 60%, rgba(255,210,122,.6), transparent)',
-            filter: 'blur(26px)',
-          }}
-        />
-        <div
-          className="absolute inset-0 rounded-full"
-          style={{
-            background:
-              'radial-gradient(circle at 50% 50%, transparent 62%, rgba(255,255,255,.28) 70%, transparent 74%)',
-          }}
-        />
-        <div
-          className="absolute inset-0 rounded-full"
-          style={{
-            background:
-              'radial-gradient(circle at var(--hx, 34%) var(--hy, 28%), rgba(255,255,255,.95), rgba(255,255,255,.35) 16%, transparent 40%)',
-          }}
-        />
+      <div className="o-glow" />
+      <div className="o-ball">
+        <div className="o-core" />
+        <div className="o-swirl" />
+        <div className="o-rim" />
+        <div className="o-gloss" />
       </div>
-
-      <div
-        className="absolute inset-0 grid place-items-center text-white font-semibold text-[20px] tracking-[0.2px] select-none"
-        style={{
-          textShadow: '0 2px 12px rgba(40,20,80,.35)',
-          opacity: 'var(--lab, 1)',
-        }}
-      >
-        <div className="text-center">
+      <div className="o-label">
+        <div>
           <svg
             width="34"
             height="34"
@@ -249,16 +225,14 @@ export function Orb({ mode, isDragging = false, onOrbClick, controllerRef }: Orb
             strokeWidth="2.2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="block mx-auto mb-[8px]"
           >
             <path d="M12 19V5M5 12l7-7 7 7" />
           </svg>
           <span ref={labRef} id="olab">
-            Drop here
+            {stateRef.current.labelText}
           </span>
         </div>
       </div>
     </div>
   );
 }
-
