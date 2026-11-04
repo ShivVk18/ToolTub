@@ -70,53 +70,45 @@ export function AuroraBackground() {
   }, []);
 
   return (
-    <div
-      id="bg"
-      className="fixed inset-0 pointer-events-none overflow-hidden z-0"
-      aria-hidden="true"
-    >
+    <div id="bg" aria-hidden="true">
       <div
         ref={bARef}
         id="bA"
-        className="blob absolute rounded-full will-change-transform opacity-[var(--blobOp)]"
+        className="blob"
         style={{
           width: '62vw',
           height: '62vw',
           left: '-14vw',
           top: '-26vw',
-          background: 'radial-gradient(circle closest-side, var(--blobA), transparent 85%)',
+          ['--c' as any]: 'var(--blobA)',
         }}
       />
       <div
         ref={bBRef}
         id="bB"
-        className="blob absolute rounded-full will-change-transform opacity-[var(--blobOp)]"
+        className="blob"
         style={{
           width: '56vw',
           height: '56vw',
           left: '58vw',
           top: '30vh',
-          background: 'radial-gradient(circle closest-side, var(--blobB), transparent 85%)',
+          ['--c' as any]: 'var(--blobB)',
         }}
       />
       <div
         ref={bCRef}
         id="bC"
-        className="blob absolute rounded-full will-change-transform opacity-[var(--blobOp)]"
+        className="blob"
         style={{
           width: '42vw',
           height: '42vw',
           left: '36vw',
           top: '-22vw',
-          background: 'radial-gradient(circle closest-side, var(--blobC), transparent 85%)',
+          ['--c' as any]: 'var(--blobC)',
         }}
       />
       <div id="aura" ref={auraRef} />
-      <div
-        ref={grainRef}
-        id="grain"
-        className="absolute inset-0 pointer-events-none opacity-[0.05] dark:opacity-[0.035] mix-blend-multiply dark:mix-blend-screen bg-[length:180px_180px]"
-      />
+      <div ref={grainRef} id="grain" />
     </div>
   );
 }

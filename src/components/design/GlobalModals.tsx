@@ -3,15 +3,34 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { VoiceSheet } from './VoiceSheet';
+import { CommandPalette } from './CommandPalette';
 import { useUIStore } from '@/lib/uiStore';
 import { goto } from '@/lib/animation';
 
 export function GlobalModals() {
   const router = useRouter();
-  const { isVoiceSheetOpen, closeVoiceSheet } = useUIStore();
+  const {
+    isVoiceSheetOpen,
+    closeVoiceSheet,
+    isPaletteOpen,
+    closePalette,
+    setActiveTool,
+  } = useUIStore();
 
   return (
     <>
+      <CommandPalette
+        isOpen={isPaletteOpen}
+        onClose={closePalette}
+        onSelectTool={(tool) => {
+          if (tool.slug) {
+            router.push(`/${tool.slug}`);
+          } else {
+            setActiveTool(tool);
+          }
+        }}
+      />
+
       <VoiceSheet
         isOpen={isVoiceSheetOpen}
         onClose={closeVoiceSheet}
