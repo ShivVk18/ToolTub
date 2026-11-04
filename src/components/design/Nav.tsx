@@ -75,65 +75,65 @@ export function Nav({ onOpenSearch, onOpenPro, isHome = true }: NavProps) {
     }
   };
 
+  const handleLogin = () => {
+    const toastEl = document.getElementById('toast');
+    if (toastEl) {
+      toastEl.textContent = 'No account needed — KlipKit is free forever!';
+      toastEl.classList.add('show');
+      setTimeout(() => toastEl.classList.remove('show'), 2600);
+    }
+  };
+
   return (
     <>
       <div id="prog" aria-hidden="true" />
-      <header id="nav" className="fixed top-0 left-0 right-0 z-40 flex justify-center px-[clamp(16px,3vw,48px)] pointer-events-none">
-        <div className="navin pointer-events-auto flex items-center justify-between">
+      <header id="nav">
+        <div className="navin">
           {/* Brand */}
           <Link
             href="/"
-            className="brand flex items-center gap-[12px] h-[44px] min-h-[44px] flex-none font-semibold text-[22px] tracking-[-0.3px] text-ink no-underline select-none pl-2"
+            className="brand"
+            onClick={(e) => {
+              if (isHome) {
+                e.preventDefault();
+                goto(0);
+              }
+            }}
           >
-            <div className="mark relative w-[38px] h-[38px] rounded-[12px] bg-ink text-bg grid place-items-center font-serif italic font-semibold text-[23px]">
-              k
-              <span
-                className="absolute w-[8px] h-[8px] rounded-full right-[6px] top-[6px]"
-                style={{
-                  background: 'linear-gradient(135deg, #A99BFF, #FF9C82)',
-                }}
-              />
-            </div>
+            <div className="mark">k</div>
             KlipKit
           </Link>
 
           {/* Links */}
-          <nav
-            aria-label="Main"
-            className="links hidden min-[1100px]:flex gap-[32px] text-[16px] text-muted ml-[28px]"
-          >
+          <nav aria-label="Main" className="links">
             <button
               type="button"
               onClick={() => handleNavClick('explore')}
-              className="text-inherit hover:text-ink cursor-pointer transition-colors"
             >
               Tools
             </button>
             <button
               type="button"
               onClick={() => handleNavClick('feel')}
-              className="text-inherit hover:text-ink cursor-pointer transition-colors"
             >
               Why KlipKit
             </button>
             <button
               type="button"
               onClick={() => (onOpenPro ? onOpenPro() : handleNavClick('pricing'))}
-              className="text-inherit hover:text-ink cursor-pointer transition-colors"
             >
               Pro
             </button>
             <button
               type="button"
               onClick={() => handleNavClick('pricing')}
-              className="text-inherit hover:text-ink cursor-pointer transition-colors"
             >
               Pricing
             </button>
           </nav>
 
-          {/* Actions */}
-          <div className="navr flex items-center gap-[10px] flex-none">
+          {/* Right Action Group */}
+          <div className="navr">
             <button
               id="kbtn"
               type="button"
@@ -142,8 +142,8 @@ export function Nav({ onOpenSearch, onOpenPro, isHome = true }: NavProps) {
                 if (onOpenSearch) onOpenSearch();
                 window.dispatchEvent(new Event('klipkit:search'));
               }}
-              aria-label="Search tools — What do you need to do? Try “shrink pdf”"
-              className="kbtn flex items-center gap-[12px] h-[44px] min-h-[44px] flex-none px-[16px] max-[1100px]:px-[12px] rounded-full bg-panel border border-line text-muted text-[15px] backdrop-blur-[12px] min-w-[250px] max-[1100px]:min-w-0 transition-transform active:scale-[0.98] cursor-pointer"
+              aria-label="Search tools"
+              className="kbtn"
             >
               <svg
                 width="17"
@@ -158,18 +158,16 @@ export function Nav({ onOpenSearch, onOpenPro, isHome = true }: NavProps) {
                 <circle cx="11" cy="11" r="7" />
                 <path d="M20 20l-3.5-3.5" />
               </svg>
-              <span className="max-[1100px]:hidden">Search 76 tools…</span>
-              <kbd className="ml-auto font-sans font-medium text-[12px] px-[8px] py-[4px] rounded-[8px] border border-line2 text-ink2 bg-soft">
-                ⌘K
-              </kbd>
+              <span>Search 76 tools…</span>
+              <kbd>⌘K</kbd>
             </button>
 
             <button
               id="theme"
               type="button"
               onClick={toggleTheme}
-              aria-label="Toggle dark mode"
-              className="icon-btn w-[44px] h-[44px] min-w-[44px] min-h-[44px] flex-none rounded-full grid place-items-center bg-panel border border-line text-ink backdrop-blur-[12px] transition-transform active:scale-[0.96]"
+              aria-label="Toggle theme"
+              className="icon-btn"
             >
               <svg
                 id="ticon"
@@ -194,26 +192,19 @@ export function Nav({ onOpenSearch, onOpenPro, isHome = true }: NavProps) {
             </button>
 
             <button
+              id="login"
               type="button"
-              className="pill hidden min-[640px]:inline-flex items-center gap-[8px] h-[44px] px-[20px] rounded-full text-[15px] font-medium border border-line2 bg-panel text-ink transition-transform active:scale-[0.96]"
-              onClick={() => {
-                if (typeof window !== 'undefined') {
-                  const toastEl = document.getElementById('toast');
-                  if (toastEl) {
-                    toastEl.textContent = 'No account needed — KlipKit is free forever!';
-                    toastEl.classList.add('show');
-                    setTimeout(() => toastEl.classList.remove('show'), 2600);
-                  }
-                }
-              }}
+              className="pill"
+              onClick={handleLogin}
             >
               Log in
             </button>
 
             <button
+              id="gopro"
               type="button"
               data-mag
-              className="pill ink inline-flex items-center gap-[8px] h-[44px] px-[20px] rounded-full text-[15px] font-medium bg-ink text-bg border border-ink transition-transform active:scale-[0.96]"
+              className="pill ink"
               onClick={() => (onOpenPro ? onOpenPro() : handleNavClick('pricing'))}
             >
               Go Pro
