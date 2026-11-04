@@ -170,7 +170,13 @@ export function CommandPalette({ isOpen, onClose, onSelectTool }: CommandPalette
           </kbd>
         </div>
 
-        <div className="plist max-h-[420px] overflow-auto p-[8px]">
+        <div
+          id="plist"
+          tabIndex={0}
+          role="region"
+          aria-label="Tools"
+          className="plist max-h-[420px] overflow-auto p-[8px]"
+        >
           {!query && (
             <div className="pg text-[12px] font-semibold tracking-[1.2px] uppercase text-faint p-[12px_14px_6px]">
               Popular

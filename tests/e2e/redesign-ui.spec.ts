@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { assertAccessible } from './helpers';
 
 test.describe('KlipKit Redesign UI & Visual Layer', () => {
   test.beforeEach(async ({ page }) => {
@@ -159,5 +160,18 @@ test.describe('KlipKit Redesign UI & Visual Layer', () => {
     const panel = page.locator('#panel');
     await expect(panel).toBeVisible();
     await expect(page.locator('#pnT')).toHaveText('Base64');
+  });
+
+  test('axe accessibility check on home page', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForLoadState('domcontentloaded');
+    await assertAccessible(page, 'home page');
+  });
+
+  test('prefers-reduced-motion turns off continuous animations', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.locator('#hero')).toBeVisible();
   });
 });
