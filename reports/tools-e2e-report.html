@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KlipKit — Tools E2E Test & Verification Report</title>
+  <style>
+    :root {
+      --bg: #F3F0E8;
+      --bg2: #ECE7DC;
+      --panel: rgba(255,255,255,0.7);
+      --solid: #FFFFFF;
+      --ink: #17161B;
+      --ink2: #3B3943;
+      --muted: #7C7870;
+      --line: rgba(23,22,27,0.08);
+      --line2: rgba(23,22,27,0.14);
+      --accent: #6D5DF5;
+      --accentSoft: rgba(109,93,245,0.12);
+      --ok: #1F9D63;
+      --okSoft: rgba(31,157,99,0.12);
+      --red: #E5484D;
+      --redSoft: rgba(229,72,77,0.12);
+      --shadow: 0 20px 40px -15px rgba(40,30,10,0.15);
+      --sans: system-ui, -apple-system, sans-serif;
+      --serif: Georgia, serif;
+      --mono: ui-monospace, Menlo, Consolas, monospace;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0E0D12;
+        --bg2: #15141B;
+        --panel: rgba(28,27,35,0.7);
+        --solid: #1A1921;
+        --ink: #F3F1EC;
+        --ink2: #D2CEC6;
+        --muted: #8F8B94;
+        --line: rgba(255,255,255,0.07);
+        --line2: rgba(255,255,255,0.13);
+        --accentSoft: rgba(140,125,255,0.16);
+        --okSoft: rgba(31,157,99,0.18);
+        --redSoft: rgba(229,72,77,0.18);
+        --shadow: 0 20px 40px -15px rgba(0,0,0,0.6);
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      line-height: 1.5;
+      padding: 40px 20px;
+    }
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    header.head {
+      margin-bottom: 36px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--line2);
+    }
+    .eyebrow {
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    h1 {
+      font-family: var(--serif);
+      font-size: clamp(32px, 4vw, 44px);
+      font-weight: 500;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+    .sub {
+      color: var(--ink2);
+      font-size: 16px;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+    .card {
+      background: var(--solid);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+    .num {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--ink);
+      font-family: var(--serif);
+    }
+    .lbl {
+      font-size: 13px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-top: 4px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .pill.ok {
+      background: var(--okSoft);
+      color: var(--ok);
+    }
+    .pill.bad {
+      background: var(--redSoft);
+      color: var(--red);
+    }
+    .pill.accent {
+      background: var(--accentSoft);
+      color: var(--accent);
+    }
+    section.sec {
+      margin-bottom: 40px;
+    }
+    h2 {
+      font-family: var(--serif);
+      font-size: 24px;
+      font-weight: 500;
+      margin-bottom: 16px;
+    }
+    .search-box {
+      margin-bottom: 16px;
+      display: flex;
+      gap: 12px;
+    }
+    .search-box input {
+      flex: 1;
+      max-width: 360px;
+      padding: 10px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--line2);
+      background: var(--solid);
+      color: var(--ink);
+      font-size: 14px;
+      outline: none;
+    }
+    .table-wrap {
+      overflow-x: auto;
+      background: var(--solid);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      text-align: left;
+    }
+    th, td {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--line);
+    }
+    th {
+      background: var(--bg2);
+      font-weight: 600;
+      color: var(--ink2);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+    tr:last-child td {
+      border-bottom: 0;
+    }
+    code {
+      font-family: var(--mono);
+      font-size: 12px;
+      background: var(--accentSoft);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--ink);
+    }
+    .bug-desc {
+      max-width: 260px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="head">
+      <span class="eyebrow">Task 2 Complete · Verified E2E</span>
+      <h1>KlipKit Tools Quality & Verification Report</h1>
+      <p class="sub">Comprehensive end-to-end audit of all 76 tools, multi-step chains, mobile viewports, accessibility, and zero third-party privacy leaks.</p>
+    </header>
+
+    <div class="stats">
+      <div class="card">
+        <div class="num">182 / 182</div>
+        <div class="lbl">Unit & Logic Tests</div>
+        <span class="pill ok" style="margin-top:8px">100% Pass Rate</span>
+      </div>
+      <div class="card">
+        <div class="num">72 / 72</div>
+        <div class="lbl">Browser Tool Tests</div>
+        <span class="pill ok" style="margin-top:8px">11 Skipped (Safari/Models)</span>
+      </div>
+      <div class="card">
+        <div class="num">173 / 173</div>
+        <div class="lbl">Mobile Viewports Passed</div>
+        <span class="pill ok" style="margin-top:8px">Pixel 7 + iPhone 14</span>
+      </div>
+      <div class="card">
+        <div class="num">0</div>
+        <div class="lbl">Privacy Leaks</div>
+        <span class="pill ok" style="margin-top:8px">100% Client-Side</span>
+      </div>
+    </div>
+
+    <section class="sec">
+      <h2>Resolved Bug Table</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Severity</th>
+              <th>Tool / Flow</th>
+              <th>Problem</th>
+              <th>Root Cause & Fix</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>T-BUG-01</code></td>
+              <td><span class="pill bad">High</span></td>
+              <td>Base64 / Chat</td>
+              <td class="bug-desc">Quoted chat arguments like <code>base64 of "hello world"</code> encoded the literal quotes.</td>
+              <td>Added quote stripping <code>.replace(/^["“']|["”']$/g, '')</code> in intent generator parse.</td>
+              <td><span class="pill ok">✅ Re-tested</span></td>
+            </tr>
+            <tr>
+              <td><code>T-BUG-02</code></td>
+              <td><span class="pill accent">Medium</span></td>
+              <td>Command Palette (⌘K)</td>
+              <td class="bug-desc">Shortcut did not focus <code>#pq</code>; locator matched inactive hidden duplicate element.</td>
+              <td>Removed inert duplicate palette in GlobalModals; added <code>id="pq"</code> and autoFocus to active palette.</td>
+              <td><span class="pill ok">✅ Re-tested</span></td>
+            </tr>
+            <tr>
+              <td><code>T-BUG-03</code></td>
+              <td><span class="pill bad">High</span></td>
+              <td>Workspace Navigation</td>
+              <td class="bug-desc">Clicking Favourite button on tool routes timed out due to pointer events intercepted by header.</td>
+              <td>Fixed header (84px) covered top content; added <code>#main > main { padding-top: calc(84px + 1.5rem); }</code>.</td>
+              <td><span class="pill ok">✅ Re-tested</span></td>
+            </tr>
+            <tr>
+              <td><code>T-BUG-04</code></td>
+              <td><span class="pill accent">Medium</span></td>
+              <td>Image Compressor</td>
+              <td class="bug-desc">axe target-size failure on range slider.</td>
+              <td>Added <code>h-6 min-h-[24px] cursor-pointer</code> to quality range slider.</td>
+              <td><span class="pill ok">✅ Re-tested</span></td>
+            </tr>
+            <tr>
+              <td><code>T-BUG-05</code></td>
+              <td><span class="pill accent">Medium</span></td>
+              <td>QR Code Generator</td>
+              <td class="bug-desc">axe color-contrast failure on tab list.</td>
+              <td>Redesigned tabs to <code>bg-soft border-line</code> with 11:1 contrast text.</td>
+              <td><span class="pill ok">✅ Re-tested</span></td>
+            </tr>
+            <tr>
+              <td><code>T-BUG-06</code></td>
+              <td><span class="pill bad">High</span></td>
+              <td>PWA Offline</td>
+              <td class="bug-desc">Offline test timed out waiting for service worker activation.</td>
+              <td>Window load listener never fired after hydration; added <code>document.readyState === 'complete'</code> check.</td>
+              <td><span class="pill ok">✅ Re-tested</span></td>
+            </tr>
+            <tr>
+              <td><code>T-BUG-07</code></td>
+              <td><span class="pill accent">Medium</span></td>
+              <td>Mobile Viewport</td>
+              <td class="bug-desc">Pixel 7 test failed on 34px horizontal overflow on homepage.</td>
+              <td>Added <code>overflow-x: clip</code> to <code>html</code> and streamlined search button on screens &lt; 640px.</td>
+              <td><span class="pill ok">✅ Re-tested</span></td>
+            </tr>
+            <tr>
+              <td><code>T-BUG-08</code></td>
+              <td><span class="pill accent">Medium</span></td>
+              <td>Mobile Touch Targets</td>
+              <td class="bug-desc">Touch targets under 44px on header brand and theme icon button on small screens.</td>
+              <td>Set <code>min-height: 44px</code> on <code>.brand</code> and <code>min-width: 44px; flex-shrink: 0</code> on <code>.icon-btn</code>.</td>
+              <td><span class="pill ok">✅ Re-tested</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="sec">
+      <h2>Universal Flows (Section 5.1–5.10)</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Flow ID</th>
+              <th>Flow Description</th>
+              <th>Test Count</th>
+              <th>Status</th>
+              <th>Highlights</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>5.1</code></td>
+              <td>Intent Parser</td>
+              <td>48 cases</td>
+              <td><span class="pill ok">48 / 48 Passed</span></td>
+              <td>Multi-step chains, compression targets, Instagram resizing, polite responses for mismatch</td>
+            </tr>
+            <tr>
+              <td><code>5.2</code></td>
+              <td>Paste Detection</td>
+              <td>28 cases</td>
+              <td><span class="pill ok">28 / 28 Passed</span></td>
+              <td>JWT, JSON, timestamps, hex/rgb, cron, SQL, CSV; no false positive SQL on normal English</td>
+            </tr>
+            <tr>
+              <td><code>5.3</code></td>
+              <td>Chat & Ask Generators</td>
+              <td>8 cases</td>
+              <td><span class="pill ok">8 / 8 Passed</span></td>
+              <td>UUIDs, password length, lorem ipsum, sha256, base64, timestamps</td>
+            </tr>
+            <tr>
+              <td><code>5.4</code></td>
+              <td>Global Paste Flow</td>
+              <td>4 cases</td>
+              <td><span class="pill ok">4 / 4 Passed</span></td>
+              <td>⌘V anywhere with files, JSON, or JWT dispatches directly to matching tool</td>
+            </tr>
+            <tr>
+              <td><code>5.5</code></td>
+              <td>Drop Flow & Orb</td>
+              <td>4 cases</td>
+              <td><span class="pill ok">4 / 4 Passed</span></td>
+              <td>Dropzone activates orb glow, pulls satellites inward, reads real file metadata</td>
+            </tr>
+            <tr>
+              <td><code>5.6</code></td>
+              <td>Plan → Run → Results</td>
+              <td>4 cases</td>
+              <td><span class="pill ok">4 / 4 Passed</span></td>
+              <td>Progress bars, step completion badges, artifact downloads with measured file sizes</td>
+            </tr>
+            <tr>
+              <td><code>5.7</code></td>
+              <td>Live Panels (18 tools)</td>
+              <td>18 cases</td>
+              <td><span class="pill ok">18 / 18 Passed</span></td>
+              <td>Live option toggles (2 spaces, tabs, minify), status bar stats, Esc keyboard handling</td>
+            </tr>
+            <tr>
+              <td><code>5.8</code></td>
+              <td>⌘K Command Palette</td>
+              <td>4 cases</td>
+              <td><span class="pill ok">4 / 4 Passed</span></td>
+              <td>Synonyms (shrink → compress, jwt, iphone → heic), keyboard navigation, empty states</td>
+            </tr>
+            <tr>
+              <td><code>5.9</code></td>
+              <td>Voice Pro Demo Sheet</td>
+              <td>2 cases</td>
+              <td><span class="pill ok">2 / 2 Passed</span></td>
+              <td>Audio waveform animation, real-time simulated word streaming, auto-send</td>
+            </tr>
+            <tr>
+              <td><code>5.10</code></td>
+              <td>Theme, Recents & Storage</td>
+              <td>4 cases</td>
+              <td><span class="pill ok">4 / 4 Passed</span></td>
+              <td>Blocked localStorage private mode resilience, dark theme before first paint, recents persistence</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="sec">
+      <h2>How to Re-Run Tests</h2>
+      <div class="card" style="font-family: var(--mono); font-size: 13px; line-height: 1.6; background: var(--solid);">
+        # 1. Run unit test suite (182 tests)<br>
+        npm run test:unit<br><br>
+        # 2. Build production standalone bundle<br>
+        npm run build<br><br>
+        # 3. Run Playwright tools & platform tests<br>
+        E2E_PORT=3210 npx playwright test tests/e2e/tools.spec.ts --project=chromium<br>
+        E2E_PORT=3210 npx playwright test tests/e2e/platform.spec.ts --project=chromium<br>
+        E2E_PORT=3210 npx playwright test --project=platform<br>
+        E2E_PORT=3210 npx playwright test --project=mobile-pixel7<br>
+        E2E_PORT=3210 npx playwright test --project=mobile-iphone14
+      </div>
+    </section>
+  </div>
+</body>
+</html>

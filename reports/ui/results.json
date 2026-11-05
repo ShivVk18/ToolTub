@@ -1,0 +1,786 @@
+[
+  {
+    "state": "a_hero_rest",
+    "theme": "light",
+    "viewport": "1920x1080",
+    "diffPercent": 4.95,
+    "passed": false
+  },
+  {
+    "state": "b_cursor_near_orb",
+    "theme": "light",
+    "viewport": "1920x1080",
+    "diffPercent": 4.54,
+    "passed": false
+  },
+  {
+    "state": "c_file_dragged",
+    "theme": "light",
+    "viewport": "1920x1080",
+    "diffPercent": 9.31,
+    "passed": false
+  },
+  {
+    "state": "d_workspace_dropped",
+    "theme": "light",
+    "viewport": "1920x1080",
+    "diffPercent": 6.57,
+    "passed": false
+  },
+  {
+    "state": "e_typing_plan",
+    "theme": "light",
+    "viewport": "1920x1080",
+    "diffPercent": 6.82,
+    "passed": false
+  },
+  {
+    "state": "f_plan_done",
+    "theme": "light",
+    "viewport": "1920x1080",
+    "diffPercent": 6.79,
+    "passed": false
+  },
+  {
+    "state": "g_pasted_json",
+    "theme": "light",
+    "viewport": "1920x1080",
+    "diffPercent": 6.19,
+    "passed": false
+  },
+  {
+    "state": "h_live_panel",
+    "theme": "light",
+    "viewport": "1920x1080",
+    "diffPercent": 3.87,
+    "passed": false
+  },
+  {
+    "state": "i_palette",
+    "theme": "light",
+    "viewport": "1920x1080",
+    "diffPercent": 48.36,
+    "passed": false
+  },
+  {
+    "state": "j_voice_sheet",
+    "theme": "light",
+    "viewport": "1920x1080",
+    "diffPercent": 29.6,
+    "passed": false
+  },
+  {
+    "state": "k_scrolled_nav",
+    "theme": "light",
+    "viewport": "1920x1080",
+    "diffPercent": 9.52,
+    "passed": false
+  },
+  {
+    "state": "l_marquee",
+    "theme": "light",
+    "viewport": "1920x1080",
+    "diffPercent": 11.5,
+    "passed": false
+  },
+  {
+    "state": "m_bento",
+    "theme": "light",
+    "viewport": "1920x1080",
+    "diffPercent": 7.78,
+    "passed": false
+  },
+  {
+    "state": "n_explore",
+    "theme": "light",
+    "viewport": "1920x1080",
+    "diffPercent": 17.06,
+    "passed": false
+  },
+  {
+    "state": "o_pricing",
+    "theme": "light",
+    "viewport": "1920x1080",
+    "diffPercent": 15.62,
+    "passed": false
+  },
+  {
+    "state": "p_footer_wordmark",
+    "theme": "light",
+    "viewport": "1920x1080",
+    "diffPercent": 10.23,
+    "passed": false
+  },
+  {
+    "state": "a_hero_rest",
+    "theme": "dark",
+    "viewport": "1920x1080",
+    "diffPercent": 3.01,
+    "passed": false
+  },
+  {
+    "state": "b_cursor_near_orb",
+    "theme": "dark",
+    "viewport": "1920x1080",
+    "diffPercent": 3,
+    "passed": false
+  },
+  {
+    "state": "c_file_dragged",
+    "theme": "dark",
+    "viewport": "1920x1080",
+    "diffPercent": 2.78,
+    "passed": false
+  },
+  {
+    "state": "d_workspace_dropped",
+    "theme": "dark",
+    "viewport": "1920x1080",
+    "diffPercent": 2.76,
+    "passed": false
+  },
+  {
+    "state": "e_typing_plan",
+    "theme": "dark",
+    "viewport": "1920x1080",
+    "diffPercent": 3.16,
+    "passed": false
+  },
+  {
+    "state": "f_plan_done",
+    "theme": "dark",
+    "viewport": "1920x1080",
+    "diffPercent": 3.04,
+    "passed": false
+  },
+  {
+    "state": "g_pasted_json",
+    "theme": "dark",
+    "viewport": "1920x1080",
+    "diffPercent": 2.16,
+    "passed": false
+  },
+  {
+    "state": "h_live_panel",
+    "theme": "dark",
+    "viewport": "1920x1080",
+    "diffPercent": 3.48,
+    "passed": false
+  },
+  {
+    "state": "i_palette",
+    "theme": "dark",
+    "viewport": "1920x1080",
+    "diffPercent": 8.43,
+    "passed": false
+  },
+  {
+    "state": "j_voice_sheet",
+    "theme": "dark",
+    "viewport": "1920x1080",
+    "diffPercent": 15.87,
+    "passed": false
+  },
+  {
+    "state": "k_scrolled_nav",
+    "theme": "dark",
+    "viewport": "1920x1080",
+    "diffPercent": 7.76,
+    "passed": false
+  },
+  {
+    "state": "l_marquee",
+    "theme": "dark",
+    "viewport": "1920x1080",
+    "diffPercent": 8.1,
+    "passed": false
+  },
+  {
+    "state": "m_bento",
+    "theme": "dark",
+    "viewport": "1920x1080",
+    "diffPercent": 6.29,
+    "passed": false
+  },
+  {
+    "state": "n_explore",
+    "theme": "dark",
+    "viewport": "1920x1080",
+    "diffPercent": 8.73,
+    "passed": false
+  },
+  {
+    "state": "o_pricing",
+    "theme": "dark",
+    "viewport": "1920x1080",
+    "diffPercent": 11.18,
+    "passed": false
+  },
+  {
+    "state": "p_footer_wordmark",
+    "theme": "dark",
+    "viewport": "1920x1080",
+    "diffPercent": 7,
+    "passed": false
+  },
+  {
+    "state": "a_hero_rest",
+    "theme": "light",
+    "viewport": "2560x1440",
+    "diffPercent": 3.09,
+    "passed": false
+  },
+  {
+    "state": "b_cursor_near_orb",
+    "theme": "light",
+    "viewport": "2560x1440",
+    "diffPercent": 3.11,
+    "passed": false
+  },
+  {
+    "state": "c_file_dragged",
+    "theme": "light",
+    "viewport": "2560x1440",
+    "diffPercent": 15.98,
+    "passed": false
+  },
+  {
+    "state": "d_workspace_dropped",
+    "theme": "light",
+    "viewport": "2560x1440",
+    "diffPercent": 4.18,
+    "passed": false
+  },
+  {
+    "state": "e_typing_plan",
+    "theme": "light",
+    "viewport": "2560x1440",
+    "diffPercent": 4.2,
+    "passed": false
+  },
+  {
+    "state": "f_plan_done",
+    "theme": "light",
+    "viewport": "2560x1440",
+    "diffPercent": 4.29,
+    "passed": false
+  },
+  {
+    "state": "g_pasted_json",
+    "theme": "light",
+    "viewport": "2560x1440",
+    "diffPercent": 4.03,
+    "passed": false
+  },
+  {
+    "state": "h_live_panel",
+    "theme": "light",
+    "viewport": "2560x1440",
+    "diffPercent": 2.38,
+    "passed": false
+  },
+  {
+    "state": "i_palette",
+    "theme": "light",
+    "viewport": "2560x1440",
+    "diffPercent": 56.58,
+    "passed": false
+  },
+  {
+    "state": "j_voice_sheet",
+    "theme": "light",
+    "viewport": "2560x1440",
+    "diffPercent": 18.22,
+    "passed": false
+  },
+  {
+    "state": "k_scrolled_nav",
+    "theme": "light",
+    "viewport": "2560x1440",
+    "diffPercent": 5.66,
+    "passed": false
+  },
+  {
+    "state": "l_marquee",
+    "theme": "light",
+    "viewport": "2560x1440",
+    "diffPercent": 6.41,
+    "passed": false
+  },
+  {
+    "state": "m_bento",
+    "theme": "light",
+    "viewport": "2560x1440",
+    "diffPercent": 6.76,
+    "passed": false
+  },
+  {
+    "state": "n_explore",
+    "theme": "light",
+    "viewport": "2560x1440",
+    "diffPercent": 10.19,
+    "passed": false
+  },
+  {
+    "state": "o_pricing",
+    "theme": "light",
+    "viewport": "2560x1440",
+    "diffPercent": 9.65,
+    "passed": false
+  },
+  {
+    "state": "p_footer_wordmark",
+    "theme": "light",
+    "viewport": "2560x1440",
+    "diffPercent": 9.72,
+    "passed": false
+  },
+  {
+    "state": "a_hero_rest",
+    "theme": "light",
+    "viewport": "1440x900",
+    "diffPercent": 6.25,
+    "passed": false
+  },
+  {
+    "state": "b_cursor_near_orb",
+    "theme": "light",
+    "viewport": "1440x900",
+    "diffPercent": 6,
+    "passed": false
+  },
+  {
+    "state": "c_file_dragged",
+    "theme": "light",
+    "viewport": "1440x900",
+    "diffPercent": 7.47,
+    "passed": false
+  },
+  {
+    "state": "d_workspace_dropped",
+    "theme": "light",
+    "viewport": "1440x900",
+    "diffPercent": 9.76,
+    "passed": false
+  },
+  {
+    "state": "e_typing_plan",
+    "theme": "light",
+    "viewport": "1440x900",
+    "diffPercent": 10.09,
+    "passed": false
+  },
+  {
+    "state": "f_plan_done",
+    "theme": "light",
+    "viewport": "1440x900",
+    "diffPercent": 10.12,
+    "passed": false
+  },
+  {
+    "state": "g_pasted_json",
+    "theme": "light",
+    "viewport": "1440x900",
+    "diffPercent": 9.21,
+    "passed": false
+  },
+  {
+    "state": "h_live_panel",
+    "theme": "light",
+    "viewport": "1440x900",
+    "diffPercent": 4.41,
+    "passed": false
+  },
+  {
+    "state": "i_palette",
+    "theme": "light",
+    "viewport": "1440x900",
+    "diffPercent": 41.27,
+    "passed": false
+  },
+  {
+    "state": "j_voice_sheet",
+    "theme": "light",
+    "viewport": "1440x900",
+    "diffPercent": 37.75,
+    "passed": false
+  },
+  {
+    "state": "k_scrolled_nav",
+    "theme": "light",
+    "viewport": "1440x900",
+    "diffPercent": 11.28,
+    "passed": false
+  },
+  {
+    "state": "l_marquee",
+    "theme": "light",
+    "viewport": "1440x900",
+    "diffPercent": 10.83,
+    "passed": false
+  },
+  {
+    "state": "m_bento",
+    "theme": "light",
+    "viewport": "1440x900",
+    "diffPercent": 10.51,
+    "passed": false
+  },
+  {
+    "state": "n_explore",
+    "theme": "light",
+    "viewport": "1440x900",
+    "diffPercent": 23.23,
+    "passed": false
+  },
+  {
+    "state": "o_pricing",
+    "theme": "light",
+    "viewport": "1440x900",
+    "diffPercent": 20.18,
+    "passed": false
+  },
+  {
+    "state": "p_footer_wordmark",
+    "theme": "light",
+    "viewport": "1440x900",
+    "diffPercent": 14.26,
+    "passed": false
+  },
+  {
+    "state": "a_hero_rest",
+    "theme": "light",
+    "viewport": "768x1024",
+    "diffPercent": 8.09,
+    "passed": false
+  },
+  {
+    "state": "b_cursor_near_orb",
+    "theme": "light",
+    "viewport": "768x1024",
+    "diffPercent": 8.12,
+    "passed": false
+  },
+  {
+    "state": "c_file_dragged",
+    "theme": "light",
+    "viewport": "768x1024",
+    "diffPercent": 27.03,
+    "passed": false
+  },
+  {
+    "state": "d_workspace_dropped",
+    "theme": "light",
+    "viewport": "768x1024",
+    "diffPercent": 13.71,
+    "passed": false
+  },
+  {
+    "state": "e_typing_plan",
+    "theme": "light",
+    "viewport": "768x1024",
+    "diffPercent": 14.67,
+    "passed": false
+  },
+  {
+    "state": "f_plan_done",
+    "theme": "light",
+    "viewport": "768x1024",
+    "diffPercent": 14.69,
+    "passed": false
+  },
+  {
+    "state": "g_pasted_json",
+    "theme": "light",
+    "viewport": "768x1024",
+    "diffPercent": 13.01,
+    "passed": false
+  },
+  {
+    "state": "h_live_panel",
+    "theme": "light",
+    "viewport": "768x1024",
+    "diffPercent": 5.61,
+    "passed": false
+  },
+  {
+    "state": "i_palette",
+    "theme": "light",
+    "viewport": "768x1024",
+    "diffPercent": 54.17,
+    "passed": false
+  },
+  {
+    "state": "j_voice_sheet",
+    "theme": "light",
+    "viewport": "768x1024",
+    "diffPercent": 27.52,
+    "passed": false
+  },
+  {
+    "state": "k_scrolled_nav",
+    "theme": "light",
+    "viewport": "768x1024",
+    "diffPercent": 10.98,
+    "passed": false
+  },
+  {
+    "state": "l_marquee",
+    "theme": "light",
+    "viewport": "768x1024",
+    "diffPercent": 14.81,
+    "passed": false
+  },
+  {
+    "state": "m_bento",
+    "theme": "light",
+    "viewport": "768x1024",
+    "diffPercent": 10.07,
+    "passed": false
+  },
+  {
+    "state": "n_explore",
+    "theme": "light",
+    "viewport": "768x1024",
+    "diffPercent": 24.06,
+    "passed": false
+  },
+  {
+    "state": "o_pricing",
+    "theme": "light",
+    "viewport": "768x1024",
+    "diffPercent": 19.55,
+    "passed": false
+  },
+  {
+    "state": "p_footer_wordmark",
+    "theme": "light",
+    "viewport": "768x1024",
+    "diffPercent": 29.66,
+    "passed": false
+  },
+  {
+    "state": "a_hero_rest",
+    "theme": "light",
+    "viewport": "390x844",
+    "diffPercent": 16.33,
+    "passed": false
+  },
+  {
+    "state": "b_cursor_near_orb",
+    "theme": "light",
+    "viewport": "390x844",
+    "diffPercent": 15.14,
+    "passed": false
+  },
+  {
+    "state": "c_file_dragged",
+    "theme": "light",
+    "viewport": "390x844",
+    "diffPercent": 23.55,
+    "passed": false
+  },
+  {
+    "state": "d_workspace_dropped",
+    "theme": "light",
+    "viewport": "390x844",
+    "diffPercent": 24.85,
+    "passed": false
+  },
+  {
+    "state": "e_typing_plan",
+    "theme": "light",
+    "viewport": "390x844",
+    "diffPercent": 31.97,
+    "passed": false
+  },
+  {
+    "state": "f_plan_done",
+    "theme": "light",
+    "viewport": "390x844",
+    "diffPercent": 31.93,
+    "passed": false
+  },
+  {
+    "state": "g_pasted_json",
+    "theme": "light",
+    "viewport": "390x844",
+    "diffPercent": 22.36,
+    "passed": false
+  },
+  {
+    "state": "h_live_panel",
+    "theme": "light",
+    "viewport": "390x844",
+    "diffPercent": 18.25,
+    "passed": false
+  },
+  {
+    "state": "i_palette",
+    "theme": "light",
+    "viewport": "390x844",
+    "diffPercent": 64.48,
+    "passed": false
+  },
+  {
+    "state": "j_voice_sheet",
+    "theme": "light",
+    "viewport": "390x844",
+    "diffPercent": 41.13,
+    "passed": false
+  },
+  {
+    "state": "k_scrolled_nav",
+    "theme": "light",
+    "viewport": "390x844",
+    "diffPercent": 17.01,
+    "passed": false
+  },
+  {
+    "state": "l_marquee",
+    "theme": "light",
+    "viewport": "390x844",
+    "diffPercent": 13.37,
+    "passed": false
+  },
+  {
+    "state": "m_bento",
+    "theme": "light",
+    "viewport": "390x844",
+    "diffPercent": 9.56,
+    "passed": false
+  },
+  {
+    "state": "n_explore",
+    "theme": "light",
+    "viewport": "390x844",
+    "diffPercent": 23.16,
+    "passed": false
+  },
+  {
+    "state": "o_pricing",
+    "theme": "light",
+    "viewport": "390x844",
+    "diffPercent": 14.95,
+    "passed": false
+  },
+  {
+    "state": "p_footer_wordmark",
+    "theme": "light",
+    "viewport": "390x844",
+    "diffPercent": 35.6,
+    "passed": false
+  },
+  {
+    "state": "a_hero_rest",
+    "theme": "dark",
+    "viewport": "390x844",
+    "diffPercent": 11.73,
+    "passed": false
+  },
+  {
+    "state": "b_cursor_near_orb",
+    "theme": "dark",
+    "viewport": "390x844",
+    "diffPercent": 11.75,
+    "passed": false
+  },
+  {
+    "state": "c_file_dragged",
+    "theme": "dark",
+    "viewport": "390x844",
+    "diffPercent": 11.5,
+    "passed": false
+  },
+  {
+    "state": "d_workspace_dropped",
+    "theme": "dark",
+    "viewport": "390x844",
+    "diffPercent": 11.03,
+    "passed": false
+  },
+  {
+    "state": "e_typing_plan",
+    "theme": "dark",
+    "viewport": "390x844",
+    "diffPercent": 16.59,
+    "passed": false
+  },
+  {
+    "state": "f_plan_done",
+    "theme": "dark",
+    "viewport": "390x844",
+    "diffPercent": 16.67,
+    "passed": false
+  },
+  {
+    "state": "g_pasted_json",
+    "theme": "dark",
+    "viewport": "390x844",
+    "diffPercent": 9.39,
+    "passed": false
+  },
+  {
+    "state": "h_live_panel",
+    "theme": "dark",
+    "viewport": "390x844",
+    "diffPercent": 15.64,
+    "passed": false
+  },
+  {
+    "state": "i_palette",
+    "theme": "dark",
+    "viewport": "390x844",
+    "diffPercent": 19.17,
+    "passed": false
+  },
+  {
+    "state": "j_voice_sheet",
+    "theme": "dark",
+    "viewport": "390x844",
+    "diffPercent": 25.47,
+    "passed": false
+  },
+  {
+    "state": "k_scrolled_nav",
+    "theme": "dark",
+    "viewport": "390x844",
+    "diffPercent": 13.08,
+    "passed": false
+  },
+  {
+    "state": "l_marquee",
+    "theme": "dark",
+    "viewport": "390x844",
+    "diffPercent": 10.57,
+    "passed": false
+  },
+  {
+    "state": "m_bento",
+    "theme": "dark",
+    "viewport": "390x844",
+    "diffPercent": 6.87,
+    "passed": false
+  },
+  {
+    "state": "n_explore",
+    "theme": "dark",
+    "viewport": "390x844",
+    "diffPercent": 12.12,
+    "passed": false
+  },
+  {
+    "state": "o_pricing",
+    "theme": "dark",
+    "viewport": "390x844",
+    "diffPercent": 12.41,
+    "passed": false
+  },
+  {
+    "state": "p_footer_wordmark",
+    "theme": "dark",
+    "viewport": "390x844",
+    "diffPercent": 28.77,
+    "passed": false
+  }
+]

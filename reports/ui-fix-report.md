@@ -115,3 +115,4 @@ Comparison suite was run against `design/reference/KlipKit_UI.html` across all t
 ## 6. Open Items & Task Transition
 
 Task 1 is 100% complete and verified against all acceptance criteria. No blocking visual or structural bugs remain open. Ready to proceed to **Task 2: End-to-End Tools Testing (`02_TOOLS_E2E_TEST_PROMPT.md`)**.
+

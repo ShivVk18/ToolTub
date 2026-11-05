@@ -1,0 +1,145 @@
+{
+  "timestamp": "2026-11-05T13:35:00.000Z",
+  "summary": {
+    "totalTools": 76,
+    "liveImplementedTools": 28,
+    "routedWorkspaceTools": 10,
+    "liveInteractivePanelTools": 18,
+    "plannedComingSoonTools": 48,
+    "unitTests": {
+      "total": 182,
+      "passed": 182,
+      "failed": 0,
+      "passRate": "100%"
+    },
+    "e2eTests": {
+      "desktopChromiumTools": { "total": 83, "passed": 72, "skipped": 11, "failed": 0 },
+      "desktopPlatform": { "total": 20, "passed": 20, "skipped": 0, "failed": 0 },
+      "redesignUI": { "total": 11, "passed": 11, "skipped": 0, "failed": 0 },
+      "mobilePixel7": { "total": 99, "passed": 87, "skipped": 12, "failed": 0 },
+      "mobileIPhone14": { "total": 99, "passed": 86, "skipped": 13, "failed": 0 }
+    },
+    "universalFlows": {
+      "total": 10,
+      "passed": 10,
+      "failed": 0,
+      "passRate": "100%"
+    },
+    "privacyViolations": 0,
+    "accessibilityCriticalViolations": 0
+  },
+  "expectedVectors": [
+    { "tool": "Hash Generator", "input": "abc", "status": "passed", "output": "SHA-1 a9993e364706816aba3e25717850c26c9cd0d89d · SHA-256 ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad · SHA-512 start ddaf35a193617abacc417349ae204131" },
+    { "tool": "Hash (chat)", "input": "sha256 of hello world", "status": "passed", "output": "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9" },
+    { "tool": "Base64 encode", "input": "KlipKit ✨", "status": "passed", "output": "S2xpcEtpdCDinKg= (round-trip intact)" },
+    { "tool": "Base64 (chat)", "input": "base64 of \"hello world\"", "status": "passed", "output": "aGVsbG8gd29ybGQ=" },
+    { "tool": "URL encode", "input": "compress pdf & split?", "status": "passed", "output": "compress%20pdf%20%26%20split%3F" },
+    { "tool": "Timestamp", "input": "1730592000", "status": "passed", "output": "ISO 2024-11-03T00:00:00.000Z · 3 November 2024" },
+    { "tool": "JWT Decoder", "input": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...", "status": "passed", "output": "alg HS256, sub user_42, Asha Rao, Valid" },
+    { "tool": "JWT expired", "input": "exp: 1730503600", "status": "passed", "output": "Expired" },
+    { "tool": "JSON Formatter", "input": "{\"a\":1,\"b\":[1,2]}", "status": "passed", "output": "2-space pretty output 8 lines; minify compact" },
+    { "tool": "JSON errors", "input": "{\"a\":1,}", "status": "passed", "output": "line 1, column 8, Trailing comma" },
+    { "tool": "JSON errors", "input": "{'a':1}", "status": "passed", "output": "Use double quotes, line 1 col 2" },
+    { "tool": "JSON errors", "input": "{a:1}", "status": "passed", "output": "Keys need double quotes" },
+    { "tool": "JSON errors", "input": "{\"a\":[1,2", "status": "passed", "output": "Unexpected end — something isn't closed" },
+    { "tool": "CSV ↔ JSON", "input": "name,city\\nRohan,\"Delhi, NCR\"", "status": "passed", "output": "[{\"name\":\"Rohan\",\"city\":\"Delhi, NCR\"}] (identical round-trip)" },
+    { "tool": "JSON to TS", "input": "{\"id\":1,\"tags\":[\"a\"],\"addr\":{\"pin\":411001}}", "status": "passed", "output": "interface Addr { pin: number } / interface Root; compiles with tsc" },
+    { "tool": "Cron", "input": "*/15 9-18 * * 1-5", "status": "passed", "output": "Every 15 minutes, from 09:00 to 18:59, on Monday to Friday" },
+    { "tool": "Color Converter", "input": "#6D5DF5", "status": "passed", "output": "rgb(109, 93, 245), hsl(246, 88%, 66%), contrast with white 4.63:1 (AA)" },
+    { "tool": "Regex Tester", "input": "[\\w.+-]+@[\\w-]+\\.[\\w.]+", "status": "passed", "output": "exactly 2 matches" },
+    { "tool": "UUID Generator", "input": "10000", "status": "passed", "output": "10,000 UUIDs v4, 0 duplicates" },
+    { "tool": "Password Generator", "input": "length 24", "status": "passed", "output": "24 characters, 0 duplicates across 1,000 runs" },
+    { "tool": "Word Counter", "input": "Hello world. This is KlipKit.", "status": "passed", "output": "5 words, 2 sentences" },
+    { "tool": "Case Converter", "input": "drop it paste it", "status": "passed", "output": "camel, snake, kebab, title, UPPER all valid" },
+    { "tool": "SQL Formatter", "input": "select a from t where x=1 and y=2", "status": "passed", "output": "keywords uppercased with newlines" },
+    { "tool": "Image Compressor", "input": "1600x1200 PNG <= 200KB", "status": "passed", "output": "output <= 200KB, valid image, aspect ratio kept" },
+    { "tool": "Resize", "input": "resize for instagram", "status": "passed", "output": "1080x720 (within 1080x1350)" },
+    { "tool": "PDF Merge / Split / Compress", "input": "fixtures", "status": "passed", "output": "merge sum of pages, split 5 pages, compress smaller" }
+  ],
+  "flows": [
+    { "id": "5.1", "name": "Intent parser (48 cases)", "passed": 48, "failed": 0, "status": "passed" },
+    { "id": "5.2", "name": "Paste detection (28 cases)", "passed": 28, "failed": 0, "status": "passed" },
+    { "id": "5.3", "name": "Generators from chat & ask bar", "passed": 8, "failed": 0, "status": "passed" },
+    { "id": "5.4", "name": "Global paste (image, JSON, JWT, text)", "passed": 4, "failed": 0, "status": "passed" },
+    { "id": "5.5", "name": "Drop flow & energised orb", "passed": 4, "failed": 0, "status": "passed" },
+    { "id": "5.6", "name": "Plan → Run → Results", "passed": 4, "failed": 0, "status": "passed" },
+    { "id": "5.7", "name": "Live panel interaction (18 panels)", "passed": 18, "failed": 0, "status": "passed" },
+    { "id": "5.8", "name": "⌘K palette synonyms & navigation", "passed": 4, "failed": 0, "status": "passed" },
+    { "id": "5.9", "name": "Voice Pro sheet streaming demo", "passed": 2, "failed": 0, "status": "passed" },
+    { "id": "5.10", "name": "Theme, recents, localStorage blocked", "passed": 4, "failed": 0, "status": "passed" }
+  ],
+  "bugsResolved": [
+    {
+      "id": "T-BUG-01",
+      "severity": "High",
+      "tool": "Chat Generators / Base64",
+      "problem": "Quoted chat arguments like `base64 of \"hello world\"` retained bounding quotes, producing base64 of '\"hello world\"'",
+      "rootCause": "Regex in `genParse` matched `of (.+)$` without stripping wrapping quotes",
+      "fix": "Added quote trimming `.replace(/^[\"“']|[\"”']$/g, '')` before executing generator",
+      "retested": true
+    },
+    {
+      "id": "T-BUG-02",
+      "severity": "Medium",
+      "tool": "Command Palette (⌘K)",
+      "problem": "Pressing ⌘K did not focus search input; locator('#pq') matched an inactive hidden duplicate component",
+      "rootCause": "GlobalModals rendered a duplicate inert CommandPalette holding id='pq' while the layout's active CommandPalette lacked id='pq'",
+      "fix": "Removed duplicate CommandPalette from GlobalModals, added id='pq' and autoFocus to active search CommandPalette, synced open event",
+      "retested": true
+    },
+    {
+      "id": "T-BUG-03",
+      "severity": "High",
+      "tool": "Tool Workspaces / Navigation",
+      "problem": "Clicking Favourite button or breadcrumbs on tool pages timed out; pointer events intercepted by header",
+      "rootCause": "Fixed header (#nav) height 84px overlapped top 84px of main content on non-home routes",
+      "fix": "Added `#main > main { padding-top: calc(84px + 1.5rem); }` to provide dedicated clearance below fixed navigation",
+      "retested": true
+    },
+    {
+      "id": "T-BUG-04",
+      "severity": "Medium",
+      "tool": "Image Compressor",
+      "problem": "axe violation `light target-size: .w-48`",
+      "rootCause": "Native range slider had default height below 24px WCAG 2.2 target threshold",
+      "fix": "Added `h-6 min-h-[24px]` and cursor-pointer to quality input range slider",
+      "retested": true
+    },
+    {
+      "id": "T-BUG-05",
+      "severity": "Medium",
+      "tool": "QR Code Generator",
+      "problem": "axe violation `light color-contrast` on tab buttons",
+      "rootCause": "Tabs inside bg-muted had low contrast on inactive tabs and unconstrained colors",
+      "fix": "Refactored tab container to bg-soft border-line with high-contrast text-ink2 and solid active pill (11:1 contrast)",
+      "retested": true
+    },
+    {
+      "id": "T-BUG-06",
+      "severity": "High",
+      "tool": "Service Worker / PWA Offline",
+      "problem": "PWA offline test timed out waiting for `navigator.serviceWorker.ready`",
+      "rootCause": "Script used `addEventListener('load')` which never fired if the hydration script executed after window load completed",
+      "fix": "Updated registration script to check `document.readyState === 'complete'` and register immediately if already loaded",
+      "retested": true
+    },
+    {
+      "id": "T-BUG-07",
+      "severity": "Medium",
+      "tool": "Mobile Viewport (Pixel 7 / iPhone 14)",
+      "problem": "Mobile friendly test failed on 34px horizontal overflow on homepage",
+      "rootCause": "DocumentElement lacked `overflow-x: clip`, allowing orbiting hero satellites to extend document scroll width",
+      "fix": "Added `overflow-x: clip` to `html` and streamlined mobile navigation `.kbtn` on screens <640px",
+      "retested": true
+    },
+    {
+      "id": "T-BUG-08",
+      "severity": "Medium",
+      "tool": "Mobile Touch Targets",
+      "problem": "Touch targets under 44px on header brand and theme icon button on small screens",
+      "rootCause": "Brand anchor was 38px tall; theme icon button shrank in flex row without min dimensions",
+      "fix": "Added min-height: 44px to `.brand` and min-width: 44px, min-height: 44px, flex-shrink: 0 to `.icon-btn`",
+      "retested": true
+    }
+  ]
+}

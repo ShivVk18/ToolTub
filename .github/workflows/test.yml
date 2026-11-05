@@ -38,4 +38,5 @@ jobs:
           name: reports
           path: |
             playwright-report
+            reports
             .lighthouseci/reports
