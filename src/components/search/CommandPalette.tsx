@@ -129,6 +129,8 @@ export function CommandPalette({ index }: { index: SearchEntry[] }) {
           </svg>
           <input
             ref={input}
+            id="pq"
+            autoFocus
             role="combobox"
             aria-expanded="true"
             aria-controls="search-results"
@@ -224,7 +226,7 @@ export function CommandPalette({ index }: { index: SearchEntry[] }) {
           })}
           {q && results.length === 0 && (
             <li className="pg normal-case tracking-normal text-[15px] p-[24px] text-muted text-center">
-              No tool matches “{q}”. Try “pdf”, “image” or “json”.
+              No tools match. Try “pdf”, “image” or “json”.
             </li>
           )}
         </ul>

@@ -27,7 +27,12 @@ export const useUIStore = create<UIState>((set) => ({
   panelTool: null,
   panelInput: '',
   isPanelFull: false,
-  openPalette: () => set({ isPaletteOpen: true }),
+  openPalette: () => {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('klipkit:search'));
+    }
+    set({ isPaletteOpen: true });
+  },
   closePalette: () => set({ isPaletteOpen: false }),
   openVoiceSheet: () => set({ isVoiceSheetOpen: true }),
   closeVoiceSheet: () => set({ isVoiceSheetOpen: false }),

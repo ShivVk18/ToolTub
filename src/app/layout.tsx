@@ -39,7 +39,7 @@ export const metadata: Metadata = {
 };
 
 /** Registers the service worker, then hands it every same-origin URL this page already loaded (first-visit offline). */
-const swScript = `if("serviceWorker"in navigator)addEventListener("load",()=>{navigator.serviceWorker.register("/sw.js").then(()=>navigator.serviceWorker.ready).then(r=>{var u=[location.href].concat(performance.getEntriesByType("resource").map(e=>e.name).filter(n=>n.indexOf(location.origin)===0));r.active&&r.active.postMessage({type:"cache-urls",urls:u})}).catch(()=>{})})`;
+const swScript = `if("serviceWorker"in navigator){var reg=function(){navigator.serviceWorker.register("/sw.js").then(function(){return navigator.serviceWorker.ready}).then(function(r){var u=[location.href].concat(performance.getEntriesByType("resource").map(function(e){return e.name}).filter(function(n){return n.indexOf(location.origin)===0}));r.active&&r.active.postMessage({type:"cache-urls",urls:u})}).catch(function(){})};if(document.readyState==="complete")reg();else addEventListener("load",reg)}`;
 
 export const viewport: Viewport = { themeColor: THEME_COLOR, width: "device-width", initialScale: 1 };
 

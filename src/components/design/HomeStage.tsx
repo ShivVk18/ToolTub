@@ -313,6 +313,23 @@ export function HomeStage() {
     return () => window.removeEventListener('paste', handleGlobalPaste);
   }, []);
 
+  const handleSelectTool = async (t: ToolItem) => {
+    if (window.scrollY > 10) {
+      await goto(0);
+    }
+    if (PANELS[t.n]) {
+      openPanel(t, '');
+      return;
+    }
+    closePanel();
+    setContextTool(t);
+    setCurrentFile(null);
+    setCurrentPaste(null);
+    setMode('work');
+    document.body.classList.add('is-work');
+    orbControllerRef.current?.triggerGulp(0.8);
+  };
+
   // Hash deep links: klipkit.com/#json-formatter opens the live tool
   useEffect(() => {
     const routeHash = () => {
@@ -347,23 +364,6 @@ export function HomeStage() {
       return cleanup;
     }
   }, []);
-
-  const handleSelectTool = async (t: ToolItem) => {
-    if (window.scrollY > 10) {
-      await goto(0);
-    }
-    if (PANELS[t.n]) {
-      openPanel(t, '');
-      return;
-    }
-    closePanel();
-    setContextTool(t);
-    setCurrentFile(null);
-    setCurrentPaste(null);
-    setMode('work');
-    document.body.classList.add('is-work');
-    orbControllerRef.current?.triggerGulp(0.8);
-  };
 
   const handleNew = () => {
     closePanel();

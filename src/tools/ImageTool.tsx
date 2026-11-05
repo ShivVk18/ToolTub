@@ -79,7 +79,7 @@ export function ImageTool({ slug, preset, next, mode }: ToolProps & { mode: Mode
         <>
           {mode === "compress" && (
             <Field label={`Quality: ${Math.round(quality * 100)}`}>
-              <input type="range" min={0.4} max={0.95} step={0.05} value={quality} onChange={(e) => setQuality(Number(e.target.value))} className="w-48" disabled={!!targetKB} />
+              <input type="range" min={0.4} max={0.95} step={0.05} value={quality} onChange={(e) => setQuality(Number(e.target.value))} className="w-48 h-6 min-h-[24px] cursor-pointer" disabled={!!targetKB} />
             </Field>
           )}
           {mode === "compress" && (

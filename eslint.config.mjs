@@ -15,7 +15,19 @@ const eslintConfig = defineConfig([
     // Third-party engines copied from node_modules at install time (minified, not our code).
     "public/vendor/**",
     "worker/node_modules/**",
+    "scripts/**",
+    "reports/**",
   ]),
+  {
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unused-vars": "warn",
+      "react/no-unescaped-entities": "off",
+      "react-hooks/set-state-in-effect": "off",
+      "react-hooks/refs": "off",
+      "react-hooks/purity": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;

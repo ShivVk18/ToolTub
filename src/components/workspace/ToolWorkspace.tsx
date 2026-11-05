@@ -78,7 +78,7 @@ export function ToolWorkspace({ input, settings, advanced, action, status, progr
         {settings && <div className="flex flex-wrap items-end gap-4">{settings}</div>}
         {advanced && (
           <details className="group rounded-lg border border-border px-4 py-2 text-sm">
-            <summary className="cursor-pointer select-none text-fg-muted">Advanced options</summary>
+            <summary className="cursor-pointer select-none text-fg-muted py-2 min-h-[44px] flex items-center">Advanced options</summary>
             <div className="flex flex-wrap items-end gap-4 py-3">{advanced}</div>
           </details>
         )}

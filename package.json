@@ -15,6 +15,7 @@
     "test:e2e:quick": "playwright test",
     "test:a11y": "playwright test --grep accessible",
     "test:perf": "npm run build && lhci autorun --config=lighthouserc.cjs",
+    "test:report": "playwright show-report",
     "test:all": "npm run lint && npx tsc --noEmit && npm run test:unit && npm run test:e2e"
   },
   "dependencies": {

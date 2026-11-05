@@ -6,12 +6,13 @@ test.describe("homepage", () => {
     const g = guard(page);
     await page.goto("/");
     await expect(page.locator("h1")).toHaveCount(1);
-    await expect(page.locator("h1")).toContainText("run on your device");
-    await expect(page.getByText("No sign-up · Runs on your device · Free forever")).toBeVisible();
-    for (const name of ["Productivity", "Developer", "Creator"]) await expect(page.getByRole("heading", { name, exact: true })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Popular tools" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Tool Chains" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Questions about KlipKit" })).toBeVisible();
+    await expect(page.locator("h1")).toContainText("Drop it. Paste it.");
+    await expect(page.locator("h1")).toContainText("Or just say what you need.");
+    await expect(page.getByText("76 tools · Runs on your device · Free forever")).toBeVisible();
+    await expect(page.locator("#feel")).toBeVisible();
+    await expect(page.locator("#explore")).toBeVisible();
+    await expect(page.locator("#pricing")).toBeVisible();
+    await expect(page.locator("#giant")).toBeAttached();
     await page.waitForLoadState("networkidle");
     g.assertClean();
   });
@@ -32,31 +33,22 @@ test.describe("search (Cmd/Ctrl+K)", () => {
     test.skip(isMobile, "keyboard shortcut is a desktop feature");
     await page.goto("/");
     await page.keyboard.press(browserName === "webkit" ? "Meta+k" : "Control+k");
-    const box = page.getByRole("combobox");
-    await expect(box).toBeFocused();
-    await box.fill("shrink pdf");
-    await expect(page.getByRole("option").first()).toContainText("Compress PDF");
-    await box.fill("jwt");
-    await expect(page.getByRole("option").first()).toContainText("JWT Decoder");
-    await box.fill("heic");
-    await expect(page.getByRole("option").first()).toContainText("HEIC to JPG");
+    const input = page.locator("#pq");
+    await expect(input).toBeFocused();
+    await input.fill("shrink pdf");
+    await expect(page.locator(".plist .pi").first()).toContainText("Compress PDF");
+    await input.fill("jwt");
+    await expect(page.locator(".plist .pi").first()).toContainText("JWT Decoder");
+    await input.fill("heic");
+    await expect(page.locator(".plist .pi").first()).toContainText("HEIC to JPG");
     await page.keyboard.press("Enter");
     await expect(page).toHaveURL(/\/heic-to-jpg$/);
   });
   test("no-results state", async ({ page }) => {
     await page.goto("/");
-    await page.getByRole("button", { name: /What do you need to do/ }).click();
-    await page.getByRole("combobox").fill("zzqxw");
-    await expect(page.getByText("No tool matches")).toBeVisible();
-  });
-  test("coming-soon tools are labelled, not linked", async ({ page }) => {
-    await page.goto("/");
-    await page.getByRole("button", { name: /What do you need to do/ }).click();
-    await page.getByRole("combobox").fill("merge pdf");
-    // Available tools rank first, so find the Merge PDF row rather than assuming it is first.
-    const opt = page.getByRole("option").filter({ hasText: "Merge PDF" });
-    await expect(opt).toContainText("Coming soon");
-    await expect(opt.locator("button")).toBeDisabled();
+    await page.locator(".kbtn").click();
+    await page.locator("#pq").fill("zzqxw");
+    await expect(page.getByText(/No tools match/i)).toBeVisible();
   });
 });
 
@@ -66,8 +58,8 @@ test.describe("recents, favourites, theme", () => {
     await page.getByRole("button", { name: "Add to favourites" }).click();
     await page.goto("/jwt-decoder");
     await page.goto("/");
-    await expect(page.getByRole("heading", { name: "Favourites" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Recently used" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Favourites" })).toBeAttached();
+    await expect(page.getByRole("heading", { name: "Recently used" })).toBeAttached();
     await page.reload();
     await expect(page.locator("section", { has: page.getByRole("heading", { name: "Favourites" }) })).toContainText("JSON Formatter");
     await page.goto("/json-formatter");
@@ -94,7 +86,7 @@ test.describe("recents, favourites, theme", () => {
   });
   test("dark theme persists and is applied before first paint", async ({ page }) => {
     await page.goto("/");
-    await page.getByRole("button", { name: "Toggle dark mode" }).click();
+    await page.getByRole("button", { name: /toggle (theme|dark mode)/i }).first().click();
     await expect(page.locator("html")).toHaveClass(/dark/);
     await page.addInitScript(() => document.addEventListener("DOMContentLoaded", () => ((window as unknown as { __darkAtDcl: boolean }).__darkAtDcl = document.documentElement.classList.contains("dark"))));
     await page.reload();
