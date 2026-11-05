@@ -298,7 +298,7 @@ export const PANELS: Record<string, PanelConfig> = {
         html:
           `<div class="swatch" style="background:${c.hex};margin-bottom:14px"><span style="color:#fff">Aa</span><span style="color:#17161B">Aa</span></div>` +
           esc(s),
-        copy: c.hex,
+        copy: s,
         status: c.hex,
       };
     },

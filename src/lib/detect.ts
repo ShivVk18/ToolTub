@@ -234,7 +234,9 @@ export function genParse(text: string): GenParsed | null {
       spans.push([n.index, n.index + n[0].length, { i: 1 }]);
     }
     const q = /["“'](.+?)["”']|\bof\s+(.+)$/i.exec(text);
-    return { g, n: n ? +n[1] : null, arg: q ? q[1] || q[2] : null, spans };
+    const rawArg = q ? q[1] || q[2] : null;
+    const arg = rawArg ? rawArg.trim().replace(/^["“']|["”']$/g, '') : null;
+    return { g, n: n ? +n[1] : null, arg, spans };
   }
   return null;
 }
