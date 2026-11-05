@@ -303,3 +303,4 @@ E2E_PORT=3210 npx playwright test --project=mobile-iphone14
 # 8. View the complete interactive HTML report
 npm run test:report
 ```
+
