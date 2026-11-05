@@ -124,8 +124,11 @@ body.is-work #hero{opacity:0;transform:translateY(-40px) scale(.98);filter:blur(
 .eyebrow b{color:var(--accent);font-weight:600}
 h1{font-family:var(--serif);font-weight:500;text-align:center;letter-spacing:-.025em;line-height:1.02;font-size:clamp(48px,5.9vw,112px);margin-top:22px}
 h1 .l2{display:block;font-style:italic;color:var(--muted)}
-h1 .w{display:inline-block;opacity:0;transform:translateY(.35em);filter:blur(10px);animation:wordIn .9s cubic-bezier(.2,.8,.2,1) forwards}
-@keyframes wordIn{to{opacity:1;transform:none;filter:none}}
+h1 .w{display:inline-block;animation:wordIn .9s cubic-bezier(.2,.8,.2,1) both}
+@keyframes wordIn{from{opacity:0;transform:translateY(.35em);filter:blur(10px)}to{opacity:1;transform:none;filter:none}}
+@media (prefers-reduced-motion: reduce) {
+  h1 .w { animation: none !important; opacity: 1 !important; transform: none !important; filter: none !important; }
+}
 #orbSlot{width:clamp(170px,13.2vw,252px);height:clamp(170px,13.2vw,252px);margin-top:clamp(14px,2.4vh,30px);flex:none;cursor:pointer;border-radius:50%}
 .hint{margin-top:clamp(14px,2.4vh,26px);font-size:18px;color:var(--muted);text-align:center;min-height:26px;transition:color .3s}
 .samples{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;justify-content:center}

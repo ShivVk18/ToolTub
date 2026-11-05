@@ -142,7 +142,7 @@ export function Nav({ onOpenSearch, onOpenPro, isHome = true }: NavProps) {
                 if (onOpenSearch) onOpenSearch();
                 window.dispatchEvent(new Event('klipkit:search'));
               }}
-              aria-label="Search tools"
+              aria-label="Search 76 tools… (⌘K)"
               className="kbtn"
             >
               <svg

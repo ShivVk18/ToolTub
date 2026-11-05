@@ -186,7 +186,7 @@ export function ExploreSection({ onSelectTool }: ExploreSectionProps) {
                   )}
                 </span>
 
-                <h4 className="text-[18px] font-semibold text-ink mt-[16px]">{t.n}</h4>
+                <h3 className="text-[18px] font-semibold text-ink mt-[16px]">{t.n}</h3>
                 <p className="text-[14px] text-ink2 mt-[4px] leading-[1.45]">{t.d}</p>
               </div>
             </button>
