@@ -15,6 +15,8 @@ export function useToolSearch(index: SearchEntry[]) {
   return useMemo(() => createToolSearch(index), [index]);
 }
 
+const CAT_KEY = { productivity: "p", developer: "d", creator: "c" } as const;
+
 function hlName(n: string, q: string): string {
   const w = q.trim().split(/\s+/)[0];
   if (!w) return esc(n);
@@ -37,9 +39,17 @@ export function CommandPalette({ index }: { index: SearchEntry[] }) {
   const search = useToolSearch(index);
   const recents = useKlip((s) => s.recents);
 
-  const results = q
-    ? search(q)
-    : recents.map((s) => index.find((e) => e.slug === s)).filter((e): e is SearchEntry => !!e);
+  const recentEntries = recents.map((s) => index.find((e) => e.slug === s)).filter((e): e is SearchEntry => !!e);
+  // Empty query: recently used tools if any, otherwise the first 8 home-grid tools (as in the reference).
+  const popular = useMemo(
+    () =>
+      index
+        .filter((e) => e.homeRank !== undefined)
+        .sort((a, b) => a.homeRank! - b.homeRank!)
+        .slice(0, 8),
+    [index],
+  );
+  const results = q ? search(q) : recentEntries.length ? recentEntries : popular;
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -144,22 +154,13 @@ export function CommandPalette({ index }: { index: SearchEntry[] }) {
         <ul id="search-results" role="listbox" className="plist max-h-[420px] overflow-auto p-[8px] list-none m-0">
           {!q && results.length > 0 && (
             <li className="pg text-[12px] font-semibold tracking-[1.2px] uppercase text-faint p-[12px_14px_6px]">
-              Recently used
+              {recentEntries.length ? "Recently used" : "Popular"}
             </li>
           )}
           {results.map((r, i) => {
             const isSel = i === active;
-            const catKey = r.hub.startsWith("dev") ? "d" : r.hub.startsWith("creat") ? "c" : "p";
-            const cat = CATS[catKey];
-            const iconKey = r.slug.includes("pdf")
-              ? "pdf"
-              : r.slug.includes("image") || r.slug.includes("heic")
-                ? "img"
-                : r.slug.includes("audio")
-                  ? "audio"
-                  : r.slug.includes("video")
-                    ? "video"
-                    : "code";
+            const cat = CATS[CAT_KEY[r.category]];
+            const iconKey = r.icon ?? "code";
 
             return (
               <li key={r.slug} role="option" aria-selected={isSel}>
@@ -192,10 +193,10 @@ export function CommandPalette({ index }: { index: SearchEntry[] }) {
                   <div className="flex-1 min-w-0">
                     <span
                       className="block font-semibold text-ink leading-tight"
-                      dangerouslySetInnerHTML={{ __html: hlName(r.name, q) }}
+                      dangerouslySetInnerHTML={{ __html: hlName(r.short ?? r.name, q) }}
                     />
                     <span className="block text-[13px] text-muted truncate">
-                      {r.available ? r.tagline : "Coming soon"}
+                      {r.available ? (r.blurb ?? r.tagline) : "Coming soon"}
                     </span>
                   </div>
                   <small className="text-muted text-[13px] ml-auto flex-none">{cat.n}</small>

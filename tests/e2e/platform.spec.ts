@@ -63,6 +63,19 @@ test.describe("search (Cmd/Ctrl+K)", () => {
     await page.keyboard.press("Enter");
     await expect(page).toHaveURL(/\/heic-to-jpg$/);
   });
+  test("empty palette lists Popular tools; rows show the right category", async ({ page }) => {
+    await page.goto("/");
+    await page.locator(".kbtn").click();
+    await expect(page.locator(".plist .pg")).toHaveText(/popular/i);
+    const rows = page.locator(".plist .pi");
+    await expect(rows).toHaveCount(8);
+    await expect(rows.first()).toContainText("Compress PDF");
+    await page.locator("#pq").fill("jwt");
+    await expect(rows.first()).toContainText("JWT Decoder");
+    await expect(rows.first().locator("small")).toHaveText("Developer");
+    await page.locator("#pq").fill("background");
+    await expect(rows.first().locator("small")).toHaveText("Creator");
+  });
   test("no-results state", async ({ page }) => {
     await page.goto("/");
     await page.locator(".kbtn").click();
