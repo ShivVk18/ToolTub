@@ -6,9 +6,15 @@ export function DesignFooter() {
     <footer className="relative z-[2] px-[clamp(20px,6vw,140px)] py-[40px] pb-[60px] flex items-center gap-[18px] text-ink2 text-[14px] border-t border-line flex-wrap">
       <Link
         href="/"
-        className="brand flex items-center gap-[12px] font-semibold text-[17px] text-ink no-underline select-none mr-[6px]"
+        className="brand flex items-center gap-[12px] font-semibold text-ink no-underline select-none mr-[6px]"
+        // Inline sizes as in the reference: the global .brand/.mark rules (nav size) would otherwise win.
+        // .brand keeps a 44 px tap target; the negative margin lets it take the reference's 30 px of layout.
+        style={{ fontSize: 17, marginBlock: -7 }}
       >
-        <div className="mark w-[30px] h-[30px] rounded-[9px] bg-ink text-bg grid place-items-center font-serif italic font-semibold text-[18px] relative">
+        <div
+          className="mark bg-ink text-bg grid place-items-center font-serif italic font-semibold relative"
+          style={{ width: 30, height: 30, fontSize: 18, borderRadius: 9 }}
+        >
           k
           <span
             className="absolute w-[6px] h-[6px] rounded-full right-[4px] top-[4px]"

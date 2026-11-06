@@ -318,6 +318,27 @@ test.describe("KlipKit Redesign UI & Visual Layer", () => {
       expect(Math.abs(app[s] - ref[s]), `${s}: app ${app[s]} vs ref ${ref[s]}`).toBeLessThanOrEqual(1);
   });
 
+  test("footer brand matches the reference size", async ({ browser, baseURL }) => {
+    const measure = async (url: string) => {
+      const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+      await page.goto(url, { waitUntil: "load" });
+      const m = await page.evaluate(() => {
+        const f = document.querySelectorAll("footer")[document.querySelectorAll("footer").length - 1];
+        const mark = f.querySelector(".mark")!.getBoundingClientRect();
+        return {
+          footer: Math.round(f.getBoundingClientRect().height),
+          mark: Math.round(mark.width),
+          brandFs: getComputedStyle(f.querySelector(".brand")!).fontSize,
+        };
+      });
+      await page.close();
+      return m;
+    };
+    const ref = await measure("file://" + process.cwd() + "/design/reference/KlipKit_UI.html");
+    const app = await measure(baseURL + "/");
+    expect(app).toEqual(ref);
+  });
+
   test("prefers-reduced-motion turns off continuous animations", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
