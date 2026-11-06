@@ -181,6 +181,21 @@ test.describe("KlipKit Redesign UI & Visual Layer", () => {
     expect(leaks).toEqual([]);
   });
 
+  test("Go Pro opens a visible, clickable voice sheet; Escape closes it", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+    await page.locator("#gopro").click();
+    const sheet = page.locator("#sheet");
+    await expect.poll(() => sheet.evaluate((el) => getComputedStyle(el).opacity)).toBe("1");
+    const onTop = await page.locator("#tryVoice").evaluate((btn) => {
+      const r = btn.getBoundingClientRect();
+      return document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2)?.closest("#tryVoice") === btn;
+    });
+    expect(onTop).toBe(true);
+    await page.keyboard.press("Escape");
+    await expect.poll(() => sheet.evaluate((el) => getComputedStyle(el).opacity)).toBe("0");
+  });
+
   test("prefers-reduced-motion turns off continuous animations", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");

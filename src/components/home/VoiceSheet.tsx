@@ -23,8 +23,9 @@ export function VoiceSheet({ isOpen, onClose, onTryVoiceDemo, onSeePlans }: Voic
   return (
     <div
       id="sheet"
+      // The reference CSS (#sheet / #sheet.open) drives visibility and the box's entrance transform.
       className={`fixed inset-0 z-70 grid place-items-center transition-opacity duration-300 ${
-        isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        isOpen ? "open opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
       }`}
     >
       <div
