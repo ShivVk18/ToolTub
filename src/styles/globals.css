@@ -195,12 +195,16 @@ footer,
 .flychip {
   line-height: normal;
 }
-button {
-  font: inherit;
-  color: inherit;
-  background: none;
-  border: 0;
-  cursor: pointer;
+/* Element reset in the base layer so Tailwind utilities (bg-ink, border…) can override it.
+   Unlayered, it made every tool page's primary button transparent. */
+@layer base {
+  button {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    cursor: pointer;
+  }
 }
 ::selection {
   background: var(--h0);
