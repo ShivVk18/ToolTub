@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { formatJson, jsonErrorOffset } from "@/workers/json-ops";
+import { formatJson, jsonErrorOffset } from "@/lib/engines/json";
 
 const fx = (n: string) => readFileSync(new URL(`../fixtures/generated/${n}`, import.meta.url), "utf8");
 

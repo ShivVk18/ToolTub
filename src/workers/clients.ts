@@ -22,7 +22,7 @@ export const bgWorker = createWorkerClient<BgOps>(
   () => new Worker(new URL("./bg.worker.ts", import.meta.url), { type: "module" }),
 );
 
-import type { JsonJob, JsonResult } from "./json-ops";
+import type { JsonJob, JsonResult } from "@/lib/engines/json";
 export const jsonWorker = createWorkerClient<{ format: (job: JsonJob) => JsonResult }>(
   () => new Worker(new URL("./json.worker.ts", import.meta.url), { type: "module" }),
 );

@@ -2,8 +2,9 @@
 
 import React, { useEffect, useState, useRef, useLayoutEffect } from "react";
 import { KINDS, SAMPLES } from "@/lib/fileKind";
-import { genParse, looksLikeContent } from "@/lib/detect";
-import { markHTML } from "@/lib/intent";
+import { genParse } from "@/lib/engines/generators";
+import { looksLikeContent } from "@/lib/engines/detect";
+import { markHTML } from "@/lib/engines/intent";
 import { addLoop } from "@/lib/motion/animation";
 
 interface HeroProps {

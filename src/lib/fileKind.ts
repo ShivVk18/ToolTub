@@ -1,4 +1,5 @@
-export type FileKind = "pdf" | "image" | "audio" | "video" | "data" | "doc" | "other";
+import type { FileKind } from "./engines/intent";
+export type { FileKind };
 
 export interface FileKindConfig {
   c: string;

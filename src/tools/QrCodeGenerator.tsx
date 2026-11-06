@@ -5,7 +5,7 @@ import { ResultActions } from "@/components/tool/ToolChrome";
 import { Field, ToolWorkspace, inputClass } from "@/components/tool/ToolWorkspace";
 import type { Artifact } from "@/lib/store/klip";
 import type { ToolProps } from "./types";
-import { vcardPayload, wifiPayload } from "@/lib/qr-payload";
+import { vcardPayload, wifiPayload } from "@/lib/engines/qr-payload";
 
 type Kind = "url" | "text" | "wifi" | "vcard";
 const dataUrlToBlob = (u: string) => {

@@ -3,7 +3,12 @@ import { useMemo, useState } from "react";
 import { ResultActions } from "@/components/tool/ToolChrome";
 import { ToolWorkspace } from "@/components/tool/ToolWorkspace";
 import type { ToolProps } from "./types";
-import { JWT_CLAIMS as CLAIMS, JWT_TIME_CLAIMS as TIME_CLAIMS, decodeJwt as decode, expiryStatus } from "@/lib/jwt";
+import {
+  JWT_CLAIMS as CLAIMS,
+  JWT_TIME_CLAIMS as TIME_CLAIMS,
+  decodeJwt as decode,
+  expiryStatus,
+} from "@/lib/engines/jwt";
 
 const SAMPLE =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2F1dGgua2xpcGtpdC5jb20iLCJzdWIiOiJ1c2VyXzEyMyIsImF1ZCI6ImFwaSIsImlhdCI6MTc2MjAwMDAwMCwiZXhwIjoxNzYyMDAzNjAwLCJyb2xlIjoiZWRpdG9yIn0.c2lnbmF0dXJl";

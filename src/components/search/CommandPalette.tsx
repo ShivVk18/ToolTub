@@ -8,7 +8,7 @@ import { useKlip } from "@/lib/store/klip";
 import { cn } from "@/lib/utils";
 import { createToolSearch } from "@/lib/search";
 import { CATS, tint, TOOL_ICON_PATHS, type ToolItem } from "@/lib/designTools";
-import { esc } from "@/lib/intent";
+import { esc } from "@/lib/engines/intent";
 
 export function useToolSearch(index: SearchEntry[]) {
   return useMemo(() => createToolSearch(index), [index]);

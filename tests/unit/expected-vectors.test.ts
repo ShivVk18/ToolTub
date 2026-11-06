@@ -1,7 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { PANELS } from "@/lib/livePanels";
-import { hashAll, genParse, runGen, jsonErr } from "@/lib/detect";
-import { parse } from "@/lib/intent";
+import { hashAll } from "@/lib/engines/hash";
+import { genParse } from "@/lib/engines/generators";
+import { runGen } from "@/lib/actions";
+import { jsonErr } from "@/lib/engines/json";
+import { parse } from "@/lib/engines/intent";
 
 describe("Task 2 Section 4: Expected Test Vectors", () => {
   // 1. Hash Generator: abc

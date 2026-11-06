@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { escapeWifi, vcardPayload, wifiPayload } from "@/lib/qr-payload";
+import { escapeWifi, vcardPayload, wifiPayload } from "@/lib/engines/qr-payload";
 
 describe("Wi-Fi QR payload", () => {
   it("escapes backslash, semicolon, comma, colon and quote", () => {

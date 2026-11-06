@@ -2,8 +2,11 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { addLoop } from "@/lib/motion/animation";
-import { parse, markHTML } from "@/lib/intent";
-import { detect, genParse, PT_TILE, PT_COLOR, PSUG, cap } from "@/lib/detect";
+import { parse, markHTML } from "@/lib/engines/intent";
+import { detect, PSUG } from "@/lib/engines/detect";
+import { genParse } from "@/lib/engines/generators";
+import { PT_TILE, PT_COLOR } from "@/lib/actions";
+import { cap } from "@/lib/engines/text";
 import { KINDS } from "@/lib/fileKind";
 
 const DEMOS: [string, "pdf" | "video" | "image" | null, string][] = [

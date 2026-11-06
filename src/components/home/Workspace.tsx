@@ -11,19 +11,11 @@ import {
   fmtSize,
   kindOf,
 } from "@/lib/fileKind";
-import {
-  type PasteItem,
-  PT_TILE,
-  PT_COLOR,
-  PSUG,
-  ACT,
-  genParse,
-  runGen,
-  pasteAct,
-  wordStats,
-  ActionResult,
-} from "@/lib/detect";
-import { parse, markHTML, type IntentStep } from "@/lib/intent";
+import { type PasteItem, PSUG, pasteAct } from "@/lib/engines/detect";
+import { PT_TILE, PT_COLOR, ACT, runGen, ActionResult } from "@/lib/actions";
+import { genParse } from "@/lib/engines/generators";
+import { wordStats } from "@/lib/engines/text";
+import { parse, markHTML, type IntentStep } from "@/lib/engines/intent";
 import { tween, wait, ease } from "@/lib/motion/animation";
 import { useUIStore } from "@/lib/store/ui";
 import { LiveToolPanel } from "./LiveToolPanel";

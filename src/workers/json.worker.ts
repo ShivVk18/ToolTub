@@ -1,4 +1,4 @@
 import { serveWorker } from "@/lib/worker-rpc";
-import { formatJson, type JsonJob } from "./json-ops";
+import { formatJson, type JsonJob } from "@/lib/engines/json";
 
 serveWorker({ format: (job: JsonJob) => formatJson(job) });

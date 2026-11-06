@@ -15,7 +15,9 @@ import { SAMPLES, fromFile, meta as metaFile, type FileInfo, KINDS } from "@/lib
 import { type ToolItem, CATS, tint, TOOL_ICON_PATHS, TOOLS } from "@/lib/designTools";
 import { tween, wait, ease, ripple, goto, addLoop, initMagneticButtons } from "@/lib/motion/animation";
 import { useUIStore } from "@/lib/store/ui";
-import { pasteItem, type PasteItem, PT_TILE, PT_COLOR, looksLikeContent, esc } from "@/lib/detect";
+import { pasteItem, type PasteItem, looksLikeContent } from "@/lib/engines/detect";
+import { PT_TILE, PT_COLOR } from "@/lib/actions";
+import { esc } from "@/lib/engines/text";
 import { PANELS } from "@/lib/livePanels";
 
 export function HomeStage() {

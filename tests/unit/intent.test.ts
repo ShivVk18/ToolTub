@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parse, markHTML, RULES } from "@/lib/intent";
+import { parse, markHTML, RULES } from "@/lib/engines/intent";
 import { kindOf, fmtSize, fmtDur, describe as describeFile, meta } from "@/lib/fileKind";
 
 describe("fileKind utilities", () => {

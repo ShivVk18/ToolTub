@@ -1,4 +1,7 @@
-import type { FileKind } from "./fileKind";
+/** File kinds the intent parser and file cards understand. */
+export type FileKind = "pdf" | "image" | "audio" | "video" | "data" | "doc" | "other";
+import { esc } from "./text";
+export { esc };
 
 export interface IntentRule {
   id: string;
@@ -130,9 +133,6 @@ export const RULES: IntentRule[] = [
     t: "Minify",
   },
 ];
-
-export const esc = (s: string): string =>
-  s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c] || c);
 
 export function parse(text: string, kind?: FileKind): { steps: IntentStep[]; spans: Span[] } {
   const steps: IntentStep[] = [];

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { decodeJwt, expiryStatus } from "@/lib/jwt";
+import { decodeJwt, expiryStatus } from "@/lib/engines/jwt";
 
 const b64url = (o: unknown) => Buffer.from(JSON.stringify(o)).toString("base64url");
 const make = (payload: object, header: object = { alg: "HS256", typ: "JWT" }, sig = "c2ln") =>

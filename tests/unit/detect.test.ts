@@ -1,26 +1,15 @@
 import { describe, it, expect } from "vitest";
-import {
-  detect,
-  jsonErr,
-  genParse,
-  genPassword,
-  hashAll,
-  tsType,
-  toCSV,
-  parseCSV,
-  fmtSQL,
-  tsConv,
-  parseColor,
-  cronExplain,
-  cronNext,
-  wordStats,
-  cleanText,
-  decodeJWT,
-  pasteItem,
-  pasteAct,
-  ACT,
-  runGen,
-} from "@/lib/detect";
+import { detect, pasteItem, pasteAct } from "@/lib/engines/detect";
+import { jsonErr, tsType } from "@/lib/engines/json";
+import { genParse, genPassword } from "@/lib/engines/generators";
+import { hashAll } from "@/lib/engines/hash";
+import { toCSV, parseCSV } from "@/lib/engines/csv";
+import { fmtSQL } from "@/lib/engines/sql";
+import { tsConv } from "@/lib/engines/time";
+import { parseColor } from "@/lib/engines/color";
+import { cronExplain, cronNext } from "@/lib/engines/cron";
+import { wordStats, cleanText } from "@/lib/engines/text";
+import { ACT, runGen } from "@/lib/actions";
 
 describe("detect()", () => {
   it("detects JWT token", () => {
@@ -183,7 +172,7 @@ describe("Converters & Helpers", () => {
   });
 
   it("converts timestamps to human dates", () => {
-    const r = tsConv("1730592000");
+    const r = tsConv("1730592000", Date.UTC(2026, 10, 4, 4, 37));
     expect(r).not.toBeNull();
     const utc = r!.find(([k]) => k === "UTC");
     expect(utc![1]).toContain("GMT");
@@ -201,7 +190,7 @@ describe("Converters & Helpers", () => {
   it("explains cron schedule and computes next runs", () => {
     const exp = cronExplain("*/15 9-18 * * 1-5");
     expect(exp).toContain("Every 15 minutes");
-    const next = cronNext("*/15 9-18 * * 1-5", 3);
+    const next = cronNext("*/15 9-18 * * 1-5", Date.UTC(2026, 10, 4, 4, 37), 3);
     expect(next.length).toBe(3);
   });
 

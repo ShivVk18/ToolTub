@@ -1,29 +1,20 @@
 // KlipKit Live Tool Panels Library
 // 18 client-side developer tools matching design/reference/KlipKit_UI.html lines 945-970
 
-import {
-  esc,
-  hlJSON,
-  jsonErr,
-  decodeJWT,
-  utf8b64,
-  tsConv,
-  wordStats,
-  titleCase,
-  hashAll,
-  genPassword,
-  LOREM,
-  parseColor,
-  cronNext,
-  cronExplain,
-  fmtSQL,
-  toCSV,
-  parseCSV,
-  tsType,
-  cleanText,
-  rel,
-  cap,
-} from "./detect";
+import { esc, utf8b64, utf8b64Decode, wordStats, titleCase, cleanText, cap } from "./engines/text";
+import { hlJSON, jsonErr, tsType } from "./engines/json";
+import { decodeJwt } from "./engines/jwt";
+import { rel, tsConv } from "./engines/time";
+import { hashAll } from "./engines/hash";
+import { genPassword, LOREM } from "./engines/generators";
+import { parseColor } from "./engines/color";
+import { cronNext, cronExplain } from "./engines/cron";
+import { fmtSQL } from "./engines/sql";
+import { toCSV, parseCSV } from "./engines/csv";
+import { uuidV4 } from "./engines/random";
+import { byteLength, fmtSize } from "./engines/format";
+
+export { fmtSize };
 
 export interface PanelRunResult {
   html?: string;
@@ -42,12 +33,6 @@ export interface PanelConfig {
   run: (v: string, o?: string | null, pat?: string, fl?: string) => PanelRunResult | Promise<PanelRunResult>;
 }
 
-export function fmtSize(n: number): string {
-  if (n < 1024) return `${n} B`;
-  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
-  return `${(n / (1024 * 1024)).toFixed(1)} MB`;
-}
-
 export const PANELS: Record<string, PanelConfig> = {
   "JSON Formatter": {
     opts: [
@@ -63,7 +48,7 @@ export const PANELS: Record<string, PanelConfig> = {
       try {
         const x = JSON.parse(v);
         const s = o === "m" ? JSON.stringify(x) : JSON.stringify(x, null, o === "t" ? "\t" : +o! || 2);
-        const size = typeof Blob !== "undefined" ? new Blob([s]).size : Buffer.byteLength(s);
+        const size = byteLength(s);
         return {
           html: hlJSON(s),
           copy: s,
@@ -86,7 +71,7 @@ export const PANELS: Record<string, PanelConfig> = {
     run: (v) => {
       if (!v.trim()) return {};
       try {
-        const { H, P } = decodeJWT(v);
+        const { header: H, payload: P } = decodeJwt(v);
         const exp = P.exp ? Number(P.exp) * 1000 : null;
         return {
           html: `<span class="pc">// header</span>\n${hlJSON(JSON.stringify(H, null, 2))}\n\n<span class="pc">// payload</span>\n${hlJSON(
@@ -94,7 +79,7 @@ export const PANELS: Record<string, PanelConfig> = {
           )}`,
           copy: JSON.stringify(P, null, 2),
           status: exp
-            ? (exp < Date.now() ? `✕ Expired ${rel(exp)}` : `✓ Valid · expires ${rel(exp)}`) +
+            ? (exp < Date.now() ? `✕ Expired ${rel(exp, Date.now())}` : `✓ Valid · expires ${rel(exp, Date.now())}`) +
               ` · ${H.alg || "none"} · signature not verified`
             : `No expiry · ${H.alg || "none"}`,
           bad: exp ? exp < Date.now() : false,
@@ -114,8 +99,8 @@ export const PANELS: Record<string, PanelConfig> = {
     run: (v, o) => {
       if (!v) return {};
       try {
-        const s = o === "d" ? decodeURIComponent(escape(atob(v.trim()))) : utf8b64(v);
-        const size = typeof Blob !== "undefined" ? new Blob([s]).size : Buffer.byteLength(s);
+        const s = o === "d" ? utf8b64Decode(v) : utf8b64(v);
+        const size = byteLength(s);
         return {
           html: esc(s),
           copy: s,
@@ -162,10 +147,10 @@ export const PANELS: Record<string, PanelConfig> = {
     run: (v) => {
       if (!v.trim()) return {};
       const r = /^\d{9,13}$/.test(v.trim())
-        ? tsConv(v)
+        ? tsConv(v, Date.now())
         : (() => {
             const d = new Date(v);
-            return isNaN(d.getTime()) ? null : tsConv(String(d.getTime()));
+            return isNaN(d.getTime()) ? null : tsConv(String(d.getTime()), Date.now());
           })();
       if (!r) return { html: '<span class="perr">Type a Unix timestamp or a date</span>', status: "✕", bad: 1 };
       const s = r.map((x) => x[0].padEnd(14) + x[1]).join("\n");
@@ -245,14 +230,7 @@ export const PANELS: Record<string, PanelConfig> = {
     ],
     run: (_v, o) => {
       const len = +(o || 5);
-      const l = Array.from({ length: len }, () =>
-        typeof crypto !== "undefined" && crypto.randomUUID
-          ? crypto.randomUUID()
-          : "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
-              const r = (Math.random() * 16) | 0;
-              return (c === "x" ? r : (r & 0x3) | 0x8).toString(16);
-            }),
-      );
+      const l = Array.from({ length: len }, () => uuidV4());
       return { html: esc(l.join("\n")), copy: l.join("\n"), status: `${l.length} × UUID v4` };
     },
   },
@@ -318,7 +296,7 @@ export const PANELS: Record<string, PanelConfig> = {
           bad: 1,
         };
       }
-      const r = cronNext(v, 6);
+      const r = cronNext(v, Date.now(), 6);
       const s =
         cronExplain(v) +
         "\n\n" +

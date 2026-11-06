@@ -1,3 +1,5 @@
+import { cap, esc } from "./text";
+
 /** [Own] JSON formatting with human-readable errors. Runs in json.worker.ts for big inputs. */
 export interface JsonJob {
   text: string;
@@ -185,4 +187,59 @@ export function formatJson({ text, indent, sortKeys, stripComments }: JsonJob): 
       hint: hintFor(src, line, column),
     };
   }
+}
+export function hlJSON(s: string): string {
+  return esc(s).replace(
+    /(&quot;(?:[^&]|&(?!quot;))*?&quot;)(\s*:)?|\b(true|false|null)\b|(-?\d+(?:\.\d+)?(?:e[+-]?\d+)?)/gi,
+    (_m, str, colon, kw, num) =>
+      str
+        ? colon
+          ? `<span class="jk">${str}</span>${colon}`
+          : `<span class="js">${str}</span>`
+        : kw
+          ? `<span class="jb">${kw}</span>`
+          : `<span class="jn">${num}</span>`,
+  );
+}
+
+// ---------- JSON error pinpointing ----------
+export function jsonErr(t: string, e: Error | { message?: string }): { msg: string; line?: number; col?: number } {
+  const m = /position (\d+)/.exec(e.message || "");
+  const pos = m ? +m[1] : jsonErrorOffset(t);
+  if (pos < 0) return { msg: "Invalid JSON" };
+  const before = t.slice(0, pos);
+  const line = before.split("\n").length;
+  const col = pos - before.lastIndexOf("\n");
+  const ch = t[pos];
+  const prev = before.replace(/\s+$/, "").slice(-1);
+  const msg =
+    pos >= t.length
+      ? "Unexpected end — something isn’t closed"
+      : ch === "'"
+        ? "Use double quotes, not single quotes"
+        : prev === "," && (ch === "}" || ch === "]")
+          ? "Trailing comma — remove the comma before " + ch
+          : /[A-Za-z_$]/.test(ch) && (prev === "{" || prev === ",")
+            ? "Keys need double quotes"
+            : `Unexpected “${ch}”`;
+  return { msg, line, col };
+}
+
+// ---------- JSON → TypeScript ----------
+export function tsType(v: unknown, name: string, acc: string[]): string {
+  if (v === null) return "null";
+  if (Array.isArray(v)) {
+    if (!v.length) return "unknown[]";
+    const t = tsType(v[0], (name || "item").replace(/s$/, "") || "Item", acc);
+    return (/[|]/.test(t) ? `(${t})` : t) + "[]";
+  }
+  if (typeof v === "object") {
+    const n = cap((name || "root").replace(/[^\w]/g, "")) || "Root";
+    const f = Object.entries(v as Record<string, unknown>)
+      .map(([k, x]) => `  ${/^[a-z_$][\w$]*$/i.test(k) ? k : JSON.stringify(k)}: ${tsType(x, k, acc)};`)
+      .join("\n");
+    acc.push(`export interface ${n} {\n${f}\n}`);
+    return n;
+  }
+  return typeof v;
 }
