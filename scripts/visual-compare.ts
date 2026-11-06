@@ -135,12 +135,7 @@ const STATES: Record<string, { desc: string; run: StateHandler }> = {
     desc: "Explore grid + tab change",
     run: async (p) => {
       await scrollTo(p, "#explore");
-      await p
-        .locator("#tabs")
-        .getByText("Developer")
-        .first()
-        .click({ timeout: 2000 })
-        .catch(() => {});
+      await clickText(p, "#tabs", "Developer");
       await settle(p, 900);
     },
   },
@@ -148,12 +143,7 @@ const STATES: Record<string, { desc: string; run: StateHandler }> = {
     desc: "pricing (yearly)",
     run: async (p) => {
       await scrollTo(p, "#pricing");
-      await p
-        .locator("#billTabs")
-        .getByText("Yearly")
-        .first()
-        .click({ timeout: 2000 })
-        .catch(() => {});
+      await clickText(p, "#billTabs", "Yearly");
       await settle(p, 900);
     },
   },
@@ -167,6 +157,21 @@ const STATES: Record<string, { desc: string; run: StateHandler }> = {
     },
   },
 };
+
+/**
+ * Click the first element under `scope` whose text contains `text`, with a DOM click so the page doesn't
+ * scroll. (Playwright's click scrolls into view first; in the reference that jumped the page ~570 px.)
+ */
+const clickText = (p: Page, scope: string, text: string) =>
+  p.evaluate(
+    ([sc, t]) => {
+      const el = Array.from(document.querySelectorAll<HTMLElement>(`${sc} *`)).find(
+        (e) => e.children.length === 0 && e.textContent?.includes(t),
+      );
+      ((el?.closest("button, [role=tab], .tab") as HTMLElement | null) ?? el)?.click();
+    },
+    [scope, text] as const,
+  );
 
 async function scrollTo(p: Page, sel: string, ms = 900) {
   await p.evaluate((s) => {
