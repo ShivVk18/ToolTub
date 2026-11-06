@@ -1,428 +1,364 @@
-import { chromium, type Browser, type Page } from "@playwright/test";
-// @ts-ignore
-import { PNG } from "pngjs";
+/**
+ * Visual compare: the reference prototype (design/reference/KlipKit_UI.html) vs the app, state by state.
+ *
+ *   node scripts/visual-compare.ts                       # all states × 5 viewports × 2 themes
+ *   node scripts/visual-compare.ts --states a,h --vp 1920x1080 --theme light
+ *   APP_URL=http://127.0.0.1:3000/ node scripts/visual-compare.ts   # use an already-running app
+ *
+ * Deterministic frames: both pages get a fake clock (page.clock.install) and time only moves through
+ * page.clock.runFor(); after each state every CSS animation is paused at a fixed point. Both pages are
+ * driven through the same window.__kk test hook. Output: reports/ui/{ref,app,diff,side}-<state>-<theme>-<vp>.png,
+ * reports/ui/results.json and reports/ui/summary.md. Pass = ≤ 2% of unmasked pixels differ (pixelmatch).
+ */
+import { chromium, type Page } from "@playwright/test";
+import pngjs from "pngjs";
+import pixelmatch from "pixelmatch";
+import { spawn, type ChildProcess } from "node:child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
 
+const { PNG } = pngjs;
 const OUT_DIR = path.resolve("reports/ui");
-fs.mkdirSync(OUT_DIR, { recursive: true });
-
 const REF_URL = "file://" + path.resolve("design/reference/KlipKit_UI.html");
-const APP_URL = process.env.APP_URL || "http://127.0.0.1:3333/";
+const PORT = 3333;
+const APP_URL = process.env.APP_URL || `http://127.0.0.1:${PORT}/`;
+const PASS_PCT = 2;
 
-type StateHandler = (page: Page, vp: [number, number]) => Promise<void>;
+type Theme = "light" | "dark";
+type Vp = [number, number];
+type StateHandler = (page: Page, vp: Vp) => Promise<void>;
+
+const arg = (name: string) => {
+  const i = process.argv.indexOf(`--${name}`);
+  return i > 0 ? process.argv[i + 1] : undefined;
+};
+
+/** Advance the page's fake clock (rAF, timers, Date) by `ms`. */
+const settle = (page: Page, ms: number) => page.clock.runFor(ms);
+/** Call a window.__kk hook without awaiting it: its animations need the clock, which we drive from outside. */
+const kk = (page: Page, fn: string, ...args: unknown[]) =>
+  page.evaluate(
+    ([f, a]) => {
+      const hook = (window as unknown as { __kk?: Record<string, (...x: unknown[]) => unknown> }).__kk;
+      void hook?.[f as string]?.(...(a as unknown[]));
+    },
+    [fn, args] as const,
+  );
 
 const STATES: Record<string, { desc: string; run: StateHandler }> = {
-  a_hero_rest: {
-    desc: "Hero at rest",
-    run: async (page) => {
-      await page.evaluate(() => window.scrollTo(0, 0));
-      await page.waitForTimeout(400);
+  a: { desc: "hero at rest", run: async (p) => settle(p, 400) },
+  b: {
+    desc: "cursor near the orb",
+    run: async (p, [w]) => {
+      const slot = await p.locator("#orbSlot").boundingBox();
+      await p.mouse.move(w / 2 + 75, slot ? slot.y + slot.height / 2 - 40 : 330);
+      await settle(p, 800);
     },
   },
-  b_cursor_near_orb: {
-    desc: "Cursor near orb",
-    run: async (page, [w]) => {
-      await page.mouse.move(w / 2 + 75, 330);
-      await page.waitForTimeout(400);
+  c: {
+    desc: "file dragged over the page",
+    run: async (p, [w]) => {
+      await kk(p, "drag", true, w / 2, 350);
+      await settle(p, 800);
     },
   },
-  c_file_dragged: {
-    desc: "File dragged over page (veil + energised orb + satellites pulled in)",
-    run: async (page, [w, h]) => {
-      await page.evaluate(
-        ([cx, cy]) => {
-          if ((window as any).__kk?.drag) (window as any).__kk.drag(true, cx, cy);
-        },
-        [w / 2, 350],
-      );
-      await page.waitForTimeout(400);
+  d: {
+    desc: "workspace after the sample PDF",
+    run: async (p, [w]) => {
+      await kk(p, "ingestSample", "pdf", w / 2, 350);
+      await settle(p, 3000);
     },
   },
-  d_workspace_dropped: {
-    desc: "Workspace after dropping sample PDF",
-    run: async (page, [w, h]) => {
-      await page.evaluate(
-        async ([cx, cy]) => {
-          if ((window as any).__kk?.ingestSample) {
-            await (window as any).__kk.ingestSample("pdf", cx, cy);
-          }
-        },
-        [w / 2, 350],
-      );
-      await page.waitForTimeout(1400);
+  e: {
+    desc: "typing a multi-step instruction",
+    run: async (p, [w]) => {
+      await kk(p, "ingestSample", "pdf", w / 2, 350);
+      await settle(p, 3000);
+      await p.locator("#cmp").fill("compress to under 2 mb and split pages 1-5");
+      await settle(p, 600);
     },
   },
-  e_typing_plan: {
-    desc: 'Typing "compress to under 2 mb and split pages 1-5" (live highlight + plan preview)',
-    run: async (page, [w, h]) => {
-      await page.evaluate(
-        async ([cx, cy]) => {
-          if ((window as any).__kk?.ingestSample) {
-            await (window as any).__kk.ingestSample("pdf", cx, cy);
-          }
-        },
-        [w / 2, 350],
-      );
-      await page.waitForTimeout(1200);
-      await page.evaluate(() => {
-        const cmp = document.getElementById("cmp") as HTMLTextAreaElement | null;
-        if (cmp) {
-          cmp.value = "compress to under 2 mb and split pages 1-5";
-          cmp.dispatchEvent(new Event("input", { bubbles: true }));
-        }
-      });
-      await page.waitForTimeout(400);
+  f: {
+    desc: "plan running and done",
+    run: async (p, [w]) => {
+      await kk(p, "ingestSample", "pdf", w / 2, 350);
+      await settle(p, 3000);
+      await p.locator("#cmp").fill("compress to under 2 mb and split pages 1-5");
+      await p.locator("#cmp").press("Enter");
+      await settle(p, 1500);
+      await p
+        .locator(".run")
+        .first()
+        .click({ timeout: 2000 })
+        .catch(() => {});
+      await settle(p, 5000);
     },
   },
-  f_plan_done: {
-    desc: "Plan running and done (results shown)",
-    run: async (page, [w, h]) => {
-      await page.evaluate(
-        async ([cx, cy]) => {
-          if ((window as any).__kk?.ingestSample) {
-            await (window as any).__kk.ingestSample("pdf", cx, cy);
-          }
-        },
-        [w / 2, 350],
-      );
-      await page.waitForTimeout(1200);
-      await page.evaluate(() => {
-        const cmp = document.getElementById("cmp") as HTMLTextAreaElement | null;
-        if (cmp) {
-          cmp.value = "compress to under 2 mb and split pages 1-5";
-          cmp.dispatchEvent(new Event("input", { bubbles: true }));
-        }
-      });
-      await page.waitForTimeout(400);
-      await page.evaluate(() => {
-        const runBtn = document.querySelector(".run") as HTMLButtonElement | null;
-        if (runBtn) runBtn.click();
-      });
-      await page.waitForTimeout(2000);
+  g: {
+    desc: "pasted JSON flow",
+    run: async (p) => {
+      await kk(p, "pasteIn", '{"user":{"id":42,"roles":["admin"]},"active":true}');
+      await settle(p, 3000);
     },
   },
-  g_pasted_json: {
-    desc: "Pasted JSON flow",
-    run: async (page) => {
-      await page.evaluate(async () => {
-        if ((window as any).__kk?.pasteIn) {
-          (window as any).__kk.pasteIn('{"user":{"id":42,"roles":["admin"]},"active":true}');
-        }
-      });
-      await page.waitForTimeout(1400);
+  h: {
+    desc: "live panel (JSON Formatter)",
+    run: async (p) => {
+      await kk(p, "openPanel", "JSON Formatter", '{"a":1,"b":[1,2]}');
+      await settle(p, 1200);
     },
   },
-  h_live_panel: {
-    desc: "Live panel #json-formatter and #regex-tester",
-    run: async (page) => {
-      await page.evaluate(async () => {
-        if ((window as any).__kk?.openPanel) {
-          (window as any).__kk.openPanel("JSON Formatter", '{"a":1,"b":[1,2]}');
-        }
-      });
-      await page.waitForTimeout(600);
-    },
-  },
-  i_palette: {
+  i: {
     desc: "⌘K palette",
-    run: async (page) => {
-      const kbtn = page.locator(".kbtn");
-      if (await kbtn.isVisible()) {
-        await kbtn.click();
-      } else {
-        await page.evaluate(() => {
-          if ((window as any).__kk?.openPal) (window as any).__kk.openPal();
-          const pal = document.getElementById("pal");
-          if (pal) pal.classList.add("open");
-        });
-      }
-      await page.waitForTimeout(500);
+    run: async (p) => {
+      await kk(p, "openPal");
+      await settle(p, 600);
     },
   },
-  j_voice_sheet: {
+  j: {
     desc: "Pro voice sheet",
-    run: async (page) => {
-      const proBtn = page.locator("#proBtn, #proNavBtn, .pill.ink").first();
-      if (await proBtn.isVisible()) {
-        await proBtn.click();
-      } else {
-        await page.evaluate(() => {
-          const sheet = document.getElementById("sheet");
-          if (sheet) sheet.classList.add("open");
-        });
-      }
-      await page.waitForTimeout(500);
+    run: async (p) => {
+      await p.locator("#nav .pill.ink, #gopro").first().click();
+      await settle(p, 600);
     },
   },
-  k_scrolled_nav: {
-    desc: "Scrolled 200 px (capsule nav)",
-    run: async (page) => {
-      await page.evaluate(() => {
-        window.scrollTo(0, 200);
-        document.body.classList.add("scrolled");
-      });
-      await page.waitForTimeout(500);
+  k: {
+    desc: "scrolled 200 px (capsule nav)",
+    run: async (p) => {
+      await p.evaluate(() => window.scrollTo(0, 200));
+      await settle(p, 900);
     },
   },
-  l_marquee: {
-    desc: "Marquee band",
-    run: async (page) => {
-      await page.locator(".band").scrollIntoViewIfNeeded();
-      await page.waitForTimeout(400);
-    },
-  },
-  m_bento: {
-    desc: "Bento section",
-    run: async (page) => {
-      await page.locator("#feel").scrollIntoViewIfNeeded();
-      await page.waitForTimeout(600);
-    },
-  },
-  n_explore: {
+  l: { desc: "marquee band", run: async (p) => scrollTo(p, ".band") },
+  m: { desc: "bento section", run: async (p) => scrollTo(p, "#feel", 1500) },
+  n: {
     desc: "Explore grid + tab change",
-    run: async (page) => {
-      await page.locator("#explore").scrollIntoViewIfNeeded();
-      await page.evaluate(() => {
-        const tabs = Array.from(document.querySelectorAll("#tabs .tab")) as HTMLElement[];
-        const devTab = tabs.find((t) => t.textContent?.includes("Developer"));
-        if (devTab) devTab.click();
-      });
-      await page.waitForTimeout(400);
+    run: async (p) => {
+      await scrollTo(p, "#explore");
+      await p
+        .locator("#tabs")
+        .getByText("Developer")
+        .first()
+        .click({ timeout: 2000 })
+        .catch(() => {});
+      await settle(p, 900);
     },
   },
-  o_pricing: {
-    desc: "Pricing (monthly/yearly)",
-    run: async (page) => {
-      await page.locator("#pricing").scrollIntoViewIfNeeded();
-      await page.evaluate(() => {
-        const billTabs = Array.from(document.querySelectorAll("#billTabs .tab")) as HTMLElement[];
-        const yrTab = billTabs.find((t) => t.textContent?.includes("Yearly"));
-        if (yrTab) yrTab.click();
-      });
-      await page.waitForTimeout(400);
+  o: {
+    desc: "pricing (yearly)",
+    run: async (p) => {
+      await scrollTo(p, "#pricing");
+      await p
+        .locator("#billTabs")
+        .getByText("Yearly")
+        .first()
+        .click({ timeout: 2000 })
+        .catch(() => {});
+      await settle(p, 900);
     },
   },
-  p_footer_wordmark: {
-    desc: "Footer giant wordmark with the cursor over it",
-    run: async (page, [w, h]) => {
-      await page.locator("#giant").scrollIntoViewIfNeeded();
-      await page.mouse.move(w / 2, h / 2);
-      await page.waitForTimeout(400);
+  p: {
+    desc: "footer wordmark with the cursor over it",
+    run: async (p, [w]) => {
+      await scrollTo(p, "#giant");
+      const g = await p.locator("#giant").boundingBox();
+      await p.mouse.move(w / 2, g ? g.y + g.height / 2 : 400);
+      await settle(p, 900);
     },
   },
 };
 
-function compareImages(
-  refBuf: Buffer,
-  appBuf: Buffer,
-  orbRect?: { x: number; y: number; r: number },
-): { diffPercent: number; diffPngBuf: Buffer; sideBySideBuf: Buffer } {
-  const refPng = PNG.sync.read(refBuf);
-  const appPng = PNG.sync.read(appBuf);
-  const w = refPng.width;
-  const h = refPng.height;
-
-  const diffPng = new PNG({ width: w, height: h });
-  const sideBySide = new PNG({ width: w * 3, height: h });
-
-  // Copy ref into sideBySide col 0
-  PNG.bitblt(refPng, sideBySide, 0, 0, w, h, 0, 0);
-  // Copy app into sideBySide col 1
-  PNG.bitblt(appPng, sideBySide, 0, 0, w, h, w, 0);
-
-  let diffCount = 0;
-  let totalValid = 0;
-
-  for (let y = 0; y < h; y++) {
-    for (let x = 0; x < w; x++) {
-      const idx = (y * w + x) * 4;
-
-      // Mask orb interior if provided
-      let isMasked = false;
-      if (orbRect) {
-        const dx = x - orbRect.x;
-        const dy = y - orbRect.y;
-        if (dx * dx + dy * dy <= orbRect.r * orbRect.r) {
-          isMasked = true;
-        }
-      }
-
-      const r1 = refPng.data[idx];
-      const g1 = refPng.data[idx + 1];
-      const b1 = refPng.data[idx + 2];
-      const a1 = refPng.data[idx + 3];
-
-      const r2 = appPng.data[idx];
-      const g2 = appPng.data[idx + 1];
-      const b2 = appPng.data[idx + 2];
-      const a2 = appPng.data[idx + 3];
-
-      if (isMasked) {
-        diffPng.data[idx] = Math.round(r2 * 0.3);
-        diffPng.data[idx + 1] = Math.round(g2 * 0.3);
-        diffPng.data[idx + 2] = Math.round(b2 * 0.3);
-        diffPng.data[idx + 3] = 255;
-        continue;
-      }
-
-      totalValid++;
-      // Color distance with tolerance for film grain & anti-aliased subpixel rendering
-      const delta = Math.abs(r1 - r2) + Math.abs(g1 - g2) + Math.abs(b1 - b2);
-
-      if (delta > 32) {
-        diffCount++;
-        // Highlight diff in bright magenta
-        diffPng.data[idx] = 255;
-        diffPng.data[idx + 1] = 0;
-        diffPng.data[idx + 2] = 120;
-        diffPng.data[idx + 3] = 255;
-      } else {
-        // Match in subtle tone
-        const gray = Math.round(((r2 + g2 + b2) / 3) * 0.3 + 160);
-        diffPng.data[idx] = gray;
-        diffPng.data[idx + 1] = gray;
-        diffPng.data[idx + 2] = gray;
-        diffPng.data[idx + 3] = 255;
-      }
-    }
-  }
-
-  // Copy diff into sideBySide col 2
-  PNG.bitblt(diffPng, sideBySide, 0, 0, w, h, w * 2, 0);
-
-  const diffPercent = totalValid > 0 ? (diffCount / totalValid) * 100 : 0;
-  return {
-    diffPercent,
-    diffPngBuf: PNG.sync.write(diffPng),
-    sideBySideBuf: PNG.sync.write(sideBySide),
-  };
+async function scrollTo(p: Page, sel: string, ms = 900) {
+  await p.evaluate((s) => {
+    const el = document.querySelector(s);
+    if (el) window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 40);
+  }, sel);
+  await settle(p, ms);
 }
 
-async function preparePage(page: Page, url: string, theme: "light" | "dark", vp: [number, number]) {
-  await page.setViewportSize({ width: vp[0], height: vp[1] });
-  await page.emulateMedia({ colorScheme: theme });
+async function preparePage(page: Page, url: string, theme: Theme) {
+  await page.clock.install({ time: new Date("2026-11-04T10:07:00+05:30") });
   await page.addInitScript((t) => {
     try {
       localStorage.setItem("theme", t);
       localStorage.setItem("kk.theme", JSON.stringify(t));
-      document.documentElement.dataset.theme = t;
-      if (t === "dark") document.documentElement.classList.add("dark");
-      else document.documentElement.classList.remove("dark");
     } catch {}
   }, theme);
-  await page.goto(url, { waitUntil: "domcontentloaded" });
-  await page.waitForTimeout(600);
-
-  // Settle theme and freeze carets
+  await page.goto(url, { waitUntil: "load" });
   await page.evaluate((t) => {
-    document.documentElement.classList.remove("theming");
     document.documentElement.dataset.theme = t;
-    if (t === "dark") document.documentElement.classList.add("dark");
-    else document.documentElement.classList.remove("dark");
-
+    document.documentElement.classList.toggle("dark", t === "dark");
     const s = document.createElement("style");
-    s.textContent = `
-      * { caret-color: transparent !important; }
-      .bcar { opacity: 0 !important; }
-    `;
+    // Carets and the film grain are noise, not design.
+    s.textContent = "*{caret-color:transparent!important}.bcar{opacity:0!important}#grain{display:none!important}";
     document.head.appendChild(s);
   }, theme);
+  await page.evaluate(() => document.fonts.ready);
+  await settle(page, 2500); // entrance animations, squiggle, satellites measured
+}
+
+/** Pause every CSS animation: finite ones at their end state, infinite ones at t = 0. */
+const freezeAnimations = (page: Page) =>
+  page.evaluate(() => {
+    for (const a of document.getAnimations()) {
+      const timing = a.effect?.getComputedTiming();
+      a.pause();
+      a.currentTime = timing && Number.isFinite(timing.endTime as number) ? (timing.endTime as number) : 0;
+    }
+  });
+
+/** Circles to ignore: the orb interior (animated gradient). */
+const orbMask = (page: Page) =>
+  page.evaluate(() => {
+    const o = document.getElementById("orb")?.getBoundingClientRect();
+    return o && o.width > 4 ? { x: o.left + o.width / 2, y: o.top + o.height / 2, r: o.width * 0.45 } : null;
+  });
+
+function compare(refBuf: Buffer, appBuf: Buffer, masks: ({ x: number; y: number; r: number } | null)[]) {
+  const ref = PNG.sync.read(refBuf);
+  const app = PNG.sync.read(appBuf);
+  const w = Math.min(ref.width, app.width);
+  const h = Math.min(ref.height, app.height);
+  const crop = (img: InstanceType<typeof PNG>) => {
+    const out = new PNG({ width: w, height: h });
+    PNG.bitblt(img, out, 0, 0, w, h, 0, 0);
+    return out;
+  };
+  const a = crop(ref);
+  const b = crop(app);
+  let masked = 0;
+  for (const m of masks) {
+    if (!m) continue;
+    for (let y = Math.max(0, Math.floor(m.y - m.r)); y < Math.min(h, m.y + m.r); y++)
+      for (let x = Math.max(0, Math.floor(m.x - m.r)); x < Math.min(w, m.x + m.r); x++)
+        if ((x - m.x) ** 2 + (y - m.y) ** 2 <= m.r ** 2) {
+          const i = (y * w + x) * 4;
+          for (let k = 0; k < 4; k++) b.data[i + k] = a.data[i + k];
+          masked++;
+        }
+  }
+  const diff = new PNG({ width: w, height: h });
+  const n = pixelmatch(a.data, b.data, diff.data, w, h, { threshold: 0.12, includeAA: false });
+  const side = new PNG({ width: w * 3, height: h });
+  PNG.bitblt(a, side, 0, 0, w, h, 0, 0);
+  PNG.bitblt(crop(app), side, 0, 0, w, h, w, 0);
+  PNG.bitblt(diff, side, 0, 0, w, h, w * 2, 0);
+  return { pct: (100 * n) / (w * h - masked), diff: PNG.sync.write(diff), side: PNG.sync.write(side) };
+}
+
+async function ensureApp(): Promise<ChildProcess | null> {
+  const up = await fetch(APP_URL).then(
+    (r) => r.ok,
+    () => false,
+  );
+  if (up) return null;
+  if (process.env.APP_URL) throw new Error(`APP_URL ${APP_URL} is not reachable`);
+  console.log(`Starting the production build on :${PORT} (run "npm run build" first if this fails)…`);
+  const child = spawn(process.execPath, ["scripts/start-standalone.mjs"], {
+    env: { ...process.env, PORT: String(PORT), HOSTNAME: "127.0.0.1" },
+    stdio: "ignore",
+  });
+  for (let i = 0; i < 60; i++) {
+    await new Promise((r) => setTimeout(r, 500));
+    if (
+      await fetch(APP_URL).then(
+        (r) => r.ok,
+        () => false,
+      )
+    )
+      return child;
+  }
+  child.kill();
+  throw new Error("App did not start");
 }
 
 async function main() {
-  const browser = await chromium.launch();
-  console.log(`\n=== KlipKit Visual Compare Suite ===`);
-  console.log(`Reference: ${REF_URL}`);
-  console.log(`App:       ${APP_URL}\n`);
+  const pick = <T>(all: T[], key: string, f: (x: T) => string) => {
+    const want = arg(key)?.split(",");
+    return want ? all.filter((x) => want.includes(f(x))) : all;
+  };
+  const viewports = pick<Vp>(
+    [
+      [2560, 1440],
+      [1920, 1080],
+      [1440, 900],
+      [768, 1024],
+      [390, 844],
+    ],
+    "vp",
+    ([w, h]) => `${w}x${h}`,
+  );
+  const themes = pick<Theme>(["light", "dark"], "theme", (t) => t);
+  const states = pick(Object.entries(STATES), "states", ([k]) => k);
 
-  const results: Array<{
+  fs.mkdirSync(OUT_DIR, { recursive: true });
+  const server = await ensureApp();
+  const browser = await chromium.launch();
+  const results: {
     state: string;
-    theme: string;
+    desc: string;
+    theme: Theme;
     viewport: string;
     diffPercent: number;
     passed: boolean;
-  }> = [];
+    error?: string;
+  }[] = [];
+  console.log(`Reference: ${REF_URL}\nApp:       ${APP_URL}`);
 
-  const auditRuns: Array<{ vp: [number, number]; theme: "light" | "dark" }> = [
-    { vp: [1920, 1080], theme: "light" },
-    { vp: [1920, 1080], theme: "dark" },
-    { vp: [2560, 1440], theme: "light" },
-    { vp: [1440, 900], theme: "light" },
-    { vp: [768, 1024], theme: "light" },
-    { vp: [390, 844], theme: "light" },
-    { vp: [390, 844], theme: "dark" },
-  ];
-
-  for (const { vp, theme } of auditRuns) {
-    const vpKey = `${vp[0]}x${vp[1]}`;
-    console.log(`\n--- Viewport ${vpKey} (${theme}) ---`);
-
-    for (const [stateKey, { desc, run }] of Object.entries(STATES)) {
-      const refCtx = await browser.newContext({ viewport: { width: vp[0], height: vp[1] } });
-      const appCtx = await browser.newContext({ viewport: { width: vp[0], height: vp[1] } });
-      const refPage = await refCtx.newPage();
-      const appPage = await appCtx.newPage();
-
-      try {
-        await preparePage(refPage, REF_URL, theme, vp);
-        await preparePage(appPage, APP_URL, theme, vp);
-
-        await run(refPage, vp);
-        await run(appPage, vp);
-
-        // Get orb interior rect
-        const orbInfo = await appPage.evaluate(() => {
-          const orb = document.getElementById("orb");
-          if (orb) {
-            const r = orb.getBoundingClientRect();
-            return { x: r.left + r.width / 2, y: r.top + r.height / 2, r: r.width * 0.45 };
+  try {
+    for (const vp of viewports)
+      for (const theme of themes) {
+        const vpKey = `${vp[0]}x${vp[1]}`;
+        console.log(`\n— ${vpKey} ${theme}`);
+        for (const [key, { desc, run }] of states) {
+          const pages: Page[] = [];
+          try {
+            const shots: Buffer[] = [];
+            const masks = [];
+            for (const url of [REF_URL, APP_URL]) {
+              const ctx = await browser.newContext({ viewport: { width: vp[0], height: vp[1] }, colorScheme: theme });
+              const page = await ctx.newPage();
+              pages.push(page);
+              await preparePage(page, url, theme);
+              await run(page, vp);
+              await freezeAnimations(page);
+              masks.push(await orbMask(page));
+              shots.push(await page.screenshot({ type: "png" }));
+            }
+            const { pct, diff, side } = compare(shots[0], shots[1], masks);
+            const base = `${key}-${theme}-${vpKey}`;
+            fs.writeFileSync(path.join(OUT_DIR, `ref-${base}.png`), shots[0]);
+            fs.writeFileSync(path.join(OUT_DIR, `app-${base}.png`), shots[1]);
+            fs.writeFileSync(path.join(OUT_DIR, `diff-${base}.png`), diff);
+            fs.writeFileSync(path.join(OUT_DIR, `side-${base}.png`), side);
+            const passed = pct <= PASS_PCT;
+            results.push({ state: key, desc, theme, viewport: vpKey, diffPercent: +pct.toFixed(2), passed });
+            console.log(`  ${passed ? "✓" : "✗"} ${key} ${desc}: ${pct.toFixed(2)}%`);
+          } catch (err) {
+            const message = (err as Error).message.split("\n")[0];
+            results.push({ state: key, desc, theme, viewport: vpKey, diffPercent: 100, passed: false, error: message });
+            console.log(`  ! ${key} ${desc}: ${message}`);
+          } finally {
+            for (const p of pages) await p.context().close();
           }
-          return undefined;
-        });
-
-        const refBuf = await refPage.screenshot({ type: "png" });
-        const appBuf = await appPage.screenshot({ type: "png" });
-
-        const { diffPercent, diffPngBuf, sideBySideBuf } = compareImages(refBuf, appBuf, orbInfo);
-
-        const pass = diffPercent <= 2.0;
-        results.push({
-          state: stateKey,
-          theme,
-          viewport: vpKey,
-          diffPercent: parseFloat(diffPercent.toFixed(2)),
-          passed: pass,
-        });
-
-        const baseName = `${stateKey}-${theme}-${vpKey}`;
-        fs.writeFileSync(path.join(OUT_DIR, `ref-${baseName}.png`), refBuf);
-        fs.writeFileSync(path.join(OUT_DIR, `app-${baseName}.png`), appBuf);
-        fs.writeFileSync(path.join(OUT_DIR, `diff-${baseName}.png`), diffPngBuf);
-        fs.writeFileSync(path.join(OUT_DIR, `side-${baseName}.png`), sideBySideBuf);
-
-        const statusMark = pass ? "✅" : "⚠️";
-        console.log(`  ${statusMark} [${stateKey}] ${desc}: ${diffPercent.toFixed(2)}% diff`);
-      } catch (err: any) {
-        console.error(`  ❌ [${stateKey}] ${desc} failed:`, err.message);
-        results.push({
-          state: stateKey,
-          theme,
-          viewport: vpKey,
-          diffPercent: 100,
-          passed: false,
-        });
-      } finally {
-        await refCtx.close();
-        await appCtx.close();
+        }
       }
-    }
+  } finally {
+    await browser.close();
+    server?.kill();
   }
 
-  await browser.close();
-
-  fs.writeFileSync(path.join(OUT_DIR, "results.json"), JSON.stringify(results, null, 2));
-  console.log(`\nAudit complete. Results written to ${OUT_DIR}/results.json`);
+  fs.writeFileSync(path.join(OUT_DIR, "results.json"), JSON.stringify(results, null, 2) + "\n");
+  const passed = results.filter((r) => r.passed).length;
+  const rows = results.map(
+    (r) =>
+      `| ${r.state} | ${r.desc} | ${r.viewport} | ${r.theme} | ${r.diffPercent.toFixed(2)}% | ${r.passed ? "✅" : "❌"}${r.error ? ` ${r.error}` : ""} |`,
+  );
+  fs.writeFileSync(
+    path.join(OUT_DIR, "summary.md"),
+    `# Visual compare\n\n${passed}/${results.length} states within ${PASS_PCT}%.\n\n| State | Description | Viewport | Theme | Diff | Pass |\n|---|---|---|---|---|---|\n${rows.join("\n")}\n`,
+  );
+  console.log(`\n${passed}/${results.length} within ${PASS_PCT}% → reports/ui/summary.md`);
 }
 
 main().catch((err) => {
