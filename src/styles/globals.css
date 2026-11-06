@@ -180,6 +180,21 @@ body {
   overflow-x: hidden;
   background: var(--bg);
 }
+/* The reference never sets line-height (browser "normal"); Tailwind's preflight sets 1.5. Give the
+   reference-styled areas their original metrics. Tool-page content keeps Tailwind's 1.5, and
+   leading-* utilities on descendants still apply. */
+#nav,
+#stage,
+.band,
+.sec,
+.giant,
+footer,
+#pal,
+#sheet,
+#toast,
+.flychip {
+  line-height: normal;
+}
 button {
   font: inherit;
   color: inherit;

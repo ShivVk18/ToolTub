@@ -300,6 +300,24 @@ test.describe("KlipKit Redesign UI & Visual Layer", () => {
     expect(Math.round(tabs!.y - (h2!.y + h2!.height))).toBe(30);
   });
 
+  test("home text boxes have the reference's line heights", async ({ browser, baseURL }) => {
+    const sels = [".eyebrow", "#hint", "#samples .chip", ".plan li", ".plan .pe", "#explore .tcard p", ".band"];
+    const heights = async (url: string) => {
+      const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+      await page.goto(url, { waitUntil: "load" });
+      const h = await page.evaluate(
+        (ss) => ss.map((s) => Math.round(document.querySelector(s)?.getBoundingClientRect().height ?? -1)),
+        sels,
+      );
+      await page.close();
+      return Object.fromEntries(sels.map((s, i) => [s, h[i]]));
+    };
+    const ref = await heights("file://" + process.cwd() + "/design/reference/KlipKit_UI.html");
+    const app = await heights(baseURL + "/");
+    for (const s of sels)
+      expect(Math.abs(app[s] - ref[s]), `${s}: app ${app[s]} vs ref ${ref[s]}`).toBeLessThanOrEqual(1);
+  });
+
   test("prefers-reduced-motion turns off continuous animations", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
