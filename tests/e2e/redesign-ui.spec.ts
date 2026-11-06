@@ -231,6 +231,31 @@ test.describe("KlipKit Redesign UI & Visual Layer", () => {
     expect(saturation, `edge pixel rgb(${r},${g},${b})`).toBeGreaterThan(40);
   });
 
+  for (const width of [390, 1440, 1920]) {
+    test(`hero squiggle sits where the reference puts it under "just say" at ${width}px`, async ({
+      browser,
+      baseURL,
+    }) => {
+      // Offset of the squiggle from the word "just", once the entrance animation has finished.
+      const measure = async (url: string) => {
+        const page = await browser.newPage({ viewport: { width, height: 900 } });
+        await page.goto(url, { waitUntil: "load" });
+        await page.waitForTimeout(3200);
+        const d = await page.evaluate(() => {
+          const just = document.querySelectorAll("#h1 .l2 .w")[1].getBoundingClientRect();
+          const sq = document.getElementById("squig")!.getBoundingClientRect();
+          return { top: sq.top - just.bottom, left: sq.left - just.left };
+        });
+        await page.close();
+        return d;
+      };
+      const ref = await measure("file://" + process.cwd() + "/design/reference/KlipKit_UI.html");
+      const app = await measure(baseURL + "/");
+      expect(Math.abs(app.top - ref.top), `top: app ${app.top} vs ref ${ref.top}`).toBeLessThan(2.5);
+      expect(Math.abs(app.left - ref.left), `left: app ${app.left} vs ref ${ref.left}`).toBeLessThan(2.5);
+    });
+  }
+
   test("prefers-reduced-motion turns off continuous animations", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");

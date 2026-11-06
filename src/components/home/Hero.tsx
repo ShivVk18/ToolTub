@@ -51,15 +51,17 @@ export function Hero({ onPickSample, onOrbSlotClick, onPasteText, onSubmitAsk, h
     const ws = h1Ref.current.querySelectorAll(".l2 .w");
     if (ws.length < 3) return;
 
-    // ws[1] is "just", ws[2] is "say"
-    const a = ws[1].getBoundingClientRect();
-    const b = ws[2].getBoundingClientRect();
-    const h = h1Ref.current.getBoundingClientRect();
+    // ws[1] is "just", ws[2] is "say". Layout offsets (relative to the h1) ignore the words' entrance
+    // transform, so the result doesn't depend on when this runs. The reference measures while the words
+    // are still shifted down by 0.35em and then subtracts 16 px; reproduce that resting position.
+    const a = ws[1] as HTMLElement;
+    const b = ws[2] as HTMLElement;
+    const fontSize = parseFloat(getComputedStyle(h1Ref.current).fontSize) || 0;
     const sq = squigRef.current;
-    const w = b.right - a.left + 12;
+    const w = b.offsetLeft + b.offsetWidth - a.offsetLeft + 12;
 
-    sq.style.left = `${a.left - h.left - 6}px`;
-    sq.style.top = `${a.bottom - h.top - 4}px`;
+    sq.style.left = `${a.offsetLeft - 6}px`;
+    sq.style.top = `${a.offsetTop + a.offsetHeight + 0.35 * fontSize - 16}px`;
     sq.style.width = `${w}px`;
     sq.setAttribute("viewBox", `0 0 ${w} 26`);
 
