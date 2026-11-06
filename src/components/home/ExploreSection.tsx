@@ -92,7 +92,7 @@ export function ExploreSection({ onSelectTool }: ExploreSectionProps) {
         <span ref={countRef} id="cnt" className="tabular-nums">
           {count || 76}
         </span>{" "}
-        tools. <em className="text-muted not-italic italic">One place.</em>
+        tools. <em className="text-muted italic">One place.</em>
       </h2>
       <p className="sp text-center text-ink2 text-[19px] mt-[14px]">
         For everyday work, developers and creators. Fast, private and free.

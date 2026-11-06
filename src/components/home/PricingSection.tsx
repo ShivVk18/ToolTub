@@ -65,7 +65,7 @@ export function PricingSection({ onOpenPro }: PricingSectionProps) {
       </span>
 
       <h2 className="sh font-serif font-medium text-[clamp(40px,4.4vw,84px)] tracking-[-0.025em] leading-[1.04] text-center text-ink">
-        Free forever. <em className="text-muted not-italic italic">Pro when you need more.</em>
+        Free forever. <em className="text-muted italic">Pro when you need more.</em>
       </h2>
 
       {/* Monthly / Yearly Toggle */}

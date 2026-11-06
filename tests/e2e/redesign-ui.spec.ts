@@ -196,6 +196,17 @@ test.describe("KlipKit Redesign UI & Visual Layer", () => {
     await expect.poll(() => sheet.evaluate((el) => getComputedStyle(el).opacity)).toBe("0");
   });
 
+  test("section headings keep their italic second phrase", async ({ page }) => {
+    await page.goto("/");
+    const styles = await page.evaluate(() =>
+      ["#feel", "#explore", "#pricing"].map((id) => {
+        const em = document.querySelector(`${id} h2 em`);
+        return em ? getComputedStyle(em).fontStyle : "missing";
+      }),
+    );
+    expect(styles).toEqual(["italic", "italic", "italic"]);
+  });
+
   test("prefers-reduced-motion turns off continuous animations", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");

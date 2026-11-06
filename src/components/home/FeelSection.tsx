@@ -217,7 +217,7 @@ export function FeelSection() {
       </span>
 
       <h2 className="sh font-serif font-medium text-[clamp(40px,4.4vw,84px)] tracking-[-0.025em] leading-[1.04] text-center text-ink">
-        Easy to use. <em className="text-muted not-italic italic">Actually enjoyable.</em>
+        Easy to use. <em className="text-muted italic">Actually enjoyable.</em>
       </h2>
       <p className="sp text-center !text-ink2 text-[19px] mt-[14px]">
         Most tool sites feel like work. KlipKit feels like magic, without the learning curve.
