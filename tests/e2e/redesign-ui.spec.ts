@@ -207,6 +207,14 @@ test.describe("KlipKit Redesign UI & Visual Layer", () => {
     expect(styles).toEqual(["italic", "italic", "italic"]);
   });
 
+  test("the scrolled nav capsule blurs what's behind it", async ({ page }) => {
+    await page.goto("/");
+    await page.evaluate(() => window.scrollTo(0, 200));
+    await expect(page.locator("body")).toHaveClass(/scrolled/);
+    const blur = await page.locator(".navin").evaluate((el) => getComputedStyle(el).backdropFilter);
+    expect(blur).toContain("blur(16px)");
+  });
+
   test("prefers-reduced-motion turns off continuous animations", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");

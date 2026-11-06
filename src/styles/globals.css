@@ -2297,8 +2297,9 @@ body.scrolled .navin {
   background: var(--panel);
   border-color: var(--line);
   box-shadow: var(--shadow);
-  backdrop-filter: blur(16px) saturate(1.2);
+  /* Prefixed first: with the standard property first, the CSS minifier kept only the -webkit- one. */
   -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  backdrop-filter: blur(16px) saturate(1.2);
 }
 body.scrolled #nav::before {
   opacity: 0 !important;
