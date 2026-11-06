@@ -3,10 +3,17 @@ import { loc } from "./shared";
 
 export const imageCompressor: ToolSEO = {
   primaryKeyword: "compress image",
-  secondaryKeywords: ["image compressor", "reduce image size", "compress jpeg", "compress image to 50kb", "compress png online"],
+  secondaryKeywords: [
+    "image compressor",
+    "reduce image size",
+    "compress jpeg",
+    "compress image to 50kb",
+    "compress png online",
+  ],
   searchIntent: "do",
   title: "Image Compressor – Compress JPG, PNG, WebP Free | KlipKit",
-  description: "Compress JPG, PNG, WebP and AVIF images free in your browser. Shrink photos up to 80% with no visible quality loss. No upload, no sign-up, batch support.",
+  description:
+    "Compress JPG, PNG, WebP and AVIF images free in your browser. Shrink photos up to 80% with no visible quality loss. No upload, no sign-up, batch support.",
   ogTitle: "Image Compressor — free, private, batch",
   ogDescription: "Shrink JPG, PNG, WebP and AVIF images in your browser. Nothing is uploaded.",
   ogAlt: "KlipKit Image Compressor showing a photo reduced from 4.2 MB to 610 KB",
@@ -66,15 +73,23 @@ export const imageCompressor: ToolSEO = {
   },
   explainer:
     "Image compression removes detail that people are unlikely to notice. Lossy formats such as JPG, WebP and AVIF discard fine colour information; lossless formats such as PNG only reorganise data, so they shrink less.\n\nCompress images before emailing them, uploading them to forms with size limits, or publishing them on a website, where smaller images load faster and improve Core Web Vitals scores.\n\nCommon mistakes: compressing the same JPG repeatedly, which adds artefacts each time; saving photos as PNG, which makes them several times larger; and serving a 4000-pixel photo on a page where it displays at 800 pixels. Resize first, then compress, for the smallest file at the best quality.\n\nA quick rule of thumb: photos for the web rarely need more than 1600 pixels on the long side, thumbnails need about 400, and email attachments look fine at 1200. Pick the size first, then let the quality setting do the rest.",
-  featureList: ["Compress JPG, PNG, WebP and AVIF", "Target size in KB", "Batch up to 50 images", "Processed in your browser", "No sign-up"],
-  llmsLine: "Image Compressor: shrink JPG, PNG, WebP and AVIF in the browser (no upload), with quality and target-KB modes and batch support.",
+  featureList: [
+    "Compress JPG, PNG, WebP and AVIF",
+    "Target size in KB",
+    "Batch up to 50 images",
+    "Processed in your browser",
+    "No sign-up",
+  ],
+  llmsLine:
+    "Image Compressor: shrink JPG, PNG, WebP and AVIF in the browser (no upload), with quality and target-KB modes and batch support.",
   longTailVariants: [
     {
       slug: "compress-image-to-50kb",
       keyword: "compress image to 50kb",
       h1: "Compress Image to 50 KB",
       title: "Compress Image to 50 KB Online Free | KlipKit",
-      description: "Reduce a photo or signature to under 50 KB for exam, job and government forms. Runs in your browser: no upload, no sign-up, no watermark. Free.",
+      description:
+        "Reduce a photo or signature to under 50 KB for exam, job and government forms. Runs in your browser: no upload, no sign-up, no watermark. Free.",
       intro:
         "Exam, job and government portals often cap photos and signatures at 50 KB. This page opens the Image Compressor with a 50 KB target set, so you only need to drop the image in and download the result.",
       preset: { targetKB: 50 },

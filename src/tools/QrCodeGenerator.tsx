@@ -16,7 +16,16 @@ const dataUrlToBlob = (u: string) => {
 /** [Lib] QR Code Generator (qrcode, MIT). Static codes only: data lives in the code, nothing to expire. */
 export function QrCodeGenerator({ slug, preset, next }: ToolProps) {
   const [kind, setKind] = useState<Kind>((preset?.type as Kind) ?? "url");
-  const [f, setF] = useState({ url: "https://klipkit.com", text: "", ssid: "", password: "", security: "WPA", name: "", phone: "", email: "" });
+  const [f, setF] = useState({
+    url: "https://klipkit.com",
+    text: "",
+    ssid: "",
+    password: "",
+    security: "WPA",
+    name: "",
+    phone: "",
+    email: "",
+  });
   const [fg, setFg] = useState("#000000");
   const [bg, setBg] = useState("#ffffff");
   const [ecl, setEcl] = useState<"L" | "M" | "Q" | "H">("M");
@@ -39,8 +48,14 @@ export function QrCodeGenerator({ slug, preset, next }: ToolProps) {
 
   const png = payload ? lastPng : null;
   const svg = payload ? lastSvg : "";
-  const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setF({ ...f, [k]: e.target.value });
-  const items: Artifact[] = png ? [{ name: "qr-code.png", type: "image/png", blob: png }, { name: "qr-code.svg", type: "image/svg+xml", blob: new Blob([svg], { type: "image/svg+xml" }) }] : [];
+  const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+    setF({ ...f, [k]: e.target.value });
+  const items: Artifact[] = png
+    ? [
+        { name: "qr-code.png", type: "image/png", blob: png },
+        { name: "qr-code.svg", type: "image/svg+xml", blob: new Blob([svg], { type: "image/svg+xml" }) },
+      ]
+    : [];
 
   return (
     <ToolWorkspace
@@ -65,12 +80,24 @@ export function QrCodeGenerator({ slug, preset, next }: ToolProps) {
             ))}
           </div>
           <div className="flex flex-wrap gap-4">
-            {kind === "url" && <Field label="URL"><input className={`${inputClass} w-80`} value={f.url} onChange={set("url")} inputMode="url" /></Field>}
-            {kind === "text" && <Field label="Text"><input className={`${inputClass} w-80`} value={f.text} onChange={set("text")} /></Field>}
+            {kind === "url" && (
+              <Field label="URL">
+                <input className={`${inputClass} w-80`} value={f.url} onChange={set("url")} inputMode="url" />
+              </Field>
+            )}
+            {kind === "text" && (
+              <Field label="Text">
+                <input className={`${inputClass} w-80`} value={f.text} onChange={set("text")} />
+              </Field>
+            )}
             {kind === "wifi" && (
               <>
-                <Field label="Network name (SSID)"><input className={inputClass} value={f.ssid} onChange={set("ssid")} /></Field>
-                <Field label="Password"><input className={inputClass} value={f.password} onChange={set("password")} /></Field>
+                <Field label="Network name (SSID)">
+                  <input className={inputClass} value={f.ssid} onChange={set("ssid")} />
+                </Field>
+                <Field label="Password">
+                  <input className={inputClass} value={f.password} onChange={set("password")} />
+                </Field>
                 <Field label="Security">
                   <select className={inputClass} value={f.security} onChange={set("security")}>
                     <option value="WPA">WPA/WPA2/WPA3</option>
@@ -82,9 +109,15 @@ export function QrCodeGenerator({ slug, preset, next }: ToolProps) {
             )}
             {kind === "vcard" && (
               <>
-                <Field label="Name"><input className={inputClass} value={f.name} onChange={set("name")} /></Field>
-                <Field label="Phone"><input className={inputClass} value={f.phone} onChange={set("phone")} inputMode="tel" /></Field>
-                <Field label="Email"><input className={inputClass} value={f.email} onChange={set("email")} inputMode="email" /></Field>
+                <Field label="Name">
+                  <input className={inputClass} value={f.name} onChange={set("name")} />
+                </Field>
+                <Field label="Phone">
+                  <input className={inputClass} value={f.phone} onChange={set("phone")} inputMode="tel" />
+                </Field>
+                <Field label="Email">
+                  <input className={inputClass} value={f.email} onChange={set("email")} inputMode="email" />
+                </Field>
               </>
             )}
           </div>
@@ -92,8 +125,12 @@ export function QrCodeGenerator({ slug, preset, next }: ToolProps) {
       }
       advanced={
         <>
-          <Field label="Colour"><input type="color" value={fg} onChange={(e) => setFg(e.target.value)} className="h-10 w-16" /></Field>
-          <Field label="Background"><input type="color" value={bg} onChange={(e) => setBg(e.target.value)} className="h-10 w-16" /></Field>
+          <Field label="Colour">
+            <input type="color" value={fg} onChange={(e) => setFg(e.target.value)} className="h-10 w-16" />
+          </Field>
+          <Field label="Background">
+            <input type="color" value={bg} onChange={(e) => setBg(e.target.value)} className="h-10 w-16" />
+          </Field>
           <Field label="Error correction">
             <select className={inputClass} value={ecl} onChange={(e) => setEcl(e.target.value as typeof ecl)}>
               <option value="L">L (7%)</option>
@@ -108,15 +145,21 @@ export function QrCodeGenerator({ slug, preset, next }: ToolProps) {
         // Reserve the code's space while it renders, so the content below doesn't jump (CLS was 0.082).
         payload && !svg ? (
           <div className="size-48 rounded-lg border border-border bg-muted" aria-hidden />
-        ) : svg && (
-          <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={`data:image/svg+xml;utf8,${encodeURIComponent(svg)}`} alt="Your QR code" className="size-48 rounded-lg border border-border" />
-            <div className="space-y-2">
-              <p className="text-sm text-fg-muted">Static code · never expires · scan to test before printing</p>
-              <ResultActions items={items} next={next} from={slug} separate />
+        ) : (
+          svg && (
+            <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={`data:image/svg+xml;utf8,${encodeURIComponent(svg)}`}
+                alt="Your QR code"
+                className="size-48 rounded-lg border border-border"
+              />
+              <div className="space-y-2">
+                <p className="text-sm text-fg-muted">Static code · never expires · scan to test before printing</p>
+                <ResultActions items={items} next={next} from={slug} separate />
+              </div>
             </div>
-          </div>
+          )
         )
       }
     />

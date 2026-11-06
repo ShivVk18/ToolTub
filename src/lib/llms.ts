@@ -25,11 +25,15 @@ export function llmsTxt() {
       const list = routedTools().filter((t) => t.hub === h.id);
       if (!list.length) continue;
       out += `### ${h.name} (${abs(`/${h.id}`)})\n\n`;
-      for (const t of list) out += `- [${t.name}](${abs(`/${t.slug}`)}): ${(t.seo?.llmsLine ?? t.tagline).replace(`${t.name}: `, "")} ${t.processing.where === "device" ? "Runs on the device." : "Own server, deleted after 1 hour."}\n`;
+      for (const t of list)
+        out += `- [${t.name}](${abs(`/${t.slug}`)}): ${(t.seo?.llmsLine ?? t.tagline).replace(`${t.name}: `, "")} ${t.processing.where === "device" ? "Runs on the device." : "Own server, deleted after 1 hour."}\n`;
       out += "\n";
     }
   }
-  out += `## Tool Chains\n\n${chains.filter(isChainLive).map((c) => `- [${c.name}](${abs(`/chain/${c.slug}`)}): ${c.description}`).join("\n")}\n`;
+  out += `## Tool Chains\n\n${chains
+    .filter(isChainLive)
+    .map((c) => `- [${c.name}](${abs(`/chain/${c.slug}`)}): ${c.description}`)
+    .join("\n")}\n`;
   out += `\n## Optional\n\n- [Full content for LLMs](${abs("/llms-full.txt")})\n- [Privacy](${abs("/privacy")})\n- [Open-source licences](${abs("/licences")})\n- Coming soon: ${tools.filter((t) => t.status === "planned").length} more tools.\n`;
   return md(out);
 }

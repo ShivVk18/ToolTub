@@ -5,7 +5,8 @@ export interface JsonJob {
   sortKeys?: boolean;
   stripComments?: boolean;
 }
-export type JsonResult = { ok: true; output: string } | { ok: false; line: number; column: number; message: string; hint: string };
+export type JsonResult =
+  { ok: true; output: string } | { ok: false; line: number; column: number; message: string; hint: string };
 
 const stripJsonComments = (s: string) =>
   s.replace(/("(?:\\.|[^"\\])*")|\/\/[^\n]*|\/\*[\s\S]*?\*\//g, (m, str) => (str ? str : ""));
@@ -14,7 +15,11 @@ const sortDeep = (v: unknown): unknown =>
   Array.isArray(v)
     ? v.map(sortDeep)
     : v && typeof v === "object"
-      ? Object.fromEntries(Object.keys(v).sort().map((k) => [k, sortDeep((v as Record<string, unknown>)[k])]))
+      ? Object.fromEntries(
+          Object.keys(v)
+            .sort()
+            .map((k) => [k, sortDeep((v as Record<string, unknown>)[k])]),
+        )
       : v;
 
 /**
@@ -24,39 +29,100 @@ const sortDeep = (v: unknown): unknown =>
  */
 export function jsonErrorOffset(t: string): number {
   let i = 0;
-  const ws = () => { while (i < t.length && " \t\n\r".includes(t[i])) i++; };
-  const fail = (): never => { throw i; };
-  const lit = (w: string) => { if (t.startsWith(w, i)) i += w.length; else fail(); };
+  const ws = () => {
+    while (i < t.length && " \t\n\r".includes(t[i])) i++;
+  };
+  const fail = (): never => {
+    throw i;
+  };
+  const lit = (w: string) => {
+    if (t.startsWith(w, i)) i += w.length;
+    else fail();
+  };
   const str = () => {
     i++;
     while (i < t.length && t[i] !== '"') {
-      if (t[i] === "\\") { i++; if (!"\"\\/bfnrtu".includes(t[i] ?? "")) fail(); if (t[i] === "u") { if (!/^[0-9a-fA-F]{4}$/.test(t.slice(i + 1, i + 5))) fail(); i += 4; } }
-      else if (t.charCodeAt(i) < 0x20) fail();
+      if (t[i] === "\\") {
+        i++;
+        if (!'"\\/bfnrtu'.includes(t[i] ?? "")) fail();
+        if (t[i] === "u") {
+          if (!/^[0-9a-fA-F]{4}$/.test(t.slice(i + 1, i + 5))) fail();
+          i += 4;
+        }
+      } else if (t.charCodeAt(i) < 0x20) fail();
       i++;
     }
     if (t[i] !== '"') fail();
     i++;
   };
-  const digits = () => { if (!(t[i] >= "0" && t[i] <= "9")) fail(); while (t[i] >= "0" && t[i] <= "9") i++; };
+  const digits = () => {
+    if (!(t[i] >= "0" && t[i] <= "9")) fail();
+    while (t[i] >= "0" && t[i] <= "9") i++;
+  };
   const num = () => {
     if (t[i] === "-") i++;
     if (t[i] === "0") i++;
     else digits();
-    if (t[i] === ".") { i++; digits(); }
-    if (t[i] === "e" || t[i] === "E") { i++; if (t[i] === "+" || t[i] === "-") i++; digits(); }
+    if (t[i] === ".") {
+      i++;
+      digits();
+    }
+    if (t[i] === "e" || t[i] === "E") {
+      i++;
+      if (t[i] === "+" || t[i] === "-") i++;
+      digits();
+    }
   };
   const value = (): void => {
     ws();
     const c = t[i];
     if (c === "{") {
-      i++; ws();
-      if (t[i] === "}") { i++; return; }
-      for (;;) { ws(); if (t[i] !== '"') fail(); str(); ws(); if (t[i] !== ":") fail(); i++; value(); ws(); if (t[i] === ",") { i++; continue; } if (t[i] === "}") { i++; return; } fail(); }
+      i++;
+      ws();
+      if (t[i] === "}") {
+        i++;
+        return;
+      }
+      for (;;) {
+        ws();
+        if (t[i] !== '"') fail();
+        str();
+        ws();
+        if (t[i] !== ":") fail();
+        i++;
+        value();
+        ws();
+        if (t[i] === ",") {
+          i++;
+          continue;
+        }
+        if (t[i] === "}") {
+          i++;
+          return;
+        }
+        fail();
+      }
     }
     if (c === "[") {
-      i++; ws();
-      if (t[i] === "]") { i++; return; }
-      for (;;) { value(); ws(); if (t[i] === ",") { i++; continue; } if (t[i] === "]") { i++; return; } fail(); }
+      i++;
+      ws();
+      if (t[i] === "]") {
+        i++;
+        return;
+      }
+      for (;;) {
+        value();
+        ws();
+        if (t[i] === ",") {
+          i++;
+          continue;
+        }
+        if (t[i] === "]") {
+          i++;
+          return;
+        }
+        fail();
+      }
     }
     if (c === '"') return str();
     if (c === "t") return lit("true");
@@ -65,7 +131,14 @@ export function jsonErrorOffset(t: string): number {
     if (c === "-" || (c >= "0" && c <= "9")) return num();
     fail();
   };
-  try { value(); ws(); if (i < t.length) fail(); return -1; } catch (pos) { return typeof pos === "number" ? Math.min(pos, t.length) : t.length; }
+  try {
+    value();
+    ws();
+    if (i < t.length) fail();
+    return -1;
+  } catch (pos) {
+    return typeof pos === "number" ? Math.min(pos, t.length) : t.length;
+  }
 }
 
 function locate(text: string, message: string) {
@@ -81,9 +154,17 @@ function locate(text: string, message: string) {
 function hintFor(text: string, line: number, column: number) {
   const row = text.split("\n")[line - 1] ?? "";
   const around = row.slice(Math.max(0, column - 3), column + 2);
-  if (/,\s*[}\]]/.test(text.split("\n").slice(line - 2, line + 1).join("\n"))) return "Remove the trailing comma before the closing bracket.";
-  if (around.includes("'")) return "JSON needs double quotes (\") around strings and keys, not single quotes.";
-  if (/^\s*[A-Za-z_$][\w$]*\s*:/.test(row)) return "Keys must be in double quotes, e.g. \"name\": value.";
+  if (
+    /,\s*[}\]]/.test(
+      text
+        .split("\n")
+        .slice(line - 2, line + 1)
+        .join("\n"),
+    )
+  )
+    return "Remove the trailing comma before the closing bracket.";
+  if (around.includes("'")) return 'JSON needs double quotes (") around strings and keys, not single quotes.';
+  if (/^\s*[A-Za-z_$][\w$]*\s*:/.test(row)) return 'Keys must be in double quotes, e.g. "name": value.';
   if (/\/\/|\/\*/.test(row)) return "Standard JSON doesn't allow comments. Turn on “Strip comments”.";
   return "Check for a missing comma, quote or bracket at this position.";
 }
@@ -96,6 +177,12 @@ export function formatJson({ text, indent, sortKeys, stripComments }: JsonJob): 
   } catch (e) {
     const message = (e as Error).message;
     const { line, column } = locate(src, message);
-    return { ok: false, line, column, message: message.replace(/^JSON\.parse: /, ""), hint: hintFor(src, line, column) };
+    return {
+      ok: false,
+      line,
+      column,
+      message: message.replace(/^JSON\.parse: /, ""),
+      hint: hintFor(src, line, column),
+    };
   }
 }

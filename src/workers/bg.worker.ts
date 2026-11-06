@@ -9,7 +9,6 @@ import { serveWorker, type Progress } from "@/lib/worker-rpc";
 const MODEL_URL = "/models/isnet-general-use-int8.onnx";
 const SIZE = 1024;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let session: any = null;
 let backend = "wasm";
 
@@ -28,11 +27,17 @@ async function fetchWithProgress(url: string, progress: Progress) {
     if (done) break;
     chunks.push(value);
     got += value.length;
-    progress({ ratio: total ? got / total : undefined, label: `Downloading AI model (one time) ${Math.round(got / 1e6)} MB` });
+    progress({
+      ratio: total ? got / total : undefined,
+      label: `Downloading AI model (one time) ${Math.round(got / 1e6)} MB`,
+    });
   }
   const bytes = new Uint8Array(got);
   let o = 0;
-  for (const c of chunks) { bytes.set(c, o); o += c.length; }
+  for (const c of chunks) {
+    bytes.set(c, o);
+    o += c.length;
+  }
   await cache.put(url, new Response(bytes));
   return bytes;
 }
@@ -44,7 +49,11 @@ async function getSession(progress: Progress) {
   ort.env.wasm.wasmPaths = "/vendor/ort/";
   const model = await fetchWithProgress(MODEL_URL, progress);
   progress({ label: "Starting AI model" });
-  const hasGpu = "gpu" in navigator && !!(await (navigator as Navigator & { gpu: { requestAdapter(): Promise<unknown> } }).gpu.requestAdapter().catch(() => null));
+  const hasGpu =
+    "gpu" in navigator &&
+    !!(await (navigator as Navigator & { gpu: { requestAdapter(): Promise<unknown> } }).gpu
+      .requestAdapter()
+      .catch(() => null));
   backend = hasGpu ? "webgpu" : "wasm";
   session = await ort.InferenceSession.create(model, { executionProviders: hasGpu ? ["webgpu", "wasm"] : ["wasm"] });
   return Object.assign(session, { ort });
@@ -72,8 +81,12 @@ async function remove({ blob }: { blob: Blob }, progress: Progress) {
   const mask = out[s.outputNames[0]].data as Float32Array;
 
   // Min-max normalise to 0–255 alpha.
-  let mn = Infinity, mx = -Infinity;
-  for (const v of mask) { if (v < mn) mn = v; if (v > mx) mx = v; }
+  let mn = Infinity,
+    mx = -Infinity;
+  for (const v of mask) {
+    if (v < mn) mn = v;
+    if (v > mx) mx = v;
+  }
   const alpha = new ImageData(SIZE, SIZE);
   for (let i = 0; i < SIZE * SIZE; i++) {
     const a = ((mask[i] - mn) / (mx - mn || 1)) * 255;

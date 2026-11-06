@@ -4,7 +4,11 @@ import type { ImageJob, ImageResult } from "./image-ops";
 
 type ImageOps = {
   process: (job: ImageJob) => ImageResult;
-  heic: (job: { blob: Blob; mime: "image/jpeg" | "image/png"; quality?: number }) => { blob: Blob; width: number; height: number };
+  heic: (job: { blob: Blob; mime: "image/jpeg" | "image/png"; quality?: number }) => {
+    blob: Blob;
+    width: number;
+    height: number;
+  };
 };
 
 /** Lazily created: the worker file is only fetched when a tool first calls it. */
@@ -24,5 +28,9 @@ export const jsonWorker = createWorkerClient<{ format: (job: JsonJob) => JsonRes
 );
 
 import type { PdfCompressJob } from "./pdf-ops";
-type PdfOps = { compress: (job: PdfCompressJob) => { blob: Blob; originalSize: number; keptOriginal: boolean; note?: string } };
-export const pdfWorker = createWorkerClient<PdfOps>(() => new Worker(new URL("./pdf.worker.ts", import.meta.url), { type: "module" }));
+type PdfOps = {
+  compress: (job: PdfCompressJob) => { blob: Blob; originalSize: number; keptOriginal: boolean; note?: string };
+};
+export const pdfWorker = createWorkerClient<PdfOps>(
+  () => new Worker(new URL("./pdf.worker.ts", import.meta.url), { type: "module" }),
+);

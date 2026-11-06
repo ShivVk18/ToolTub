@@ -8,7 +8,16 @@ import { FavouriteButton, VisitTracker } from "@/components/workspace/ToolChrome
 import { RelatedTools, ToolCard } from "@/components/workspace/RelatedTools";
 import { ToolUI } from "@/tools";
 import { getHub, hubs } from "@/registry/categories";
-import { canChain, getTool, getVariant, isHubIndexable, isIndexable, relatedFor, routedTools, toolsInHub } from "@/registry/tools";
+import {
+  canChain,
+  getTool,
+  getVariant,
+  isHubIndexable,
+  isIndexable,
+  relatedFor,
+  routedTools,
+  toolsInHub,
+} from "@/registry/tools";
 import type { LongTailVariant, ToolDefinition } from "@/registry/types";
 import { hubGraph, toolGraph } from "@/lib/schema";
 import { pageMetadata } from "@/lib/metadata";
@@ -42,13 +51,29 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const r = resolve((await params).slug);
   if (!r) return {};
   if (r.kind === "hub") {
-    return pageMetadata({ path: `/${r.hub.id}`, title: r.hub.title, description: r.hub.description, ogImage: `/og/${r.hub.id}.png`, ogAlt: r.hub.h1, index: isHubIndexable(r.hub.id) });
+    return pageMetadata({
+      path: `/${r.hub.id}`,
+      title: r.hub.title,
+      description: r.hub.description,
+      ogImage: `/og/${r.hub.id}.png`,
+      ogAlt: r.hub.h1,
+      index: isHubIndexable(r.hub.id),
+    });
   }
   const t = r.tool;
   const s = t.seo;
   if (r.kind === "variant") {
     const v = r.variant;
-    return pageMetadata({ path: `/${v.slug}`, title: v.title, description: v.description, ogImage: `/og/${v.slug}.png`, ogAlt: v.h1, keywords: [v.keyword], index: isIndexable(t), category: t.category });
+    return pageMetadata({
+      path: `/${v.slug}`,
+      title: v.title,
+      description: v.description,
+      ogImage: `/og/${v.slug}.png`,
+      ogAlt: v.h1,
+      keywords: [v.keyword],
+      index: isIndexable(t),
+      category: t.category,
+    });
   }
   return pageMetadata({
     path: `/${t.slug}`,
@@ -99,7 +124,11 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         <p className="text-lg text-fg-muted">{variant?.intro ?? t.tagline}</p>
         <div className="flex flex-wrap gap-2">
           <PrivacyBadge processing={t.processing} />
-          {t.status === "beta" && <span className="rounded-full border border-amber-500/30 bg-amber-500/5 px-3 py-1 text-xs text-amber-700 dark:text-amber-400">Beta</span>}
+          {t.status === "beta" && (
+            <span className="rounded-full border border-amber-500/30 bg-amber-500/5 px-3 py-1 text-xs text-amber-700 dark:text-amber-400">
+              Beta
+            </span>
+          )}
         </div>
       </header>
       <ToolUI slug={t.slug} preset={variant?.preset} next={next} />
@@ -116,19 +145,32 @@ function HubPage({ hub }: { hub: NonNullable<ReturnType<typeof getHub>> }) {
   return (
     <main className="mx-auto max-w-6xl px-4 py-8">
       <JsonLd data={hubGraph(hub, available)} />
-      <Breadcrumbs items={[{ name: "Home", path: "/" }, { name: hub.name, path: `/${hub.id}` }]} />
+      <Breadcrumbs
+        items={[
+          { name: "Home", path: "/" },
+          { name: hub.name, path: `/${hub.id}` },
+        ]}
+      />
       <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">{hub.h1}</h1>
       <p className="mt-3 max-w-2xl text-lg text-fg-muted">{hub.description}</p>
       {available.length > 0 && (
         <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {available.map((t) => <li key={t.slug}><ToolCard tool={t} /></li>)}
+          {available.map((t) => (
+            <li key={t.slug}>
+              <ToolCard tool={t} />
+            </li>
+          ))}
         </ul>
       )}
       {soon.length > 0 && (
         <>
           <h2 className="mt-10 text-sm font-medium text-fg-muted">Coming soon</h2>
           <ul className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {soon.map((t) => <li key={t.slug}><ToolCard tool={t} /></li>)}
+            {soon.map((t) => (
+              <li key={t.slug}>
+                <ToolCard tool={t} />
+              </li>
+            ))}
           </ul>
         </>
       )}

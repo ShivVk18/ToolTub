@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { create } from 'zustand';
-import type { ToolItem } from './designTools';
+import { create } from "zustand";
+import type { ToolItem } from "./designTools";
 
 interface UIState {
   isPaletteOpen: boolean;
@@ -25,11 +25,11 @@ export const useUIStore = create<UIState>((set) => ({
   isVoiceSheetOpen: false,
   activeTool: null,
   panelTool: null,
-  panelInput: '',
+  panelInput: "",
   isPanelFull: false,
   openPalette: () => {
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new Event('klipkit:search'));
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("klipkit:search"));
     }
     set({ isPaletteOpen: true });
   },
@@ -37,30 +37,30 @@ export const useUIStore = create<UIState>((set) => ({
   openVoiceSheet: () => set({ isVoiceSheetOpen: true }),
   closeVoiceSheet: () => set({ isVoiceSheetOpen: false }),
   setActiveTool: (tool) => set({ activeTool: tool }),
-  openPanel: (tool, initialInput = '') => {
-    if (typeof document !== 'undefined') {
-      document.body.classList.add('is-work', 'panel-open');
+  openPanel: (tool, initialInput = "") => {
+    if (typeof document !== "undefined") {
+      document.body.classList.add("is-work", "panel-open");
     }
     set({ panelTool: tool, panelInput: initialInput });
   },
   closePanel: () => {
-    if (typeof document !== 'undefined') {
-      document.body.classList.remove('panel-open', 'panel-full');
+    if (typeof document !== "undefined") {
+      document.body.classList.remove("panel-open", "panel-full");
       try {
         if (window.location.hash) {
-          window.history.replaceState(null, '', window.location.pathname + window.location.search);
+          window.history.replaceState(null, "", window.location.pathname + window.location.search);
         }
       } catch {
         // ignore
       }
     }
-    set({ panelTool: null, panelInput: '', isPanelFull: false });
+    set({ panelTool: null, panelInput: "", isPanelFull: false });
   },
   togglePanelFull: () =>
     set((state) => {
       const next = !state.isPanelFull;
-      if (typeof document !== 'undefined') {
-        document.body.classList.toggle('panel-full', next);
+      if (typeof document !== "undefined") {
+        document.body.classList.toggle("panel-full", next);
       }
       return { isPanelFull: next };
     }),

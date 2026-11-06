@@ -10,11 +10,21 @@ import { JOBS_DIR, REDIS_PORT } from "../../playwright.config";
  * Skips (with a reason) if redis-server/valkey-server or soffice are not installed.
  * Worker runs with a shortened expiry (RETENTION_MS) so auto-delete can be tested.
  */
-const which = (bin: string) => { try { return execSync(`command -v ${bin}`, { encoding: "utf8" }).trim(); } catch { return ""; } };
+const which = (bin: string) => {
+  try {
+    return execSync(`command -v ${bin}`, { encoding: "utf8" }).trim();
+  } catch {
+    return "";
+  }
+};
 // CI provides Valkey as a service container (E2E_EXTERNAL_REDIS=1) instead of a local binary.
 const EXTERNAL_REDIS = !!process.env.E2E_EXTERNAL_REDIS;
 const REDIS = EXTERNAL_REDIS ? "external" : which("valkey-server") || which("redis-server");
-const SOFFICE_DIR = process.env.SOFFICE_DIR ?? (existsSync("/Applications/LibreOffice.app/Contents/MacOS/soffice") ? "/Applications/LibreOffice.app/Contents/MacOS" : which("soffice").replace(/\/soffice$/, ""));
+const SOFFICE_DIR =
+  process.env.SOFFICE_DIR ??
+  (existsSync("/Applications/LibreOffice.app/Contents/MacOS/soffice")
+    ? "/Applications/LibreOffice.app/Contents/MacOS"
+    : which("soffice").replace(/\/soffice$/, ""));
 const RETENTION_MS = 6000;
 
 let redis: ChildProcess | undefined;
@@ -26,22 +36,43 @@ const startRedis = async () => {
 };
 const startWorker = async () => {
   worker = spawn(process.execPath, ["worker/src/index.mjs"], {
-    env: { ...process.env, PATH: `${SOFFICE_DIR}:${process.env.PATH}`, VALKEY_URL: `redis://127.0.0.1:${REDIS_PORT}`, JOBS_DIR, RETENTION_MS: String(RETENTION_MS), SWEEP_INTERVAL_MS: "1000", HEARTBEAT_MS: "1000" },
+    env: {
+      ...process.env,
+      PATH: `${SOFFICE_DIR}:${process.env.PATH}`,
+      VALKEY_URL: `redis://127.0.0.1:${REDIS_PORT}`,
+      JOBS_DIR,
+      RETENTION_MS: String(RETENTION_MS),
+      SWEEP_INTERVAL_MS: "1000",
+      HEARTBEAT_MS: "1000",
+    },
     stdio: "pipe",
   });
   await new Promise<void>((resolve) => worker!.stdout!.on("data", (d) => String(d).includes("ready") && resolve()));
   await new Promise((r) => setTimeout(r, 1500));
 };
-const stopWorker = async () => { worker?.kill("SIGKILL"); worker = undefined; await new Promise((r) => setTimeout(r, 300)); };
+const stopWorker = async () => {
+  worker?.kill("SIGKILL");
+  worker = undefined;
+  await new Promise((r) => setTimeout(r, 300));
+};
 
 test.describe.configure({ mode: "serial" });
 test.skip(!REDIS || !SOFFICE_DIR, "needs redis-server/valkey-server and LibreOffice (soffice) installed");
 
-test.beforeAll(() => { rmSync(JOBS_DIR, { recursive: true, force: true }); mkdirSync(JOBS_DIR, { recursive: true }); });
-test.afterAll(async () => { await stopWorker(); redis?.kill("SIGKILL"); });
+test.beforeAll(() => {
+  rmSync(JOBS_DIR, { recursive: true, force: true });
+  mkdirSync(JOBS_DIR, { recursive: true });
+});
+test.afterAll(async () => {
+  await stopWorker();
+  redis?.kill("SIGKILL");
+});
 
-const post = (request: import("@playwright/test").APIRequestContext, file: { name: string; mimeType: string; buffer: Buffer }, tool = "pdf-to-word") =>
-  request.post(`/api/jobs?tool=${tool}`, { multipart: { file } });
+const post = (
+  request: import("@playwright/test").APIRequestContext,
+  file: { name: string; mimeType: string; buffer: Buffer },
+  tool = "pdf-to-word",
+) => request.post(`/api/jobs?tool=${tool}`, { multipart: { file } });
 const pdf = () => ({ name: "text.pdf", mimeType: "application/pdf", buffer: readFileSync(gen("text.pdf")) });
 
 async function waitDone(request: import("@playwright/test").APIRequestContext, id: string, ms = 60_000) {
@@ -66,7 +97,9 @@ test("queue down: API answers 503 fast and the UI says 'temporarily unavailable'
   await expect(alert(page)).toContainText(/temporarily unavailable/i);
 });
 
-test("worker stopped (queue up): server tools say 'temporarily unavailable' instead of hanging", async ({ request }) => {
+test("worker stopped (queue up): server tools say 'temporarily unavailable' instead of hanging", async ({
+  request,
+}) => {
   await startRedis();
   const res = await post(request, pdf());
   expect(res.status()).toBe(503);
@@ -86,7 +119,11 @@ test("PDF to Word: real DOCX with the PDF's text, downloaded in the browser", as
 
 test("upload validation: unknown tool, wrong content type, size limit", async ({ request }) => {
   expect((await post(request, pdf(), "nope")).status()).toBe(400);
-  expect((await post(request, { name: "fake.pdf", mimeType: "application/pdf", buffer: readFileSync(gen("fake.pdf")) })).status()).toBe(415);
+  expect(
+    (
+      await post(request, { name: "fake.pdf", mimeType: "application/pdf", buffer: readFileSync(gen("fake.pdf")) })
+    ).status(),
+  ).toBe(415);
   const big = Buffer.concat([Buffer.from("%PDF-1.7\n"), Buffer.alloc(51 * 1024 * 1024)]);
   expect((await post(request, { name: "big.pdf", mimeType: "application/pdf", buffer: big })).status()).toBe(413);
 });

@@ -22,10 +22,13 @@ export function sitemapGroups(): Record<string, SitemapUrl[]> {
     const key = t.hub.replace(/-tools$/, "");
     groups[key] ??= [];
     groups[key].push({ loc: abs(`/${t.slug}`), lastmod: t.seo!.lastReviewed });
-    for (const v of t.seo!.longTailVariants ?? []) groups[key].push({ loc: abs(`/${v.slug}`), lastmod: t.seo!.lastReviewed });
+    for (const v of t.seo!.longTailVariants ?? [])
+      groups[key].push({ loc: abs(`/${v.slug}`), lastmod: t.seo!.lastReviewed });
   }
   return groups;
 }
 
 export const xml = (body: string) =>
-  new Response(`<?xml version="1.0" encoding="UTF-8"?>\n${body}`, { headers: { "Content-Type": "application/xml; charset=utf-8" } });
+  new Response(`<?xml version="1.0" encoding="UTF-8"?>\n${body}`, {
+    headers: { "Content-Type": "application/xml; charset=utf-8" },
+  });

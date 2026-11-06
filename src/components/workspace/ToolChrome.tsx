@@ -32,7 +32,12 @@ export function FavouriteButton({ slug }: { slug: string }) {
   const fav = useKlip((s) => s.favourites.includes(slug));
   const toggle = useKlip((s) => s.toggleFavourite);
   return (
-    <button onClick={() => toggle(slug)} aria-pressed={fav} aria-label={fav ? "Remove from favourites" : "Add to favourites"} className="grid size-11 shrink-0 place-items-center rounded-lg hover:bg-muted sm:size-9">
+    <button
+      onClick={() => toggle(slug)}
+      aria-pressed={fav}
+      aria-label={fav ? "Remove from favourites" : "Add to favourites"}
+      className="grid size-11 shrink-0 place-items-center rounded-lg hover:bg-muted sm:size-9"
+    >
       <Star className={fav ? "size-4 fill-amber-400 text-amber-400" : "size-4"} aria-hidden />
     </button>
   );
@@ -77,7 +82,11 @@ export function ResultActions({
           }}
         >
           <Download className="size-4" aria-hidden />
-          {items.length > 1 ? (separate ? `Download (${items.map((i) => i.name.split(".").pop()!.toUpperCase()).join(" + ")})` : `Download all (${items.length})`) : "Download"}
+          {items.length > 1
+            ? separate
+              ? `Download (${items.map((i) => i.name.split(".").pop()!.toUpperCase()).join(" + ")})`
+              : `Download all (${items.length})`
+            : "Download"}
         </Button>
       )}
       {single?.text !== undefined && (
@@ -96,7 +105,10 @@ export function ResultActions({
       )}
       {next && next.length > 0 && (
         <details className="relative">
-          <summary data-testid="send-next" className="flex h-11 sm:h-10 cursor-pointer list-none items-center gap-2 rounded-lg border border-border px-4 text-sm hover:bg-muted">
+          <summary
+            data-testid="send-next"
+            className="flex h-11 sm:h-10 cursor-pointer list-none items-center gap-2 rounded-lg border border-border px-4 text-sm hover:bg-muted"
+          >
             Send to next tool <ArrowRight className="size-4" aria-hidden />
           </summary>
           <ul className="absolute z-10 mt-1 min-w-56 rounded-lg border border-border bg-card p-1 shadow-lg">

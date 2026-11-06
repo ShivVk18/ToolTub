@@ -17,7 +17,13 @@ const LEVELS = {
   recommended: { maxSide: 1754, quality: 0.72 }, // ≈150 dpi on A4
   strong: { maxSide: 1123, quality: 0.55 }, // ≈96 dpi on A4
 };
-const TARGET_STEPS = [LEVELS.recommended, LEVELS.strong, { maxSide: 900, quality: 0.45 }, { maxSide: 700, quality: 0.38 }, { maxSide: 560, quality: 0.32 }];
+const TARGET_STEPS = [
+  LEVELS.recommended,
+  LEVELS.strong,
+  { maxSide: 900, quality: 0.45 },
+  { maxSide: 700, quality: 0.38 },
+  { maxSide: 560, quality: 0.32 },
+];
 
 const isJpeg = (filter: unknown) =>
   filter === PDFName.of("DCTDecode") ||
@@ -27,7 +33,10 @@ async function compressOnce(bytes: ArrayBuffer, step: { maxSide: number; quality
   const doc = await PDFDocument.load(bytes, { updateMetadata: false });
   const objects = doc.context.enumerateIndirectObjects();
   const images = objects.filter(
-    ([, o]) => o instanceof PDFRawStream && o.dict.get(PDFName.of("Subtype")) === PDFName.of("Image") && isJpeg(o.dict.get(PDFName.of("Filter"))),
+    ([, o]) =>
+      o instanceof PDFRawStream &&
+      o.dict.get(PDFName.of("Subtype")) === PDFName.of("Image") &&
+      isJpeg(o.dict.get(PDFName.of("Filter"))),
   ) as [Parameters<typeof doc.context.assign>[0], PDFRawStream][];
 
   let done = 0;
@@ -42,7 +51,9 @@ async function compressOnce(bytes: ArrayBuffer, step: { maxSide: number; quality
       const h = Math.round(bmp.height * r);
       const canvas = new OffscreenCanvas(w, h);
       canvas.getContext("2d")!.drawImage(bmp, 0, 0, w, h);
-      const out = new Uint8Array(await (await canvas.convertToBlob({ type: "image/jpeg", quality: step.quality })).arrayBuffer());
+      const out = new Uint8Array(
+        await (await canvas.convertToBlob({ type: "image/jpeg", quality: step.quality })).arrayBuffer(),
+      );
       if (out.length >= stream.contents.length) continue; // never make an image bigger
       const dict = stream.dict;
       dict.set(PDFName.of("Width"), PDFNumber.of(w));
@@ -65,7 +76,8 @@ export async function compressPdf(job: PdfCompressJob, progress: Progress) {
   try {
     await PDFDocument.load(job.bytes, { updateMetadata: false });
   } catch (e) {
-    if (String(e).includes("encrypted")) throw new Error("This PDF is password-protected. Unlock it first, then compress it.");
+    if (String(e).includes("encrypted"))
+      throw new Error("This PDF is password-protected. Unlock it first, then compress it.");
     throw new Error("This file isn't a readable PDF.");
   }
   const steps = job.targetKB ? TARGET_STEPS : [LEVELS[job.level]];

@@ -38,7 +38,8 @@ async function draw(src: ImageBitmap, width: number, height: number, mime: strin
   ctx.drawImage(src, 0, 0, width, height);
   const out = await canvas.convertToBlob({ type: mime, quality });
   // Some browsers silently fall back to PNG for unsupported types (e.g. WebP in old Safari).
-  if (out.type !== mime) throw new Error(`This browser cannot save ${mime.replace("image/", "").toUpperCase()} files. Try JPG or PNG.`);
+  if (out.type !== mime)
+    throw new Error(`This browser cannot save ${mime.replace("image/", "").toUpperCase()} files. Try JPG or PNG.`);
   return out;
 }
 
@@ -85,16 +86,26 @@ export async function processImage(job: ImageJob): Promise<ImageResult> {
     }
     // It fits at 0.3: binary-search the highest quality that still fits.
     best = floor;
-    let lo = 0.3, hi = 0.95;
+    let lo = 0.3,
+      hi = 0.95;
     for (let i = 0; i < 6; i++) {
       const mid = (lo + hi) / 2;
       const out = await draw(src, width, height, mime, mid, job.background);
-      if (out.size <= target) { best = out; lo = mid; } else hi = mid;
+      if (out.size <= target) {
+        best = out;
+        lo = mid;
+      } else hi = mid;
     }
     return { blob: best, width, height, keptOriginal: false, note };
   }
   const smallest = await draw(src, width, height, mime, 0.3, job.background);
-  return { blob: smallest, width, height, keptOriginal: false, note: `Couldn't reach ${job.targetKB} KB; this is the smallest readable version.` };
+  return {
+    blob: smallest,
+    width,
+    height,
+    keptOriginal: false,
+    note: `Couldn't reach ${job.targetKB} KB; this is the smallest readable version.`,
+  };
 }
 
 /** [Lib] HEIC decode with libheif (LGPL-3.0), loaded as a separate file from /vendor so it stays swappable. */

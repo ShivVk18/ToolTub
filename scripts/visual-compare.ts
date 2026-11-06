@@ -1,97 +1,109 @@
-import { chromium, type Browser, type Page } from '@playwright/test';
+import { chromium, type Browser, type Page } from "@playwright/test";
 // @ts-ignore
-import { PNG } from 'pngjs';
-import * as fs from 'node:fs';
-import * as path from 'node:path';
+import { PNG } from "pngjs";
+import * as fs from "node:fs";
+import * as path from "node:path";
 
-const OUT_DIR = path.resolve('reports/ui');
+const OUT_DIR = path.resolve("reports/ui");
 fs.mkdirSync(OUT_DIR, { recursive: true });
 
-const REF_URL = 'file://' + path.resolve('design/reference/KlipKit_UI.html');
-const APP_URL = process.env.APP_URL || 'http://127.0.0.1:3333/';
+const REF_URL = "file://" + path.resolve("design/reference/KlipKit_UI.html");
+const APP_URL = process.env.APP_URL || "http://127.0.0.1:3333/";
 
 type StateHandler = (page: Page, vp: [number, number]) => Promise<void>;
 
 const STATES: Record<string, { desc: string; run: StateHandler }> = {
-  'a_hero_rest': {
-    desc: 'Hero at rest',
+  a_hero_rest: {
+    desc: "Hero at rest",
     run: async (page) => {
       await page.evaluate(() => window.scrollTo(0, 0));
       await page.waitForTimeout(400);
     },
   },
-  'b_cursor_near_orb': {
-    desc: 'Cursor near orb',
+  b_cursor_near_orb: {
+    desc: "Cursor near orb",
     run: async (page, [w]) => {
       await page.mouse.move(w / 2 + 75, 330);
       await page.waitForTimeout(400);
     },
   },
-  'c_file_dragged': {
-    desc: 'File dragged over page (veil + energised orb + satellites pulled in)',
+  c_file_dragged: {
+    desc: "File dragged over page (veil + energised orb + satellites pulled in)",
     run: async (page, [w, h]) => {
-      await page.evaluate(([cx, cy]) => {
-        if ((window as any).__kk?.drag) (window as any).__kk.drag(true, cx, cy);
-      }, [w / 2, 350]);
+      await page.evaluate(
+        ([cx, cy]) => {
+          if ((window as any).__kk?.drag) (window as any).__kk.drag(true, cx, cy);
+        },
+        [w / 2, 350],
+      );
       await page.waitForTimeout(400);
     },
   },
-  'd_workspace_dropped': {
-    desc: 'Workspace after dropping sample PDF',
+  d_workspace_dropped: {
+    desc: "Workspace after dropping sample PDF",
     run: async (page, [w, h]) => {
-      await page.evaluate(async ([cx, cy]) => {
-        if ((window as any).__kk?.ingestSample) {
-          await (window as any).__kk.ingestSample('pdf', cx, cy);
-        }
-      }, [w / 2, 350]);
+      await page.evaluate(
+        async ([cx, cy]) => {
+          if ((window as any).__kk?.ingestSample) {
+            await (window as any).__kk.ingestSample("pdf", cx, cy);
+          }
+        },
+        [w / 2, 350],
+      );
       await page.waitForTimeout(1400);
     },
   },
-  'e_typing_plan': {
+  e_typing_plan: {
     desc: 'Typing "compress to under 2 mb and split pages 1-5" (live highlight + plan preview)',
     run: async (page, [w, h]) => {
-      await page.evaluate(async ([cx, cy]) => {
-        if ((window as any).__kk?.ingestSample) {
-          await (window as any).__kk.ingestSample('pdf', cx, cy);
-        }
-      }, [w / 2, 350]);
+      await page.evaluate(
+        async ([cx, cy]) => {
+          if ((window as any).__kk?.ingestSample) {
+            await (window as any).__kk.ingestSample("pdf", cx, cy);
+          }
+        },
+        [w / 2, 350],
+      );
       await page.waitForTimeout(1200);
       await page.evaluate(() => {
-        const cmp = document.getElementById('cmp') as HTMLTextAreaElement | null;
+        const cmp = document.getElementById("cmp") as HTMLTextAreaElement | null;
         if (cmp) {
-          cmp.value = 'compress to under 2 mb and split pages 1-5';
-          cmp.dispatchEvent(new Event('input', { bubbles: true }));
+          cmp.value = "compress to under 2 mb and split pages 1-5";
+          cmp.dispatchEvent(new Event("input", { bubbles: true }));
         }
       });
       await page.waitForTimeout(400);
     },
   },
-  'f_plan_done': {
-    desc: 'Plan running and done (results shown)',
+  f_plan_done: {
+    desc: "Plan running and done (results shown)",
     run: async (page, [w, h]) => {
-      await page.evaluate(async ([cx, cy]) => {
-        if ((window as any).__kk?.ingestSample) {
-          await (window as any).__kk.ingestSample('pdf', cx, cy);
-        }
-      }, [w / 2, 350]);
+      await page.evaluate(
+        async ([cx, cy]) => {
+          if ((window as any).__kk?.ingestSample) {
+            await (window as any).__kk.ingestSample("pdf", cx, cy);
+          }
+        },
+        [w / 2, 350],
+      );
       await page.waitForTimeout(1200);
       await page.evaluate(() => {
-        const cmp = document.getElementById('cmp') as HTMLTextAreaElement | null;
+        const cmp = document.getElementById("cmp") as HTMLTextAreaElement | null;
         if (cmp) {
-          cmp.value = 'compress to under 2 mb and split pages 1-5';
-          cmp.dispatchEvent(new Event('input', { bubbles: true }));
+          cmp.value = "compress to under 2 mb and split pages 1-5";
+          cmp.dispatchEvent(new Event("input", { bubbles: true }));
         }
       });
       await page.waitForTimeout(400);
       await page.evaluate(() => {
-        const runBtn = document.querySelector('.run') as HTMLButtonElement | null;
+        const runBtn = document.querySelector(".run") as HTMLButtonElement | null;
         if (runBtn) runBtn.click();
       });
       await page.waitForTimeout(2000);
     },
   },
-  'g_pasted_json': {
-    desc: 'Pasted JSON flow',
+  g_pasted_json: {
+    desc: "Pasted JSON flow",
     run: async (page) => {
       await page.evaluate(async () => {
         if ((window as any).__kk?.pasteIn) {
@@ -101,100 +113,100 @@ const STATES: Record<string, { desc: string; run: StateHandler }> = {
       await page.waitForTimeout(1400);
     },
   },
-  'h_live_panel': {
-    desc: 'Live panel #json-formatter and #regex-tester',
+  h_live_panel: {
+    desc: "Live panel #json-formatter and #regex-tester",
     run: async (page) => {
       await page.evaluate(async () => {
         if ((window as any).__kk?.openPanel) {
-          (window as any).__kk.openPanel('JSON Formatter', '{"a":1,"b":[1,2]}');
+          (window as any).__kk.openPanel("JSON Formatter", '{"a":1,"b":[1,2]}');
         }
       });
       await page.waitForTimeout(600);
     },
   },
-  'i_palette': {
-    desc: '⌘K palette',
+  i_palette: {
+    desc: "⌘K palette",
     run: async (page) => {
-      const kbtn = page.locator('.kbtn');
+      const kbtn = page.locator(".kbtn");
       if (await kbtn.isVisible()) {
         await kbtn.click();
       } else {
         await page.evaluate(() => {
           if ((window as any).__kk?.openPal) (window as any).__kk.openPal();
-          const pal = document.getElementById('pal');
-          if (pal) pal.classList.add('open');
+          const pal = document.getElementById("pal");
+          if (pal) pal.classList.add("open");
         });
       }
       await page.waitForTimeout(500);
     },
   },
-  'j_voice_sheet': {
-    desc: 'Pro voice sheet',
+  j_voice_sheet: {
+    desc: "Pro voice sheet",
     run: async (page) => {
-      const proBtn = page.locator('#proBtn, #proNavBtn, .pill.ink').first();
+      const proBtn = page.locator("#proBtn, #proNavBtn, .pill.ink").first();
       if (await proBtn.isVisible()) {
         await proBtn.click();
       } else {
         await page.evaluate(() => {
-          const sheet = document.getElementById('sheet');
-          if (sheet) sheet.classList.add('open');
+          const sheet = document.getElementById("sheet");
+          if (sheet) sheet.classList.add("open");
         });
       }
       await page.waitForTimeout(500);
     },
   },
-  'k_scrolled_nav': {
-    desc: 'Scrolled 200 px (capsule nav)',
+  k_scrolled_nav: {
+    desc: "Scrolled 200 px (capsule nav)",
     run: async (page) => {
       await page.evaluate(() => {
         window.scrollTo(0, 200);
-        document.body.classList.add('scrolled');
+        document.body.classList.add("scrolled");
       });
       await page.waitForTimeout(500);
     },
   },
-  'l_marquee': {
-    desc: 'Marquee band',
+  l_marquee: {
+    desc: "Marquee band",
     run: async (page) => {
-      await page.locator('.band').scrollIntoViewIfNeeded();
+      await page.locator(".band").scrollIntoViewIfNeeded();
       await page.waitForTimeout(400);
     },
   },
-  'm_bento': {
-    desc: 'Bento section',
+  m_bento: {
+    desc: "Bento section",
     run: async (page) => {
-      await page.locator('#feel').scrollIntoViewIfNeeded();
+      await page.locator("#feel").scrollIntoViewIfNeeded();
       await page.waitForTimeout(600);
     },
   },
-  'n_explore': {
-    desc: 'Explore grid + tab change',
+  n_explore: {
+    desc: "Explore grid + tab change",
     run: async (page) => {
-      await page.locator('#explore').scrollIntoViewIfNeeded();
+      await page.locator("#explore").scrollIntoViewIfNeeded();
       await page.evaluate(() => {
-        const tabs = Array.from(document.querySelectorAll('#tabs .tab')) as HTMLElement[];
-        const devTab = tabs.find((t) => t.textContent?.includes('Developer'));
+        const tabs = Array.from(document.querySelectorAll("#tabs .tab")) as HTMLElement[];
+        const devTab = tabs.find((t) => t.textContent?.includes("Developer"));
         if (devTab) devTab.click();
       });
       await page.waitForTimeout(400);
     },
   },
-  'o_pricing': {
-    desc: 'Pricing (monthly/yearly)',
+  o_pricing: {
+    desc: "Pricing (monthly/yearly)",
     run: async (page) => {
-      await page.locator('#pricing').scrollIntoViewIfNeeded();
+      await page.locator("#pricing").scrollIntoViewIfNeeded();
       await page.evaluate(() => {
-        const billTabs = Array.from(document.querySelectorAll('#billTabs .tab')) as HTMLElement[];
-        const yrTab = billTabs.find((t) => t.textContent?.includes('Yearly'));
+        const billTabs = Array.from(document.querySelectorAll("#billTabs .tab")) as HTMLElement[];
+        const yrTab = billTabs.find((t) => t.textContent?.includes("Yearly"));
         if (yrTab) yrTab.click();
       });
       await page.waitForTimeout(400);
     },
   },
-  'p_footer_wordmark': {
-    desc: 'Footer giant wordmark with the cursor over it',
+  p_footer_wordmark: {
+    desc: "Footer giant wordmark with the cursor over it",
     run: async (page, [w, h]) => {
-      await page.locator('#giant').scrollIntoViewIfNeeded();
+      await page.locator("#giant").scrollIntoViewIfNeeded();
       await page.mouse.move(w / 2, h / 2);
       await page.waitForTimeout(400);
     },
@@ -204,7 +216,7 @@ const STATES: Record<string, { desc: string; run: StateHandler }> = {
 function compareImages(
   refBuf: Buffer,
   appBuf: Buffer,
-  orbRect?: { x: number; y: number; r: number }
+  orbRect?: { x: number; y: number; r: number },
 ): { diffPercent: number; diffPngBuf: Buffer; sideBySideBuf: Buffer } {
   const refPng = PNG.sync.read(refBuf);
   const appPng = PNG.sync.read(appBuf);
@@ -267,7 +279,7 @@ function compareImages(
         diffPng.data[idx + 3] = 255;
       } else {
         // Match in subtle tone
-        const gray = Math.round((r2 + g2 + b2) / 3 * 0.3 + 160);
+        const gray = Math.round(((r2 + g2 + b2) / 3) * 0.3 + 160);
         diffPng.data[idx] = gray;
         diffPng.data[idx + 1] = gray;
         diffPng.data[idx + 2] = gray;
@@ -287,29 +299,29 @@ function compareImages(
   };
 }
 
-async function preparePage(page: Page, url: string, theme: 'light' | 'dark', vp: [number, number]) {
+async function preparePage(page: Page, url: string, theme: "light" | "dark", vp: [number, number]) {
   await page.setViewportSize({ width: vp[0], height: vp[1] });
   await page.emulateMedia({ colorScheme: theme });
   await page.addInitScript((t) => {
     try {
-      localStorage.setItem('theme', t);
-      localStorage.setItem('kk.theme', JSON.stringify(t));
+      localStorage.setItem("theme", t);
+      localStorage.setItem("kk.theme", JSON.stringify(t));
       document.documentElement.dataset.theme = t;
-      if (t === 'dark') document.documentElement.classList.add('dark');
-      else document.documentElement.classList.remove('dark');
+      if (t === "dark") document.documentElement.classList.add("dark");
+      else document.documentElement.classList.remove("dark");
     } catch {}
   }, theme);
-  await page.goto(url, { waitUntil: 'domcontentloaded' });
+  await page.goto(url, { waitUntil: "domcontentloaded" });
   await page.waitForTimeout(600);
 
   // Settle theme and freeze carets
   await page.evaluate((t) => {
-    document.documentElement.classList.remove('theming');
+    document.documentElement.classList.remove("theming");
     document.documentElement.dataset.theme = t;
-    if (t === 'dark') document.documentElement.classList.add('dark');
-    else document.documentElement.classList.remove('dark');
+    if (t === "dark") document.documentElement.classList.add("dark");
+    else document.documentElement.classList.remove("dark");
 
-    const s = document.createElement('style');
+    const s = document.createElement("style");
     s.textContent = `
       * { caret-color: transparent !important; }
       .bcar { opacity: 0 !important; }
@@ -332,14 +344,14 @@ async function main() {
     passed: boolean;
   }> = [];
 
-  const auditRuns: Array<{ vp: [number, number]; theme: 'light' | 'dark' }> = [
-    { vp: [1920, 1080], theme: 'light' },
-    { vp: [1920, 1080], theme: 'dark' },
-    { vp: [2560, 1440], theme: 'light' },
-    { vp: [1440, 900], theme: 'light' },
-    { vp: [768, 1024], theme: 'light' },
-    { vp: [390, 844], theme: 'light' },
-    { vp: [390, 844], theme: 'dark' },
+  const auditRuns: Array<{ vp: [number, number]; theme: "light" | "dark" }> = [
+    { vp: [1920, 1080], theme: "light" },
+    { vp: [1920, 1080], theme: "dark" },
+    { vp: [2560, 1440], theme: "light" },
+    { vp: [1440, 900], theme: "light" },
+    { vp: [768, 1024], theme: "light" },
+    { vp: [390, 844], theme: "light" },
+    { vp: [390, 844], theme: "dark" },
   ];
 
   for (const { vp, theme } of auditRuns) {
@@ -361,7 +373,7 @@ async function main() {
 
         // Get orb interior rect
         const orbInfo = await appPage.evaluate(() => {
-          const orb = document.getElementById('orb');
+          const orb = document.getElementById("orb");
           if (orb) {
             const r = orb.getBoundingClientRect();
             return { x: r.left + r.width / 2, y: r.top + r.height / 2, r: r.width * 0.45 };
@@ -369,14 +381,10 @@ async function main() {
           return undefined;
         });
 
-        const refBuf = await refPage.screenshot({ type: 'png' });
-        const appBuf = await appPage.screenshot({ type: 'png' });
+        const refBuf = await refPage.screenshot({ type: "png" });
+        const appBuf = await appPage.screenshot({ type: "png" });
 
-        const { diffPercent, diffPngBuf, sideBySideBuf } = compareImages(
-          refBuf,
-          appBuf,
-          orbInfo
-        );
+        const { diffPercent, diffPngBuf, sideBySideBuf } = compareImages(refBuf, appBuf, orbInfo);
 
         const pass = diffPercent <= 2.0;
         results.push({
@@ -393,7 +401,7 @@ async function main() {
         fs.writeFileSync(path.join(OUT_DIR, `diff-${baseName}.png`), diffPngBuf);
         fs.writeFileSync(path.join(OUT_DIR, `side-${baseName}.png`), sideBySideBuf);
 
-        const statusMark = pass ? '✅' : '⚠️';
+        const statusMark = pass ? "✅" : "⚠️";
         console.log(`  ${statusMark} [${stateKey}] ${desc}: ${diffPercent.toFixed(2)}% diff`);
       } catch (err: any) {
         console.error(`  ❌ [${stateKey}] ${desc} failed:`, err.message);
@@ -413,7 +421,7 @@ async function main() {
 
   await browser.close();
 
-  fs.writeFileSync(path.join(OUT_DIR, 'results.json'), JSON.stringify(results, null, 2));
+  fs.writeFileSync(path.join(OUT_DIR, "results.json"), JSON.stringify(results, null, 2));
   console.log(`\nAudit complete. Results written to ${OUT_DIR}/results.json`);
 }
 

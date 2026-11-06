@@ -6,18 +6,35 @@ import { mkdirSync } from "node:fs";
 import { resolve } from "node:path";
 
 const [outDir, base, ...paths] = process.argv.slice(2);
-const VIEWPORTS = [[1920, 1080], [1440, 900], [768, 1024], [390, 844]];
+const VIEWPORTS = [
+  [1920, 1080],
+  [1440, 900],
+  [768, 1024],
+  [390, 844],
+];
 const isFile = !/^https?:/.test(base);
-const targets = isFile ? [["reference", "file://" + resolve(base)]] : (paths.length ? paths : ["/"]).map((p) => [p === "/" ? "home" : p.replace(/^\//, "").replace(/\//g, "_"), base + p]);
+const targets = isFile
+  ? [["reference", "file://" + resolve(base)]]
+  : (paths.length ? paths : ["/"]).map((p) => [
+      p === "/" ? "home" : p.replace(/^\//, "").replace(/\//g, "_"),
+      base + p,
+    ]);
 mkdirSync(outDir, { recursive: true });
 const browser = await chromium.launch();
 for (const [name, url] of targets) {
   for (const theme of ["light", "dark"]) {
     for (const [w, h] of VIEWPORTS) {
-      const ctx = await browser.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: 1, reducedMotion: "no-preference" });
+      const ctx = await browser.newContext({
+        viewport: { width: w, height: h },
+        deviceScaleFactor: 1,
+        reducedMotion: "no-preference",
+      });
       const page = await ctx.newPage();
       await page.addInitScript((t) => {
-        try { localStorage.setItem("theme", t); localStorage.setItem("kk.theme", JSON.stringify(t)); } catch {}
+        try {
+          localStorage.setItem("theme", t);
+          localStorage.setItem("kk.theme", JSON.stringify(t));
+        } catch {}
       }, theme);
       await page.goto(url, { waitUntil: "networkidle" });
       await page.waitForTimeout(2600); // let entrance animations settle

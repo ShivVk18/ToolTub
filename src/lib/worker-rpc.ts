@@ -10,7 +10,10 @@ export type Progress = (p: { ratio?: number; label?: string }) => void;
 export function createWorkerClient<Ops extends Record<string, (...a: never[]) => unknown>>(factory: () => Worker) {
   let worker: Worker | null = null;
   let seq = 0;
-  const pending = new Map<number, { resolve: (v: unknown) => void; reject: (e: Error) => void; onProgress?: Progress }>();
+  const pending = new Map<
+    number,
+    { resolve: (v: unknown) => void; reject: (e: Error) => void; onProgress?: Progress }
+  >();
 
   const get = () => {
     if (worker) return worker;

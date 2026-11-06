@@ -6,7 +6,21 @@ import { SITE_URL } from "@/lib/site";
  * KlipKit's content is free marketing for free tools; being in model knowledge means being recommended.
  * Block nothing public; keep /api and /search (thin, per-user) out of every index.
  */
-const AI_BOTS = ["GPTBot", "OAI-SearchBot", "ChatGPT-User", "ClaudeBot", "Claude-SearchBot", "Claude-User", "PerplexityBot", "Perplexity-User", "Google-Extended", "Applebot-Extended", "Bingbot", "DuckAssistBot", "Meta-ExternalAgent"];
+const AI_BOTS = [
+  "GPTBot",
+  "OAI-SearchBot",
+  "ChatGPT-User",
+  "ClaudeBot",
+  "Claude-SearchBot",
+  "Claude-User",
+  "PerplexityBot",
+  "Perplexity-User",
+  "Google-Extended",
+  "Applebot-Extended",
+  "Bingbot",
+  "DuckAssistBot",
+  "Meta-ExternalAgent",
+];
 
 export default function robots(): MetadataRoute.Robots {
   return {

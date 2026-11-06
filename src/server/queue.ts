@@ -39,7 +39,12 @@ export function getQueue() {
   // BullMQ gets its own connection (from options, not our instance) so it can't close ours.
   if (!g.queue || g.queue.closing) {
     g.queue = new Queue("convert", {
-      connection: { url: URL_, maxRetriesPerRequest: null, connectTimeout: 2000, retryStrategy: (times: number) => Math.min(times * 100, 500) },
+      connection: {
+        url: URL_,
+        maxRetriesPerRequest: null,
+        connectTimeout: 2000,
+        retryStrategy: (times: number) => Math.min(times * 100, 500),
+      },
       defaultJobOptions: { attempts: 1, removeOnComplete: { age: 3600 }, removeOnFail: { age: 3600 } },
     });
     g.queue.on("error", () => {});
@@ -60,6 +65,12 @@ export const workerAlive = async () => (await getRedis().exists(HEARTBEAT_KEY)) 
 
 /** Server tools and the input they accept. Adding a tool = add it here and in worker/src/index.mjs. */
 export const SERVER_TOOLS = {
-  "pdf-to-word": { maxMb: 50, magic: "%PDF-", ext: "pdf", outExt: "docx", outType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
+  "pdf-to-word": {
+    maxMb: 50,
+    magic: "%PDF-",
+    ext: "pdf",
+    outExt: "docx",
+    outType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  },
 } as const;
 export type ServerTool = keyof typeof SERVER_TOOLS;

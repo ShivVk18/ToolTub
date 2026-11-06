@@ -79,7 +79,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Footer />
         <CommandPalette index={searchIndex} />
         <GlobalModals />
-        {isProd && <Script id="sw-register" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html: swProdScript }} />}
+        {isProd && (
+          <Script id="sw-register" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html: swProdScript }} />
+        )}
       </body>
     </html>
   );

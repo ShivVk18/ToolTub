@@ -65,7 +65,11 @@ export function Dropzone({ accept, multiple, maxFileMb, onFiles, onReject, hint,
     >
       <Upload className="size-6 text-fg-muted" aria-hidden />
       <div>
-        <button type="button" onClick={() => inputRef.current?.click()} className="inline-flex min-h-11 items-center font-medium underline-offset-4 hover:underline sm:min-h-0">
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          className="inline-flex min-h-11 items-center font-medium underline-offset-4 hover:underline sm:min-h-0"
+        >
           Choose {multiple ? "files" : "a file"}
         </button>
         <span className="text-fg-muted"> or drop {multiple ? "them" : "it"} here · paste with Ctrl+V</span>
@@ -78,11 +82,24 @@ export function Dropzone({ accept, multiple, maxFileMb, onFiles, onReject, hint,
         </p>
       )}
       {onSample && (
-        <button type="button" onClick={onSample} className="inline-flex min-h-11 items-center text-xs text-fg-muted underline underline-offset-4 sm:min-h-0">
+        <button
+          type="button"
+          onClick={onSample}
+          className="inline-flex min-h-11 items-center text-xs text-fg-muted underline underline-offset-4 sm:min-h-0"
+        >
           Try a sample
         </button>
       )}
-      <input data-testid="file-input" aria-label={multiple ? "Choose files" : "Choose a file"} ref={inputRef} type="file" accept={accept} multiple={multiple} className="sr-only" onChange={(e) => take(e.target.files)} />
+      <input
+        data-testid="file-input"
+        aria-label={multiple ? "Choose files" : "Choose a file"}
+        ref={inputRef}
+        type="file"
+        accept={accept}
+        multiple={multiple}
+        className="sr-only"
+        onChange={(e) => take(e.target.files)}
+      />
     </div>
   );
 }

@@ -9,6 +9,9 @@ if (!existsSync(".next/standalone/server.js")) {
 }
 cpSync("public", ".next/standalone/public", { recursive: true });
 cpSync(".next/static", ".next/standalone/.next/static", { recursive: true });
-const child = spawn(process.execPath, [".next/standalone/server.js"], { stdio: "inherit", env: { ...process.env, PORT: process.env.PORT ?? "3000", HOSTNAME: process.env.HOSTNAME ?? "127.0.0.1" } });
+const child = spawn(process.execPath, [".next/standalone/server.js"], {
+  stdio: "inherit",
+  env: { ...process.env, PORT: process.env.PORT ?? "3000", HOSTNAME: process.env.HOSTNAME ?? "127.0.0.1" },
+});
 for (const sig of ["SIGINT", "SIGTERM"]) process.on(sig, () => child.kill(sig));
 child.on("exit", (code) => process.exit(code ?? 0));

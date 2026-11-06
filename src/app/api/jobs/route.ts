@@ -15,7 +15,10 @@ export async function POST(req: Request) {
   } catch (err) {
     // Log the cause (never file names or contents) so outages are diagnosable; the user gets a 503.
     console.error("[api/jobs] server tool unavailable:", err instanceof Error ? err.message : err);
-    return Response.json({ error: "Server tools are temporarily unavailable. Please try again in a few minutes." }, { status: 503 });
+    return Response.json(
+      { error: "Server tools are temporarily unavailable. Please try again in a few minutes." },
+      { status: 503 },
+    );
   }
 }
 
@@ -30,7 +33,8 @@ async function handle(req: Request) {
   const form = await req.formData();
   const file = form.get("file");
   if (!(file instanceof File)) return Response.json({ error: "No file received" }, { status: 400 });
-  if (file.size > spec.maxMb * 1024 * 1024) return Response.json({ error: `File is larger than ${spec.maxMb} MB` }, { status: 413 });
+  if (file.size > spec.maxMb * 1024 * 1024)
+    return Response.json({ error: `File is larger than ${spec.maxMb} MB` }, { status: 413 });
 
   const bytes = Buffer.from(await file.arrayBuffer());
   if (bytes.subarray(0, spec.magic.length).toString("latin1") !== spec.magic) {

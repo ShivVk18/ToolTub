@@ -17,18 +17,44 @@ describe("registry integrity", () => {
     for (const t of tools) expect(t.slug).toMatch(/^[a-z0-9]+(-[a-z0-9]+)*$/);
   });
   it("points every tool at an existing hub", () => {
-    for (const t of tools) expect(hubs.some((h) => h.id === t.hub), t.slug).toBe(true);
+    for (const t of tools)
+      expect(
+        hubs.some((h) => h.id === t.hub),
+        t.slug,
+      ).toBe(true);
   });
   it("has no related-tool links to unknown slugs", () => {
     for (const t of tools) for (const r of t.relatedTools) expect(getTool(r), `${t.slug} → ${r}`).toBeDefined();
   });
   it("never lets a variant, hub or reserved path collide with a tool slug", () => {
-    const all = [...tools.map((t) => t.slug), ...hubs.map((h) => h.id), ...tools.flatMap((t) => t.seo?.longTailVariants?.map((v) => v.slug) ?? []), "about", "privacy", "licences", "search", "chain", "api", "og"];
+    const all = [
+      ...tools.map((t) => t.slug),
+      ...hubs.map((h) => h.id),
+      ...tools.flatMap((t) => t.seo?.longTailVariants?.map((v) => v.slug) ?? []),
+      "about",
+      "privacy",
+      "licences",
+      "search",
+      "chain",
+      "api",
+      "og",
+    ];
     expect(new Set(all).size).toBe(all.length);
   });
   it("only uses allowed licences (no AGPL/GPL)", () => {
-    const allowed = ["MIT", "Apache-2.0", "BSD-2-Clause", "BSD-3-Clause", "ISC", "MPL-2.0", "LGPL-2.1", "LGPL-3.0", "OFL-1.1"];
-    for (const d of [...Object.values(deps), ...platformDeps, ...tools.flatMap((t) => t.dependencies)]) expect(allowed, d.name).toContain(d.licence);
+    const allowed = [
+      "MIT",
+      "Apache-2.0",
+      "BSD-2-Clause",
+      "BSD-3-Clause",
+      "ISC",
+      "MPL-2.0",
+      "LGPL-2.1",
+      "LGPL-3.0",
+      "OFL-1.1",
+    ];
+    for (const d of [...Object.values(deps), ...platformDeps, ...tools.flatMap((t) => t.dependencies)])
+      expect(allowed, d.name).toContain(d.licence);
   });
   it("marks every server tool with a retention time", () => {
     for (const t of tools.filter((x) => x.processing.where === "own-server")) {
@@ -53,7 +79,15 @@ describe("Tool Chains", () => {
 describe("SEO/AEO content rules (every tool with content)", () => {
   const withSeo = tools.filter((t) => t.seo);
   it("covers the 7 example tools", () => {
-    expect(withSeo.map((t) => t.slug).sort()).toEqual(["background-remover", "compress-pdf", "heic-to-jpg", "image-compressor", "json-formatter", "jwt-decoder", "qr-code-generator"]);
+    expect(withSeo.map((t) => t.slug).sort()).toEqual([
+      "background-remover",
+      "compress-pdf",
+      "heic-to-jpg",
+      "image-compressor",
+      "json-formatter",
+      "jwt-decoder",
+      "qr-code-generator",
+    ]);
   });
   it.each(withSeo.map((t) => [t.slug, t] as const))("%s follows the content rules", (_, t) => {
     const s = t.seo!;

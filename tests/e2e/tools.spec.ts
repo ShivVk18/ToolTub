@@ -2,8 +2,24 @@ import { test, expect, type Page } from "@playwright/test";
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import {
-  assertAccessible, assertMobileFriendly, downloadFrom, dropFile, fx, gen, guard, inspectImage,
-  output, pasteFile, pdfPages, primary, ready, upload, useTheme, workspace, alert, byTestId,
+  assertAccessible,
+  assertMobileFriendly,
+  downloadFrom,
+  dropFile,
+  fx,
+  gen,
+  guard,
+  inspectImage,
+  output,
+  pasteFile,
+  pdfPages,
+  primary,
+  ready,
+  upload,
+  useTheme,
+  workspace,
+  alert,
+  byTestId,
 } from "./helpers";
 
 // Routed tools, from the registry (kept in sync by the "routed tools" test below).
@@ -55,7 +71,11 @@ for (const t of TOOLS) {
       await assertMobileFriendly(page);
     });
 
-    test("keyboard: the first control in the tool is reachable with Tab and shows focus", async ({ page, isMobile, browserName }) => {
+    test("keyboard: the first control in the tool is reachable with Tab and shows focus", async ({
+      page,
+      isMobile,
+      browserName,
+    }) => {
       test.skip(isMobile, "keyboard test on desktop");
       await page.goto(`/${t.slug}`);
       await ready(page);
@@ -75,7 +95,9 @@ for (const t of TOOLS) {
 
     test("related tool links resolve", async ({ page, request }) => {
       await page.goto(`/${t.slug}`);
-      const hrefs = await page.locator('section[aria-labelledby="related"] a').evaluateAll((as) => as.map((a) => a.getAttribute("href")!));
+      const hrefs = await page
+        .locator('section[aria-labelledby="related"] a')
+        .evaluateAll((as) => as.map((a) => a.getAttribute("href")!));
       for (const h of hrefs) expect((await request.get(h)).status(), h).toBe(200);
     });
   });
@@ -219,11 +241,21 @@ test.describe("Image Resizer", () => {
 });
 
 test.describe("Image Converter", () => {
-  for (const [label, mime] of [["JPG", "image/jpeg"], ["PNG", "image/png"], ["WebP", "image/webp"]] as const) {
+  for (const [label, mime] of [
+    ["JPG", "image/jpeg"],
+    ["PNG", "image/png"],
+    ["WebP", "image/webp"],
+  ] as const) {
     test(`converts JPG, PNG, WebP, GIF and AVIF inputs to ${label}`, async ({ page, browserName }) => {
       await page.goto("/image-converter");
       await page.getByLabel("Convert to").selectOption(mime);
-      await upload(page, [fx("photo.jpg"), gen("transparent.png"), gen("photo.webp"), fx("anim.gif"), fx("photo.avif")]);
+      await upload(page, [
+        fx("photo.jpg"),
+        gen("transparent.png"),
+        gen("photo.webp"),
+        fx("anim.gif"),
+        fx("photo.avif"),
+      ]);
       await primary(page).click();
       if (mime === "image/webp" && browserName === "webkit") {
         // Safari cannot encode WebP from a canvas: the tool must say so clearly.
@@ -342,9 +374,15 @@ test.describe("JSON Formatter", () => {
     const maxGap = await page.evaluate(
       () =>
         new Promise<number>((resolve) => {
-          let last = performance.now(), max = 0;
+          let last = performance.now(),
+            max = 0;
           const end = last + 3000;
-          const tick = (now: number) => { max = Math.max(max, now - last); last = now; if (now < end) requestAnimationFrame(tick); else resolve(max); };
+          const tick = (now: number) => {
+            max = Math.max(max, now - last);
+            last = now;
+            if (now < end) requestAnimationFrame(tick);
+            else resolve(max);
+          };
           requestAnimationFrame(tick);
         }),
     );
@@ -359,7 +397,9 @@ test.describe("JWT Decoder", () => {
   test("decodes a valid token, flags expiry, states signature is not verified; no upload", async ({ page }) => {
     const g = guard(page);
     await page.goto("/jwt-decoder");
-    await page.getByLabel("JWT").fill(`${b64({ alg: "RS256", typ: "JWT" })}.${b64({ sub: "u_1", exp: 4102444800 })}.sig`);
+    await page
+      .getByLabel("JWT")
+      .fill(`${b64({ alg: "RS256", typ: "JWT" })}.${b64({ sub: "u_1", exp: 4102444800 })}.sig`);
     await expect(output(page)).toContainText("alg: RS256");
     await expect(output(page)).toContainText("Not expired");
     await expect(output(page)).toContainText(/Signature not verified/);
@@ -415,7 +455,10 @@ test.describe("Background Remover", () => {
     await expect(alert(page)).toContainText(/Couldn't download the AI model/);
   });
   test("with the model: transparent PNG, model downloaded once then cached", async ({ page, request }) => {
-    test.skip(!(await request.head("/models/isnet-general-use-int8.onnx")).ok(), "model file not installed (public/models/README.md)");
+    test.skip(
+      !(await request.head("/models/isnet-general-use-int8.onnx")).ok(),
+      "model file not installed (public/models/README.md)",
+    );
     test.setTimeout(240_000);
     await page.goto("/background-remover");
     await upload(page, fx("photo.jpg"));

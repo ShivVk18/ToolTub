@@ -6,7 +6,8 @@ const fx = (n: string) => readFileSync(new URL(`../fixtures/generated/${n}`, imp
 
 describe("jsonErrorOffset (own locator for browsers without positions in errors)", () => {
   it("returns -1 for valid JSON", () => {
-    for (const t of ['{"a":[1,2,{"b":null}]}', "[]", '"x"', "-1.5e3", ' { "u": "\\u00e9\\n" } ']) expect(jsonErrorOffset(t), t).toBe(-1);
+    for (const t of ['{"a":[1,2,{"b":null}]}', "[]", '"x"', "-1.5e3", ' { "u": "\\u00e9\\n" } '])
+      expect(jsonErrorOffset(t), t).toBe(-1);
   });
   it.each([
     ['{"a":1,}', 7],
@@ -25,9 +26,19 @@ describe("jsonErrorOffset (own locator for browsers without positions in errors)
   it("agrees with V8 on where the first error is, across many broken inputs", () => {
     const valid = JSON.stringify({ a: [1, 2, { b: "x", c: true }], d: null, e: -3.5 });
     for (let cut = 1; cut < valid.length; cut++) {
-      for (const bad of [valid.slice(0, cut), valid.slice(0, cut) + "," + valid.slice(cut), valid.slice(0, cut) + "}" + valid.slice(cut)]) {
+      for (const bad of [
+        valid.slice(0, cut),
+        valid.slice(0, cut) + "," + valid.slice(cut),
+        valid.slice(0, cut) + "}" + valid.slice(cut),
+      ]) {
         let v8: number | null = null;
-        try { JSON.parse(bad); continue; } catch (e) { const m = /position (\d+)/.exec(String(e)); v8 = m ? Number(m[1]) : null; }
+        try {
+          JSON.parse(bad);
+          continue;
+        } catch (e) {
+          const m = /position (\d+)/.exec(String(e));
+          v8 = m ? Number(m[1]) : null;
+        }
         if (v8 !== null) expect(jsonErrorOffset(bad), bad).toBe(v8);
       }
     }
@@ -52,7 +63,11 @@ describe("formatJson", () => {
     expect(r.ok && r.output).toBe('{"a":0,"b":{"c":2,"d":1}}');
   });
   it("strips comments but not // inside strings", () => {
-    const r = formatJson({ text: '{\n // note\n "url": "https://x.com/a", /* c */ "n": 1\n}', indent: 0, stripComments: true });
+    const r = formatJson({
+      text: '{\n // note\n "url": "https://x.com/a", /* c */ "n": 1\n}',
+      indent: 0,
+      stripComments: true,
+    });
     expect(r.ok && r.output).toBe('{"url":"https://x.com/a","n":1}');
   });
   it("keeps Unicode, emoji and Hindi intact", () => {

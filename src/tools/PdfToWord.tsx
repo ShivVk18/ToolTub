@@ -36,7 +36,12 @@ export function PdfToWord({ slug, next }: ToolProps) {
         for (let i = 0; i < 180; i++) {
           await new Promise((r) => setTimeout(r, 1000));
           const s: JobState = await (await fetch(`/api/jobs/${id}`)).json();
-          onProgress({ label: s.state === "waiting" ? `Waiting in the queue${s.position ? ` (position ${s.position})` : ""}…` : "Converting on KlipKit's server…" });
+          onProgress({
+            label:
+              s.state === "waiting"
+                ? `Waiting in the queue${s.position ? ` (position ${s.position})` : ""}…`
+                : "Converting on KlipKit's server…",
+          });
           if (s.state === "completed") return (await fetch(`/api/jobs/${id}/file`)).blob();
           if (s.state === "failed") throw new Error(s.error ?? "Conversion failed");
         }
@@ -44,7 +49,11 @@ export function PdfToWord({ slug, next }: ToolProps) {
       },
       (e) => ({
         cause: e.message,
-        fix: e.message.includes("unavailable") ? "Browser-based tools still work; only server conversions are paused." : e.message.includes("limit") ? "You've hit the hourly limit for server tools. Try again in a little while." : "Scanned PDFs have no text to convert: run Image to Text (OCR) first.",
+        fix: e.message.includes("unavailable")
+          ? "Browser-based tools still work; only server conversions are paused."
+          : e.message.includes("limit")
+            ? "You've hit the hourly limit for server tools. Try again in a little while."
+            : "Scanned PDFs have no text to convert: run Image to Text (OCR) first.",
       }),
     );
 
@@ -53,15 +62,35 @@ export function PdfToWord({ slug, next }: ToolProps) {
       status={job.status}
       progress={job.progress}
       error={job.error}
-      input={<Dropzone accept="application/pdf,.pdf" maxFileMb={50} onFiles={([f]) => (setFile(f), job.reset())} hint={file ? `${file.name} · ${formatBytes(file.size)}` : "Text-based PDF up to 50 MB · deleted from our server after 1 hour"} />}
+      input={
+        <Dropzone
+          accept="application/pdf,.pdf"
+          maxFileMb={50}
+          onFiles={([f]) => (setFile(f), job.reset())}
+          hint={
+            file
+              ? `${file.name} · ${formatBytes(file.size)}`
+              : "Text-based PDF up to 50 MB · deleted from our server after 1 hour"
+          }
+        />
+      }
       action={{ label: "Convert to Word", onClick: start, disabled: !file }}
       result={
         job.status === "done" &&
         job.result && (
           <div className="space-y-3">
-            <p className="text-sm">Done · {formatBytes(job.result.size)} · your PDF and the Word file are deleted from our server within 1 hour.</p>
+            <p className="text-sm">
+              Done · {formatBytes(job.result.size)} · your PDF and the Word file are deleted from our server within 1
+              hour.
+            </p>
             <ResultActions
-              items={[{ name: file!.name.replace(/\.pdf$/i, "") + ".docx", type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", blob: job.result }]}
+              items={[
+                {
+                  name: file!.name.replace(/\.pdf$/i, "") + ".docx",
+                  type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                  blob: job.result,
+                },
+              ]}
               next={next}
               from={slug}
             />

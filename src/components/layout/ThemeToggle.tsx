@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import { ripple } from '@/lib/animation';
+import React, { useEffect, useState } from "react";
+import { ripple } from "@/lib/animation";
 
 export function ThemeToggle() {
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
     try {
-      const stored = localStorage.getItem('theme') || localStorage.getItem('kk.theme');
+      const stored = localStorage.getItem("theme") || localStorage.getItem("kk.theme");
       const dark =
-        stored === 'dark' ||
+        stored === "dark" ||
         stored === '"dark"' ||
-        (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        (!stored && window.matchMedia("(prefers-color-scheme: dark)").matches);
       setIsDark(dark);
     } catch {}
   }, []);
@@ -20,28 +20,28 @@ export function ThemeToggle() {
   const toggle = (e: React.MouseEvent<HTMLButtonElement>) => {
     const next = !isDark;
     setIsDark(next);
-    const themeStr = next ? 'dark' : 'light';
+    const themeStr = next ? "dark" : "light";
 
     const r = e.currentTarget.getBoundingClientRect();
-    const stage = document.getElementById('stage') || document.body;
+    const stage = document.getElementById("stage") || document.body;
     const sr = stage.getBoundingClientRect();
     ripple(r.left + 22 - sr.left, r.top + 22 - sr.top, 80);
 
-    document.documentElement.classList.add('theming');
+    document.documentElement.classList.add("theming");
     document.documentElement.dataset.theme = themeStr;
     if (next) {
-      document.documentElement.classList.add('dark');
+      document.documentElement.classList.add("dark");
     } else {
-      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.remove("dark");
     }
 
     try {
-      localStorage.setItem('theme', themeStr);
-      localStorage.setItem('kk.theme', JSON.stringify(themeStr));
+      localStorage.setItem("theme", themeStr);
+      localStorage.setItem("kk.theme", JSON.stringify(themeStr));
     } catch {}
 
     setTimeout(() => {
-      document.documentElement.classList.remove('theming');
+      document.documentElement.classList.remove("theming");
     }, 800);
   };
 

@@ -11,7 +11,10 @@ test("no broken internal links", async ({ request }) => {
     if (seen.has(path)) continue;
     const res = await request.get(path, { maxRedirects: 0 });
     seen.set(path, res.status());
-    if (res.status() >= 400) { broken.push(`${res.status()} ${path}`); continue; }
+    if (res.status() >= 400) {
+      broken.push(`${res.status()} ${path}`);
+      continue;
+    }
     if (!res.headers()["content-type"]?.includes("text/html")) continue;
     const html = await res.text();
     for (const m of html.matchAll(/href="(\/[^"#?]*)"/g)) {

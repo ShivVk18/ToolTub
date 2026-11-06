@@ -28,7 +28,11 @@ const connection = new IORedis(process.env.VALKEY_URL ?? "redis://valkey:6379", 
  */
 const TOOLS = {
   // writer_pdf_import opens the PDF as flowing text in Writer (better for editing than the default Draw import).
-  "pdf-to-word": { input: "input.pdf", output: "output.docx", args: ["--infilter=writer_pdf_import", "--convert-to", "docx:MS Word 2007 XML"] },
+  "pdf-to-word": {
+    input: "input.pdf",
+    output: "output.docx",
+    args: ["--infilter=writer_pdf_import", "--convert-to", "docx:MS Word 2007 XML"],
+  },
 };
 
 async function convert(job) {
@@ -39,7 +43,16 @@ async function convert(job) {
   const once = async () => {
     await run(
       "soffice",
-      ["--headless", "--norestore", "--nolockcheck", `-env:UserInstallation=file://${dir}/profile`, ...spec.args, "--outdir", dir, join(dir, spec.input)],
+      [
+        "--headless",
+        "--norestore",
+        "--nolockcheck",
+        `-env:UserInstallation=file://${dir}/profile`,
+        ...spec.args,
+        "--outdir",
+        dir,
+        join(dir, spec.input),
+      ],
       { timeout: TIMEOUT_MS, killSignal: "SIGKILL" },
     ).catch((e) => {
       throw new Error(e.killed ? "timeout" : "conversion failed");

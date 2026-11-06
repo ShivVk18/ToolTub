@@ -6,7 +6,8 @@ const UUID = /^[0-9a-f-]{36}$/;
 export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   if (!UUID.test(id)) return Response.json({ state: "unknown" }, { status: 404 });
-  if (!(await queueUp())) return Response.json({ state: "unknown", error: "Server tools are temporarily unavailable." }, { status: 503 });
+  if (!(await queueUp()))
+    return Response.json({ state: "unknown", error: "Server tools are temporarily unavailable." }, { status: 503 });
   const job = await getQueue().getJob(id);
   if (!job) return Response.json({ state: "unknown" }, { status: 404 });
   const raw = await job.getState();
@@ -25,4 +26,6 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 }
 
 const humanError = (r?: string) =>
-  r?.includes("timeout") ? "The conversion took too long. Try a smaller PDF." : "We couldn't convert this PDF. Scanned or image-only PDFs need OCR first.";
+  r?.includes("timeout")
+    ? "The conversion took too long. Try a smaller PDF."
+    : "We couldn't convert this PDF. Scanned or image-only PDFs need OCR first.";

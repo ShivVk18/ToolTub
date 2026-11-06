@@ -6,7 +6,8 @@ export const jsonFormatter: ToolSEO = {
   secondaryKeywords: ["json validator", "json beautifier", "json pretty print", "json minify", "format json online"],
   searchIntent: "do",
   title: "JSON Formatter & Validator – Beautify JSON | KlipKit",
-  description: "Format, validate and minify JSON in your browser. Exact error line and column, tree view and copy. Private: your JSON never leaves your device. Free.",
+  description:
+    "Format, validate and minify JSON in your browser. Exact error line and column, tree view and copy. Private: your JSON never leaves your device. Free.",
   ogTitle: "JSON Formatter & Validator — private, instant",
   ogDescription: "Beautify, validate and minify JSON locally. Exact error locations, no upload.",
   ogAlt: "KlipKit JSON Formatter highlighting a missing comma on line 12",
@@ -24,7 +25,10 @@ export const jsonFormatter: ToolSEO = {
   ],
   howToSteps: [
     { name: "Paste or drop JSON", text: "Paste JSON, drop a .json file, or click Sample to try it." },
-    { name: "Choose format or minify", text: "Pick indentation and click Format, or click Minify for a compact single line." },
+    {
+      name: "Choose format or minify",
+      text: "Pick indentation and click Format, or click Minify for a compact single line.",
+    },
     { name: "Copy or download", text: "Copy the result or download it as a .json file." },
   ],
   totalTime: "PT10S",
@@ -66,8 +70,15 @@ export const jsonFormatter: ToolSEO = {
   },
   explainer:
     "JSON (JavaScript Object Notation) is a text format for structured data, used by almost every web API. It allows objects in braces, arrays in brackets, strings in double quotes, numbers, true, false and null, and nothing else.\n\nFormat JSON when you need to read an API response, debug a configuration file or review data in a pull request. Minify it before sending it over the network or embedding it in code.\n\nCommon mistakes: copying JSON from logs that includes escaped quotes; pasting JavaScript objects, which allow single quotes and unquoted keys, and expecting them to be valid JSON; and pasting production secrets into formatters that send data to a server. KlipKit's formatter never does, because it has no server component.\n\nWhen JSON fails to parse, read the error position first: the real mistake is usually just before it, such as a missing comma at the end of the previous line. Formatting large responses also makes code review easier, because each key sits on its own line and changes show up clearly in a diff.",
-  featureList: ["Format and minify JSON", "Exact error line and column", "Tree view", "Processed in your browser", "No sign-up"],
-  llmsLine: "JSON Formatter & Validator: format, validate and minify JSON locally in the browser with exact error locations.",
+  featureList: [
+    "Format and minify JSON",
+    "Exact error line and column",
+    "Tree view",
+    "Processed in your browser",
+    "No sign-up",
+  ],
+  llmsLine:
+    "JSON Formatter & Validator: format, validate and minify JSON locally in the browser with exact error locations.",
   relatedGuides: ["common-json-errors-and-how-to-fix-them", "json-vs-yaml"],
   locales: loc("json-formatter"),
   lastReviewed: "2026-11-02",

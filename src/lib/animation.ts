@@ -3,7 +3,7 @@
  * Matches design/reference/KlipKit_UI.html motion specifications.
  */
 
-export const now = (): number => (typeof performance !== 'undefined' ? performance.now() : Date.now());
+export const now = (): number => (typeof performance !== "undefined" ? performance.now() : Date.now());
 
 export const wait = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -23,7 +23,7 @@ class AnimationLoop {
   private running = false;
 
   constructor() {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       this.start();
     }
   }
@@ -40,7 +40,7 @@ class AnimationLoop {
         try {
           cb(t / 1000, dt);
         } catch (e) {
-          console.error('Frame loop error:', e);
+          console.error("Frame loop error:", e);
         }
       }
       if (this.running) {
@@ -68,12 +68,8 @@ export function addLoop(cb: FrameCallback): () => void {
   return animationLoop.add(cb);
 }
 
-export function tween(
-  ms: number,
-  fn: (p: number) => void,
-  e: (p: number) => number = ease.out,
-): Promise<void> {
-  if (typeof window === 'undefined') {
+export function tween(ms: number, fn: (p: number) => void, e: (p: number) => number = ease.out): Promise<void> {
+  if (typeof window === "undefined") {
     fn(1);
     return Promise.resolve();
   }
@@ -94,15 +90,15 @@ export function tween(
 
 // Global pointer coordinates with smoothing
 export const ptr = {
-  x: typeof window !== 'undefined' ? window.innerWidth / 2 : 600,
-  y: typeof window !== 'undefined' ? window.innerHeight * 0.6 : 400,
-  sx: typeof window !== 'undefined' ? window.innerWidth / 2 : 600,
-  sy: typeof window !== 'undefined' ? window.innerHeight * 0.6 : 400,
+  x: typeof window !== "undefined" ? window.innerWidth / 2 : 600,
+  y: typeof window !== "undefined" ? window.innerHeight * 0.6 : 400,
+  sx: typeof window !== "undefined" ? window.innerWidth / 2 : 600,
+  sy: typeof window !== "undefined" ? window.innerHeight * 0.6 : 400,
 };
 
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   window.addEventListener(
-    'pointermove',
+    "pointermove",
     (e) => {
       ptr.x = e.clientX;
       ptr.y = e.clientY;
@@ -120,10 +116,10 @@ if (typeof window !== 'undefined') {
  * Deterministic smooth scroll with requestAnimationFrame and ease.io4.
  */
 export function goto(target: string | number, ms: number = 1200): Promise<void> {
-  if (typeof window === 'undefined') return Promise.resolve();
+  if (typeof window === "undefined") return Promise.resolve();
   const y0 = window.scrollY;
   let y1 = 0;
-  if (typeof target === 'number') {
+  if (typeof target === "number") {
     y1 = target;
   } else {
     const el = document.getElementById(target);
@@ -143,26 +139,25 @@ export function goto(target: string | number, ms: number = 1200): Promise<void> 
  * Ripple ring helper for clicks, drops, and step completion.
  */
 export function ripple(x: number, y: number, size: number = 300, color?: string): void {
-  if (typeof document === 'undefined') return;
-  const r = document.createElement('div');
-  r.style.position = 'absolute';
-  r.style.borderRadius = '50%';
-  r.style.border = '2px solid ' + (color || 'var(--accent)');
-  r.style.pointerEvents = 'none';
-  r.style.zIndex = '4';
-  r.style.left = x + 'px';
-  r.style.top = y + 'px';
-  r.style.width = size + 'px';
-  r.style.height = size + 'px';
-  r.style.animation = 'rip 1s cubic-bezier(.2,.8,.2,1) forwards';
+  if (typeof document === "undefined") return;
+  const r = document.createElement("div");
+  r.style.position = "absolute";
+  r.style.borderRadius = "50%";
+  r.style.border = "2px solid " + (color || "var(--accent)");
+  r.style.pointerEvents = "none";
+  r.style.zIndex = "4";
+  r.style.left = x + "px";
+  r.style.top = y + "px";
+  r.style.width = size + "px";
+  r.style.height = size + "px";
+  r.style.animation = "rip 1s cubic-bezier(.2,.8,.2,1) forwards";
 
-  const container = document.getElementById('stage') || document.body;
+  const container = document.getElementById("stage") || document.body;
   container.appendChild(r);
   setTimeout(() => {
     r.remove();
   }, 1100);
 }
-
 
 export const getPointer = () => ptr;
 
@@ -170,9 +165,9 @@ export const getPointer = () => ptr;
  * Magnetic button pointer attraction effect from KlipKit_UI.html lines 1044-1047
  */
 export function initMagneticButtons(): () => void {
-  if (typeof window === 'undefined') return () => {};
+  if (typeof window === "undefined") return () => {};
   return addLoop(() => {
-    const els = document.querySelectorAll<HTMLElement>('[data-mag]');
+    const els = document.querySelectorAll<HTMLElement>("[data-mag]");
     for (const el of Array.from(els)) {
       const r = el.getBoundingClientRect();
       if (!r.width) continue;

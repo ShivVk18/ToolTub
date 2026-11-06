@@ -8,13 +8,7 @@ export type CategoryId = "productivity" | "developer" | "creator";
 
 /** Hubs are the indexable category pages (/pdf-tools, /image-tools, ...). */
 export type HubId =
-  | "pdf-tools"
-  | "image-tools"
-  | "text-tools"
-  | "utility-tools"
-  | "developer-tools"
-  | "video-tools"
-  | "creator-tools";
+  "pdf-tools" | "image-tools" | "text-tools" | "utility-tools" | "developer-tools" | "video-tools" | "creator-tools";
 
 export type Priority = "P0" | "P1" | "P2";
 
@@ -22,14 +16,13 @@ export type Priority = "P0" | "P1" | "P2";
 export type BuildType = "own" | "lib" | "model" | "srv";
 
 /** Where the work happens. Drives the privacy badge on every tool. No third parties, ever. */
-export type Processing =
-  | { where: "device" }
-  | { where: "own-server"; retentionMinutes: number };
+export type Processing = { where: "device" } | { where: "own-server"; retentionMinutes: number };
 
 /** Every bundled library or model, with its licence. Rendered on /licences. */
 export interface Dependency {
   name: string;
-  licence: "MIT" | "Apache-2.0" | "BSD-2-Clause" | "BSD-3-Clause" | "ISC" | "MPL-2.0" | "LGPL-2.1" | "LGPL-3.0" | "OFL-1.1";
+  licence:
+    "MIT" | "Apache-2.0" | "BSD-2-Clause" | "BSD-3-Clause" | "ISC" | "MPL-2.0" | "LGPL-2.1" | "LGPL-3.0" | "OFL-1.1";
   sizeKb: number; // transferred size the first time the tool runs
   url: string;
 }

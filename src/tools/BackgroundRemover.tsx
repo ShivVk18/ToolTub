@@ -26,7 +26,12 @@ export function BackgroundRemover({ slug, next }: ToolProps) {
   const job = useToolRun<{ png: Blob; url: string; backend: string }>();
   // Each result holds a full-resolution PNG behind an object URL: release it when replaced or unmounted.
   const previewUrl = job.result?.url;
-  useEffect(() => () => { if (previewUrl) URL.revokeObjectURL(previewUrl); }, [previewUrl]);
+  useEffect(
+    () => () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    },
+    [previewUrl],
+  );
 
   useHandoff((items) => items[0]?.blob && setFile(new File([items[0].blob], items[0].name, { type: items[0].type })));
 
@@ -36,7 +41,10 @@ export function BackgroundRemover({ slug, next }: ToolProps) {
         const r = await bgWorker.call("remove", { blob: file! }, { onProgress });
         return { png: r.blob, url: URL.createObjectURL(r.blob), backend: r.backend };
       },
-      (e) => ({ cause: e.message, fix: "After the first successful download, the model is cached on your device and works offline." }),
+      (e) => ({
+        cause: e.message,
+        fix: "After the first successful download, the model is cached on your device and works offline.",
+      }),
     );
 
   const [items, setItems] = useState<Artifact[]>([]);
@@ -45,18 +53,36 @@ export function BackgroundRemover({ slug, next }: ToolProps) {
     if (!job.result) return;
     const base = file!.name.replace(/\.[^.]+$/, "");
     if (choice === "transparent") setItems([{ name: `${base}-no-bg.png`, type: "image/png", blob: job.result.png }]);
-    else setItems([{ name: `${base}-bg.jpg`, type: "image/jpeg", blob: await flatten(job.result.png, choice === "custom" ? colour : choice) }]);
+    else
+      setItems([
+        {
+          name: `${base}-bg.jpg`,
+          type: "image/jpeg",
+          blob: await flatten(job.result.png, choice === "custom" ? colour : choice),
+        },
+      ]);
   };
 
   const done = job.status === "done" && job.result;
-  const shown = done ? (items.length ? items : [{ name: file!.name.replace(/\.[^.]+$/, "") + "-no-bg.png", type: "image/png", blob: job.result!.png }]) : [];
+  const shown = done
+    ? items.length
+      ? items
+      : [{ name: file!.name.replace(/\.[^.]+$/, "") + "-no-bg.png", type: "image/png", blob: job.result!.png }]
+    : [];
 
   return (
     <ToolWorkspace
       status={job.status}
       progress={job.progress}
       error={job.error}
-      input={<Dropzone accept="image/png,image/jpeg,image/webp" maxFileMb={25} onFiles={([f]) => (setFile(f), setItems([]), job.reset())} hint={file ? file.name : "JPG, PNG or WebP up to 25 MB · first use downloads a 44 MB AI model once"} />}
+      input={
+        <Dropzone
+          accept="image/png,image/jpeg,image/webp"
+          maxFileMb={25}
+          onFiles={([f]) => (setFile(f), setItems([]), job.reset())}
+          hint={file ? file.name : "JPG, PNG or WebP up to 25 MB · first use downloads a 44 MB AI model once"}
+        />
+      }
       action={{ label: "Remove background", onClick: start, disabled: !file }}
       result={
         done && (
@@ -66,7 +92,14 @@ export function BackgroundRemover({ slug, next }: ToolProps) {
               src={job.result!.url}
               alt="Your image with the background removed"
               className="max-h-96 rounded-lg border border-border"
-              style={{ background: bg === "transparent" ? "repeating-conic-gradient(#ddd 0 25%, #fff 0 50%) 0 0/16px 16px" : bg === "custom" ? custom : bg }}
+              style={{
+                background:
+                  bg === "transparent"
+                    ? "repeating-conic-gradient(#ddd 0 25%, #fff 0 50%) 0 0/16px 16px"
+                    : bg === "custom"
+                      ? custom
+                      : bg,
+              }}
             />
             <div className="flex flex-wrap items-end gap-4">
               <Field label="Background">
@@ -76,8 +109,18 @@ export function BackgroundRemover({ slug, next }: ToolProps) {
                   <option value="custom">Colour (JPG)</option>
                 </select>
               </Field>
-              {bg === "custom" && <input type="color" value={custom} onChange={(e) => (setCustom(e.target.value), prepare("custom", e.target.value))} className="h-10 w-16" aria-label="Background colour" />}
-              <span className="text-xs text-fg-muted">Ran on your device ({job.result!.backend === "webgpu" ? "GPU" : "CPU"})</span>
+              {bg === "custom" && (
+                <input
+                  type="color"
+                  value={custom}
+                  onChange={(e) => (setCustom(e.target.value), prepare("custom", e.target.value))}
+                  className="h-10 w-16"
+                  aria-label="Background colour"
+                />
+              )}
+              <span className="text-xs text-fg-muted">
+                Ran on your device ({job.result!.backend === "webgpu" ? "GPU" : "CPU"})
+              </span>
             </div>
             <ResultActions items={shown} next={next} from={slug} />
           </div>

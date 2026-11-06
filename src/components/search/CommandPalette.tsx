@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { Search } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import type { SearchEntry } from '@/registry/search-index';
-import { useKlip } from '@/lib/store';
-import { cn } from '@/lib/utils';
-import { createToolSearch } from '@/lib/search';
-import { CATS, tint, TOOL_ICON_PATHS, type ToolItem } from '@/lib/designTools';
-import { esc } from '@/lib/intent';
+import { Search } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { SearchEntry } from "@/registry/search-index";
+import { useKlip } from "@/lib/store";
+import { cn } from "@/lib/utils";
+import { createToolSearch } from "@/lib/search";
+import { CATS, tint, TOOL_ICON_PATHS, type ToolItem } from "@/lib/designTools";
+import { esc } from "@/lib/intent";
 
 export function useToolSearch(index: SearchEntry[]) {
   return useMemo(() => createToolSearch(index), [index]);
@@ -23,13 +23,13 @@ function hlName(n: string, q: string): string {
     : esc(n.slice(0, i)) +
         '<mark style="background:none;color:var(--accent);font-weight:600">' +
         esc(n.slice(i, i + w.length)) +
-        '</mark>' +
+        "</mark>" +
         esc(n.slice(i + w.length));
 }
 
 export function CommandPalette({ index }: { index: SearchEntry[] }) {
   const [open, setOpen] = useState(false);
-  const [q, setQ] = useState('');
+  const [q, setQ] = useState("");
   const [active, setActive] = useState(0);
   const router = useRouter();
   const input = useRef<HTMLInputElement>(null);
@@ -38,28 +38,26 @@ export function CommandPalette({ index }: { index: SearchEntry[] }) {
 
   const results = q
     ? search(q)
-    : recents
-        .map((s) => index.find((e) => e.slug === s))
-        .filter((e): e is SearchEntry => !!e);
+    : recents.map((s) => index.find((e) => e.slug === s)).filter((e): e is SearchEntry => !!e);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
         setOpen((o) => !o);
-        setQ('');
+        setQ("");
       }
-      if (e.key === 'Escape') setOpen(false);
+      if (e.key === "Escape") setOpen(false);
     };
     const onOpen = () => {
-      setQ('');
+      setQ("");
       setOpen(true);
     };
-    window.addEventListener('keydown', onKey);
-    window.addEventListener('klipkit:search', onOpen);
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("klipkit:search", onOpen);
     return () => {
-      window.removeEventListener('keydown', onKey);
-      window.removeEventListener('klipkit:search', onOpen);
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("klipkit:search", onOpen);
     };
   }, []);
 
@@ -71,19 +69,19 @@ export function CommandPalette({ index }: { index: SearchEntry[] }) {
     if (!e?.available) return;
     setOpen(false);
     // If on homepage and __kk exists, we can open in workspace, or navigate
-    if (window.location.pathname === '/' && (window as any).__kk) {
+    if (window.location.pathname === "/" && (window as any).__kk) {
       const match = {
         n: e.name,
-        c: e.hub.startsWith('dev') ? 'd' : e.hub.startsWith('creat') ? 'c' : 'p',
-        i: e.slug.includes('pdf')
-          ? 'pdf'
-          : e.slug.includes('image') || e.slug.includes('heic')
-          ? 'img'
-          : e.slug.includes('audio') || e.slug.includes('transcribe')
-          ? 'audio'
-          : e.slug.includes('video')
-          ? 'video'
-          : 'code',
+        c: e.hub.startsWith("dev") ? "d" : e.hub.startsWith("creat") ? "c" : "p",
+        i: e.slug.includes("pdf")
+          ? "pdf"
+          : e.slug.includes("image") || e.slug.includes("heic")
+            ? "img"
+            : e.slug.includes("audio") || e.slug.includes("transcribe")
+              ? "audio"
+              : e.slug.includes("video")
+                ? "video"
+                : "code",
         d: e.tagline,
         slug: e.slug,
       } as ToolItem;
@@ -100,10 +98,7 @@ export function CommandPalette({ index }: { index: SearchEntry[] }) {
       className="open fixed inset-0 z-60 grid place-items-start justify-center pt-[16vh] transition-opacity duration-250 opacity-100 pointer-events-auto"
       onClick={() => setOpen(false)}
     >
-      <div
-        className="bd absolute inset-0 bg-[rgba(14,12,20,0.28)] backdrop-blur-[6px]"
-        aria-hidden="true"
-      />
+      <div className="bd absolute inset-0 bg-[rgba(14,12,20,0.28)] backdrop-blur-[6px]" aria-hidden="true" />
 
       <div
         role="dialog"
@@ -140,15 +135,15 @@ export function CommandPalette({ index }: { index: SearchEntry[] }) {
               setActive(0);
             }}
             onKeyDown={(e) => {
-              if (e.key === 'ArrowDown') {
+              if (e.key === "ArrowDown") {
                 e.preventDefault();
                 setActive((a) => Math.min(a + 1, results.length - 1));
               }
-              if (e.key === 'ArrowUp') {
+              if (e.key === "ArrowUp") {
                 e.preventDefault();
                 setActive((a) => Math.max(a - 1, 0));
               }
-              if (e.key === 'Enter') {
+              if (e.key === "Enter") {
                 e.preventDefault();
                 go(results[active]);
               }
@@ -170,17 +165,17 @@ export function CommandPalette({ index }: { index: SearchEntry[] }) {
           )}
           {results.map((r, i) => {
             const isSel = i === active;
-            const catKey = r.hub.startsWith('dev') ? 'd' : r.hub.startsWith('creat') ? 'c' : 'p';
+            const catKey = r.hub.startsWith("dev") ? "d" : r.hub.startsWith("creat") ? "c" : "p";
             const cat = CATS[catKey];
-            const iconKey = r.slug.includes('pdf')
-              ? 'pdf'
-              : r.slug.includes('image') || r.slug.includes('heic')
-              ? 'img'
-              : r.slug.includes('audio')
-              ? 'audio'
-              : r.slug.includes('video')
-              ? 'video'
-              : 'code';
+            const iconKey = r.slug.includes("pdf")
+              ? "pdf"
+              : r.slug.includes("image") || r.slug.includes("heic")
+                ? "img"
+                : r.slug.includes("audio")
+                  ? "audio"
+                  : r.slug.includes("video")
+                    ? "video"
+                    : "code";
 
             return (
               <li key={r.slug} role="option" aria-selected={isSel}>
@@ -190,8 +185,8 @@ export function CommandPalette({ index }: { index: SearchEntry[] }) {
                   onClick={() => go(r)}
                   disabled={!r.available}
                   className={`pi flex w-full items-center gap-[14px] p-[11px_14px] rounded-[14px] text-[16px] text-left cursor-pointer transition-colors ${
-                    isSel ? 'bg-accentSoft' : ''
-                  } ${!r.available ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    isSel ? "bg-accentSoft" : ""
+                  } ${!r.available ? "opacity-50 cursor-not-allowed" : ""}`}
                 >
                   <div
                     className="ti w-[34px] h-[34px] rounded-[10px] grid place-items-center flex-none"
@@ -216,7 +211,7 @@ export function CommandPalette({ index }: { index: SearchEntry[] }) {
                       dangerouslySetInnerHTML={{ __html: hlName(r.name, q) }}
                     />
                     <span className="block text-[13px] text-muted truncate">
-                      {r.available ? r.tagline : 'Coming soon'}
+                      {r.available ? r.tagline : "Coming soon"}
                     </span>
                   </div>
                   <small className="text-muted text-[13px] ml-auto flex-none">{cat.n}</small>
@@ -243,7 +238,7 @@ export function CommandPalette({ index }: { index: SearchEntry[] }) {
 
 export function SearchButton({
   className,
-  label = 'Search tools — What do you need to do? Try “shrink pdf”',
+  label = "Search tools — What do you need to do? Try “shrink pdf”",
 }: {
   className?: string;
   label?: string;
@@ -251,10 +246,10 @@ export function SearchButton({
   return (
     <button
       type="button"
-      onClick={() => window.dispatchEvent(new Event('klipkit:search'))}
+      onClick={() => window.dispatchEvent(new Event("klipkit:search"))}
       aria-label="Search tools — What do you need to do? Try “shrink pdf”"
       className={cn(
-        'pill inline-flex items-center gap-[12px] h-[44px] px-[18px] rounded-full bg-panel border border-line text-muted text-[15px] backdrop-blur-[12px] hover:border-line2 hover:text-ink transition-transform active:scale-[0.98] cursor-pointer',
+        "pill inline-flex items-center gap-[12px] h-[44px] px-[18px] rounded-full bg-panel border border-line text-muted text-[15px] backdrop-blur-[12px] hover:border-line2 hover:text-ink transition-transform active:scale-[0.98] cursor-pointer",
         className,
       )}
     >

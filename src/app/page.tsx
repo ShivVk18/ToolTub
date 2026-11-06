@@ -74,9 +74,7 @@ export default function Home() {
 
       {/* Server-Rendered SEO Content, FAQ, Tool Chains and Categories preserved for search/screen-readers */}
       <div className="sr-only">
-        <p className="text-center text-sm font-medium text-ink2">
-          No sign-up · Runs on your device · Free forever
-        </p>
+        <p className="text-center text-sm font-medium text-ink2">No sign-up · Runs on your device · Free forever</p>
 
         <LocalLists index={searchIndex} />
 

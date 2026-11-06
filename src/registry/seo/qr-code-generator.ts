@@ -3,10 +3,17 @@ import { loc } from "./shared";
 
 export const qrCodeGenerator: ToolSEO = {
   primaryKeyword: "qr code generator",
-  secondaryKeywords: ["free qr code generator no expiry", "wifi qr code", "qr code for link", "qr code with logo", "vcard qr code"],
+  secondaryKeywords: [
+    "free qr code generator no expiry",
+    "wifi qr code",
+    "qr code for link",
+    "qr code with logo",
+    "vcard qr code",
+  ],
   searchIntent: "do",
   title: "QR Code Generator – Free, No Expiry, No Sign-up | KlipKit",
-  description: "Create QR codes for links, Wi-Fi and contact cards free. Static codes that never expire, PNG and SVG download, custom colours. No sign-up, no tracking.",
+  description:
+    "Create QR codes for links, Wi-Fi and contact cards free. Static codes that never expire, PNG and SVG download, custom colours. No sign-up, no tracking.",
   ogTitle: "QR Code Generator — free forever, never expires",
   ogDescription: "Static QR codes for links, Wi-Fi and contacts. PNG and SVG, no sign-up.",
   ogAlt: "KlipKit QR Code Generator creating a Wi-Fi QR code",
@@ -24,7 +31,10 @@ export const qrCodeGenerator: ToolSEO = {
   ],
   howToSteps: [
     { name: "Choose a type", text: "Pick Link, Text, Wi-Fi or Contact." },
-    { name: "Enter details", text: "Type the URL, network name and password, or contact details. The preview updates live." },
+    {
+      name: "Enter details",
+      text: "Type the URL, network name and password, or contact details. The preview updates live.",
+    },
     { name: "Download", text: "Download PNG for screens or SVG for print, then test-scan it with your phone." },
   ],
   totalTime: "PT20S",
@@ -66,15 +76,23 @@ export const qrCodeGenerator: ToolSEO = {
   },
   explainer:
     "A QR (Quick Response) code is a two-dimensional barcode that phones read with their camera. It stores text, which may be a URL, Wi-Fi credentials or a contact card, using built-in error correction so it still scans when partly damaged or covered.\n\nUse QR codes on menus, posters, packaging, business cards, event badges and slides, wherever people need to open a link or join a network without typing.\n\nCommon mistakes: using a free dynamic generator whose codes stop working after a trial; printing codes too small or without a white margin (the quiet zone); low contrast colour combinations; and long URLs that create dense codes. Shorten very long links or use a lower-density URL for codes printed small.\n\nBefore printing, always scan the code with two different phones from the distance people will actually stand. As a rule, the code should be at least one tenth as wide as the scanning distance: a code read from one metre away should be about 10 centimetres wide.",
-  featureList: ["Static QR codes that never expire", "URL, Wi-Fi, vCard, text", "PNG and SVG download", "No tracking", "No sign-up"],
-  llmsLine: "QR Code Generator: create static QR codes (URL, Wi-Fi, vCard) that never expire, with PNG/SVG download and no tracking.",
+  featureList: [
+    "Static QR codes that never expire",
+    "URL, Wi-Fi, vCard, text",
+    "PNG and SVG download",
+    "No tracking",
+    "No sign-up",
+  ],
+  llmsLine:
+    "QR Code Generator: create static QR codes (URL, Wi-Fi, vCard) that never expire, with PNG/SVG download and no tracking.",
   longTailVariants: [
     {
       slug: "wifi-qr-code-generator",
       keyword: "wifi qr code generator",
       h1: "Wi-Fi QR Code Generator",
       title: "Wi-Fi QR Code Generator – Free, Private | KlipKit",
-      description: "Make a QR code guests can scan to join your Wi-Fi without typing the password. Created in your browser, so the password is never uploaded. Free, no sign-up.",
+      description:
+        "Make a QR code guests can scan to join your Wi-Fi without typing the password. Created in your browser, so the password is never uploaded. Free, no sign-up.",
       intro:
         "Let guests join your Wi-Fi by pointing their camera at a code. This page opens the QR Code Generator in Wi-Fi mode. Your network password is encoded in your browser and never sent to KlipKit.",
       preset: { type: "wifi" },

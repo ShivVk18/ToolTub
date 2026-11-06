@@ -4,7 +4,12 @@ import { fileURLToPath } from "node:url";
 
 export default defineConfig({
   plugins: [react()],
-  resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)), "server-only": fileURLToPath(new URL("./tests/unit/server-only-stub.ts", import.meta.url)) } },
+  resolve: {
+    alias: {
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
+      "server-only": fileURLToPath(new URL("./tests/unit/server-only-stub.ts", import.meta.url)),
+    },
+  },
   test: {
     include: ["tests/unit/**/*.test.{ts,tsx}"],
     environment: "node",

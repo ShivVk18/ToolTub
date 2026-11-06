@@ -9,10 +9,11 @@ export function LocalLists({ index }: { index: SearchEntry[] }) {
   const recents = useKlip((s) => s.recents);
   const favourites = useKlip((s) => s.favourites);
   const [ready, setReady] = useState(false);
-  // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage only exists after hydration
+
   useEffect(() => setReady(true), []);
   if (!ready) return null;
-  const pick = (slugs: string[]) => slugs.map((s) => index.find((e) => e.slug === s)).filter((e): e is SearchEntry => !!e?.available);
+  const pick = (slugs: string[]) =>
+    slugs.map((s) => index.find((e) => e.slug === s)).filter((e): e is SearchEntry => !!e?.available);
   const groups = [
     { title: "Favourites", list: pick(favourites) },
     { title: "Recently used", list: pick(recents) },
@@ -26,7 +27,12 @@ export function LocalLists({ index }: { index: SearchEntry[] }) {
           <ul className="flex flex-wrap gap-2">
             {g.list.map((e) => (
               <li key={e.slug}>
-                <Link href={`/${e.slug}`} className="inline-block rounded-full border border-border px-3 py-1 text-sm hover:bg-muted">{e.name}</Link>
+                <Link
+                  href={`/${e.slug}`}
+                  className="inline-block rounded-full border border-border px-3 py-1 text-sm hover:bg-muted"
+                >
+                  {e.name}
+                </Link>
               </li>
             ))}
           </ul>

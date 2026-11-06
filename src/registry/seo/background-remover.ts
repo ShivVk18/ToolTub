@@ -3,10 +3,17 @@ import { loc } from "./shared";
 
 export const backgroundRemover: ToolSEO = {
   primaryKeyword: "background remover",
-  secondaryKeywords: ["remove background from image", "transparent background", "remove bg free", "background remover without upload", "white background photo"],
+  secondaryKeywords: [
+    "remove background from image",
+    "transparent background",
+    "remove bg free",
+    "background remover without upload",
+    "white background photo",
+  ],
   searchIntent: "do",
   title: "Background Remover – Free, On-Device AI | KlipKit",
-  description: "Remove image backgrounds free with AI that runs on your device. Download a transparent PNG or add a white or colour background. No upload, no sign-up.",
+  description:
+    "Remove image backgrounds free with AI that runs on your device. Download a transparent PNG or add a white or colour background. No upload, no sign-up.",
   ogTitle: "Background Remover — AI that runs on your device",
   ogDescription: "Transparent PNGs in seconds, without uploading your photos.",
   ogAlt: "KlipKit Background Remover cutting out a person against a checkerboard transparent background",
@@ -66,8 +73,15 @@ export const backgroundRemover: ToolSEO = {
   },
   explainer:
     "AI background removal uses a segmentation model that predicts, for every pixel, how likely it is to belong to the foreground. That prediction becomes an alpha mask; applying it to the original photo gives a transparent PNG.\n\nUse it for product photos, profile pictures, passport and ID photos, thumbnails and design mock-ups. A transparent PNG can then be placed on any background.\n\nCommon mistakes: saving the result as JPG, which cannot store transparency and fills it with black or white; starting from a low-resolution screenshot, which gives jagged edges; and uploading personal photos to removers that keep them. On-device models avoid the last problem entirely.\n\nFor product photos, shoot against a plain, contrasting background with even lighting and keep the whole object in focus. For portraits, avoid backgrounds with the same colour as hair or clothing. After removing the background, add a white background for marketplaces, or keep the transparent PNG for designs, slides and thumbnails.",
-  featureList: ["AI background removal on your device", "Full-resolution transparent PNG", "White or colour background", "No upload", "No watermark"],
-  llmsLine: "Background Remover: remove image backgrounds with an on-device AI model in the browser; full-resolution transparent PNG, no upload.",
+  featureList: [
+    "AI background removal on your device",
+    "Full-resolution transparent PNG",
+    "White or colour background",
+    "No upload",
+    "No watermark",
+  ],
+  llmsLine:
+    "Background Remover: remove image backgrounds with an on-device AI model in the browser; full-resolution transparent PNG, no upload.",
   relatedGuides: ["how-to-make-a-passport-photo-at-home", "png-vs-webp-vs-avif"],
   locales: loc("background-remover"),
   lastReviewed: "2026-11-02",

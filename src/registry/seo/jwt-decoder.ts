@@ -3,10 +3,17 @@ import { loc } from "./shared";
 
 export const jwtDecoder: ToolSEO = {
   primaryKeyword: "jwt decoder",
-  secondaryKeywords: ["decode jwt", "jwt parser", "jwt debugger", "jwt token decode online", "is it safe to decode jwt online"],
+  secondaryKeywords: [
+    "decode jwt",
+    "jwt parser",
+    "jwt debugger",
+    "jwt token decode online",
+    "is it safe to decode jwt online",
+  ],
   searchIntent: "do",
   title: "JWT Decoder – Decode JSON Web Tokens Locally | KlipKit",
-  description: "Decode JWT header and payload in your browser. See expiry, issued-at and every claim explained. Your token never leaves your device. Free, no sign-up.",
+  description:
+    "Decode JWT header and payload in your browser. See expiry, issued-at and every claim explained. Your token never leaves your device. Free, no sign-up.",
   ogTitle: "JWT Decoder — decode tokens without sending them anywhere",
   ogDescription: "Header, payload, expiry and claims explained. Runs locally in your browser.",
   ogAlt: "KlipKit JWT Decoder showing a token's header, payload and an Expired badge",
@@ -65,8 +72,15 @@ export const jwtDecoder: ToolSEO = {
   },
   explainer:
     "A JSON Web Token (JWT) is defined in RFC 7519. It looks like xxxxx.yyyyy.zzzzz: a Base64URL-encoded header, a Base64URL-encoded payload and a signature. Servers issue JWTs after login, and clients send them in the Authorization header to prove who they are.\n\nDecode a JWT when debugging authentication: checking whether a token has expired, which audience it was issued for, or which roles and scopes it carries.\n\nCommon mistakes: treating a decoded payload as trusted without verifying the signature; storing sensitive data in the payload because it looks scrambled; mixing up seconds and milliseconds in exp; and pasting live production tokens into decoders that send them to a server, where they could be logged and reused until they expire.\n\nWhen you debug login problems, compare three things first: the exp time against the server clock, the aud claim against the API you are calling, and the iss claim against your identity provider. Most rejected tokens fail one of those checks, not the signature.",
-  featureList: ["Decode JWT header and payload", "Expiry badge with local time", "Claims explained", "Processed in your browser", "No sign-up"],
-  llmsLine: "JWT Decoder: decode JSON Web Token header and payload locally in the browser, with expiry check and claims explained.",
+  featureList: [
+    "Decode JWT header and payload",
+    "Expiry badge with local time",
+    "Claims explained",
+    "Processed in your browser",
+    "No sign-up",
+  ],
+  llmsLine:
+    "JWT Decoder: decode JSON Web Token header and payload locally in the browser, with expiry check and claims explained.",
   relatedGuides: ["what-is-a-jwt-and-is-it-safe-to-decode-online", "jwt-vs-session-cookies"],
   locales: loc("jwt-decoder"),
   lastReviewed: "2026-11-02",

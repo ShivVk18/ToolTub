@@ -6,7 +6,8 @@ import { PDFDocument } from "pdf-lib";
 import { unzipSync, strFromU8 } from "fflate";
 
 export const FX = join(process.cwd(), "tests/fixtures");
-export const fx = (name: string) => (name.startsWith("generated/") || name.includes("/") ? join(FX, name) : join(FX, name));
+export const fx = (name: string) =>
+  name.startsWith("generated/") || name.includes("/") ? join(FX, name) : join(FX, name);
 export const gen = (name: string) => join(FX, "generated", name);
 
 /**
@@ -123,7 +124,14 @@ export async function inspectImage(page: Page, bytes: Buffer) {
     const u8 = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
     const sig = Array.from(u8.slice(0, 12));
     const ascii = String.fromCharCode(...sig);
-    const type = sig[0] === 0xff && sig[1] === 0xd8 ? "image/jpeg" : sig[0] === 0x89 && ascii.slice(1, 4) === "PNG" ? "image/png" : ascii.slice(0, 4) === "RIFF" && ascii.slice(8, 12) === "WEBP" ? "image/webp" : "unknown";
+    const type =
+      sig[0] === 0xff && sig[1] === 0xd8
+        ? "image/jpeg"
+        : sig[0] === 0x89 && ascii.slice(1, 4) === "PNG"
+          ? "image/png"
+          : ascii.slice(0, 4) === "RIFF" && ascii.slice(8, 12) === "WEBP"
+            ? "image/webp"
+            : "unknown";
     const bmp = await createImageBitmap(new Blob([u8]));
     const c = new OffscreenCanvas(bmp.width, bmp.height);
     const x = c.getContext("2d")!;
@@ -148,15 +156,30 @@ export function docxText(bytes: Buffer) {
 export async function assertAccessible(page: Page, label = "") {
   const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
   const bad = results.violations.filter((v) => v.impact === "serious" || v.impact === "critical");
-  expect(bad.map((v) => `${label} ${v.id}: ${v.nodes.map((n) => n.target.join(" ")).slice(0, 3).join(" | ")}`), "axe serious/critical").toEqual([]);
+  expect(
+    bad.map(
+      (v) =>
+        `${label} ${v.id}: ${v.nodes
+          .map((n) => n.target.join(" "))
+          .slice(0, 3)
+          .join(" | ")}`,
+    ),
+    "axe serious/critical",
+  ).toEqual([]);
 }
 
 /** Mobile basics: no horizontal scroll; interactive controls in header + workspace are ≥ 44 px tall/wide. */
 export async function assertMobileFriendly(page: Page) {
-  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  );
   expect(overflow, "horizontal scroll in px").toBeLessThanOrEqual(0);
   const small = await page.evaluate(() =>
-    [...document.querySelectorAll('header button, header a, section[aria-label="Tool"] button, section[aria-label="Tool"] select, section[aria-label="Tool"] input:not([type=file]):not([type=checkbox]):not([type=range]):not([type=color])')]
+    [
+      ...document.querySelectorAll(
+        'header button, header a, section[aria-label="Tool"] button, section[aria-label="Tool"] select, section[aria-label="Tool"] input:not([type=file]):not([type=checkbox]):not([type=range]):not([type=color])',
+      ),
+    ]
       .filter((el) => (el as HTMLElement).offsetParent !== null)
       .map((el) => ({ el: (el as HTMLElement).outerHTML.slice(0, 80), r: el.getBoundingClientRect() }))
       .filter(({ r }) => r.width < 44 || r.height < 44)

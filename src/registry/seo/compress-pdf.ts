@@ -3,10 +3,17 @@ import { loc } from "./shared";
 
 export const compressPdf: ToolSEO = {
   primaryKeyword: "compress pdf",
-  secondaryKeywords: ["reduce pdf size", "pdf compressor online free", "compress pdf to 100kb", "make pdf smaller", "compress pdf without uploading"],
+  secondaryKeywords: [
+    "reduce pdf size",
+    "pdf compressor online free",
+    "compress pdf to 100kb",
+    "make pdf smaller",
+    "compress pdf without uploading",
+  ],
   searchIntent: "do",
   title: "Compress PDF Online Free – Reduce PDF Size | KlipKit",
-  description: "Compress PDF files free in your browser. Reduce PDF size for email and upload forms with no upload, no sign-up and no watermark. Works on phone and desktop.",
+  description:
+    "Compress PDF files free in your browser. Reduce PDF size for email and upload forms with no upload, no sign-up and no watermark. Works on phone and desktop.",
   ogTitle: "Compress PDF — free, private, in your browser",
   ogDescription: "Shrink PDFs for email and upload portals without sending them to a server.",
   ogAlt: "KlipKit Compress PDF tool showing a PDF shrinking from 8.4 MB to 1.9 MB",
@@ -24,7 +31,10 @@ export const compressPdf: ToolSEO = {
   ],
   howToSteps: [
     { name: "Add your PDF", text: "Drag the PDF into the box, paste it, or tap to choose a file from your device." },
-    { name: "Choose a level", text: "Keep Recommended, pick Strong for the smallest file, or enter a target size such as 100 KB." },
+    {
+      name: "Choose a level",
+      text: "Keep Recommended, pick Strong for the smallest file, or enter a target size such as 100 KB.",
+    },
     { name: "Download", text: "Click Compress PDF, check the before and after size, then download the smaller file." },
   ],
   totalTime: "PT30S",
@@ -65,15 +75,23 @@ export const compressPdf: ToolSEO = {
   },
   explainer:
     "A PDF's size comes mostly from images: scanned pages, photos and screenshots. Text, fonts and vector drawings are tiny by comparison. Compressing a PDF therefore means re-encoding its images at a lower resolution and stronger JPEG quality, and removing duplicate or unused data.\n\nUse Recommended for anything you will print or read on a large screen. Use Strong or a target size when a portal rejects files above a limit, such as 100 KB, 200 KB or 2 MB for job and visa applications.\n\nCommon mistakes: compressing an already compressed PDF several times, which degrades images without saving much; converting a PDF to images and back, which removes selectable text; and uploading confidential documents to tools that keep files on their servers. KlipKit avoids the last one by doing everything in your browser.\n\nTo check the result, open the compressed file and zoom into a photo or scanned page at 100%. If text in a scan looks blurry, go back one level. For documents you must print at high quality, such as brochures, keep the original and send the compressed copy only where a size limit forces you to.",
-  featureList: ["Reduce PDF size by up to 85% on image-heavy files", "Target size in KB", "Processed in your browser", "No sign-up", "No watermark"],
-  llmsLine: "Compress PDF: reduce PDF file size in the browser (no upload), with Recommended, Strong or target-KB modes.",
+  featureList: [
+    "Reduce PDF size by up to 85% on image-heavy files",
+    "Target size in KB",
+    "Processed in your browser",
+    "No sign-up",
+    "No watermark",
+  ],
+  llmsLine:
+    "Compress PDF: reduce PDF file size in the browser (no upload), with Recommended, Strong or target-KB modes.",
   longTailVariants: [
     {
       slug: "compress-pdf-to-100kb",
       keyword: "compress pdf to 100kb",
       h1: "Compress PDF to 100 KB",
       title: "Compress PDF to 100 KB Online Free | KlipKit",
-      description: "Reduce a PDF to under 100 KB for job portals, exam forms and government sites. Runs in your browser: no upload, no sign-up, no watermark. Free.",
+      description:
+        "Reduce a PDF to under 100 KB for job portals, exam forms and government sites. Runs in your browser: no upload, no sign-up, no watermark. Free.",
       intro:
         "Many job, exam and visa portals reject PDFs above 100 KB. This page opens KlipKit's PDF compressor with a 100 KB target already set: drop your file in and it lowers image quality only as much as needed to fit.",
       preset: { targetKB: 100 },

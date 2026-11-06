@@ -25,7 +25,10 @@ export function HeicToJpg({ slug, preset, next }: ToolProps) {
         }
         return out;
       },
-      () => ({ cause: "That file couldn't be read as a HEIC photo.", fix: "Check it's an original .heic/.heif from an iPhone or iPad, not a renamed file." }),
+      () => ({
+        cause: "That file couldn't be read as a HEIC photo.",
+        fix: "Check it's an original .heic/.heif from an iPhone or iPad, not a renamed file.",
+      }),
     );
 
   return (
@@ -34,7 +37,13 @@ export function HeicToJpg({ slug, preset, next }: ToolProps) {
       progress={job.progress}
       error={job.error}
       input={
-        <Dropzone accept=".heic,.heif,image/heic,image/heif" multiple maxFileMb={50} onFiles={(f) => (setFiles(f.slice(0, 100)), job.reset())} hint={files.length ? `${files.length} photo(s) selected` : "HEIC or HEIF · up to 100 photos"} />
+        <Dropzone
+          accept=".heic,.heif,image/heic,image/heif"
+          multiple
+          maxFileMb={50}
+          onFiles={(f) => (setFiles(f.slice(0, 100)), job.reset())}
+          hint={files.length ? `${files.length} photo(s) selected` : "HEIC or HEIF · up to 100 photos"}
+        />
       }
       settings={
         <Field label="Convert to">
@@ -50,7 +59,8 @@ export function HeicToJpg({ slug, preset, next }: ToolProps) {
         job.result && (
           <div className="space-y-3">
             <p className="text-sm">
-              Converted {job.result.length} photo{job.result.length > 1 && "s"} · {formatBytes(job.result.reduce((s, a) => s + (a.blob?.size ?? 0), 0))}
+              Converted {job.result.length} photo{job.result.length > 1 && "s"} ·{" "}
+              {formatBytes(job.result.reduce((s, a) => s + (a.blob?.size ?? 0), 0))}
             </p>
             <ResultActions items={job.result} next={next} from={slug} />
           </div>

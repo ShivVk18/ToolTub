@@ -12,9 +12,15 @@ function entries() {
   }
   for (const h of hubs) map.set(h.id, { title: h.h1, sub: h.description });
   for (const c of chains.filter(isChainLive)) map.set(`chain-${c.slug}`, { title: c.name, sub: c.description });
-  map.set("home", { title: "Free online tools that run on your device", sub: "PDFs, images, code and video. No sign-up, no uploads, no clutter." });
+  map.set("home", {
+    title: "Free online tools that run on your device",
+    sub: "PDFs, images, code and video. No sign-up, no uploads, no clutter.",
+  });
   map.set("about", { title: "About KlipKit", sub: "Independent, self-hosted, free online tools." });
-  map.set("privacy", { title: "Privacy, in plain language", sub: "On your device first. Our own servers only when needed. Deleted within 1 hour." });
+  map.set("privacy", {
+    title: "Privacy, in plain language",
+    sub: "On your device first. Our own servers only when needed. Deleted within 1 hour.",
+  });
   map.set("licences", { title: "Open-source licences", sub: "Every library and model KlipKit uses, all self-hosted." });
   return map;
 }
@@ -27,19 +33,41 @@ export async function GET(_: Request, { params }: { params: Promise<{ file: stri
   const e = entries().get((await params).file.replace(/\.png$/, ""));
   if (!e) return new Response("Not found", { status: 404 });
   return new ImageResponse(
-    (
-      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", padding: 72, background: "#0B0B0F", color: "#EDEDF0" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 16, fontSize: 32, fontWeight: 600 }}>
-          <div style={{ width: 48, height: 48, borderRadius: 10, background: "#EDEDF0", color: "#0B0B0F", display: "flex", alignItems: "center", justifyContent: "center" }}>K</div>
-          KlipKit
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        padding: 72,
+        background: "#0B0B0F",
+        color: "#EDEDF0",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 16, fontSize: 32, fontWeight: 600 }}>
+        <div
+          style={{
+            width: 48,
+            height: 48,
+            borderRadius: 10,
+            background: "#EDEDF0",
+            color: "#0B0B0F",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          K
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-          <div style={{ fontSize: 76, fontWeight: 700, lineHeight: 1.05 }}>{e.title}</div>
-          <div style={{ fontSize: 32, color: "#9A9AA6", maxWidth: 1000 }}>{e.sub}</div>
-        </div>
-        <div style={{ display: "flex", fontSize: 26, color: "#34D399" }}>Runs on your device · No sign-up · Free</div>
+        KlipKit
       </div>
-    ),
+      <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+        <div style={{ fontSize: 76, fontWeight: 700, lineHeight: 1.05 }}>{e.title}</div>
+        <div style={{ fontSize: 32, color: "#9A9AA6", maxWidth: 1000 }}>{e.sub}</div>
+      </div>
+      <div style={{ display: "flex", fontSize: 26, color: "#34D399" }}>Runs on your device · No sign-up · Free</div>
+    </div>,
     { width: 1200, height: 630 },
   );
 }

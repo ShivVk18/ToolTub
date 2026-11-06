@@ -17,7 +17,11 @@ export default defineConfig({
   fullyParallel: true,
   workers: process.env.CI ? 2 : 4,
   retries: process.env.CI ? 1 : 0,
-  reporter: [["list"], ["html", { open: "never", outputFolder: "playwright-report" }], ["json", { outputFile: "test-results/results.json" }]],
+  reporter: [
+    ["list"],
+    ["html", { open: "never", outputFolder: "playwright-report" }],
+    ["json", { outputFile: "test-results/results.json" }],
+  ],
   use: { baseURL: `http://127.0.0.1:${PORT}`, trace: "retain-on-failure", acceptDownloads: true },
   webServer: {
     command: "node scripts/start-standalone.mjs",
@@ -34,10 +38,26 @@ export default defineConfig({
   },
   projects: [
     // Platform-wide, single-browser checks (SEO, links, API security, server tools, offline).
-    { name: "platform", testMatch: /(seo|links|api|server-tools|offline|lighthouse-urls)\.spec\.ts/, use: { ...devices["Desktop Chrome"] } },
-    { name: "chromium", testIgnore: /(seo|links|api|server-tools|offline)\.spec\.ts/, use: { ...devices["Desktop Chrome"] } },
-    { name: "firefox", testIgnore: /(seo|links|api|server-tools|offline)\.spec\.ts/, use: { ...devices["Desktop Firefox"] } },
-    { name: "webkit", testIgnore: /(seo|links|api|server-tools|offline)\.spec\.ts/, use: { ...devices["Desktop Safari"] } },
+    {
+      name: "platform",
+      testMatch: /(seo|links|api|server-tools|offline|lighthouse-urls)\.spec\.ts/,
+      use: { ...devices["Desktop Chrome"] },
+    },
+    {
+      name: "chromium",
+      testIgnore: /(seo|links|api|server-tools|offline)\.spec\.ts/,
+      use: { ...devices["Desktop Chrome"] },
+    },
+    {
+      name: "firefox",
+      testIgnore: /(seo|links|api|server-tools|offline)\.spec\.ts/,
+      use: { ...devices["Desktop Firefox"] },
+    },
+    {
+      name: "webkit",
+      testIgnore: /(seo|links|api|server-tools|offline)\.spec\.ts/,
+      use: { ...devices["Desktop Safari"] },
+    },
     { name: "mobile-pixel7", testMatch: /\/(tools|platform)\.spec\.ts$/, use: { ...devices["Pixel 7"] } },
     { name: "mobile-iphone14", testMatch: /\/(tools|platform)\.spec\.ts$/, use: { ...devices["iPhone 14"] } },
   ],

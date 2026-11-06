@@ -16,21 +16,24 @@ export function useToolRun<T>() {
   const [error, setError] = useState<RunError | null>(null);
   const [result, setResult] = useState<T | null>(null);
 
-  const run = useCallback(async (fn: (onProgress: typeof setProgress) => Promise<T>, toError?: (e: Error) => RunError) => {
-    setStatus("working");
-    setError(null);
-    setProgress(null);
-    try {
-      const r = await fn(setProgress);
-      setResult(r);
-      setStatus("done");
-      return r;
-    } catch (e) {
-      const err = e instanceof Error ? e : new Error(String(e));
-      setError(toError?.(err) ?? { cause: err.message });
-      setStatus("error");
-    }
-  }, []);
+  const run = useCallback(
+    async (fn: (onProgress: typeof setProgress) => Promise<T>, toError?: (e: Error) => RunError) => {
+      setStatus("working");
+      setError(null);
+      setProgress(null);
+      try {
+        const r = await fn(setProgress);
+        setResult(r);
+        setStatus("done");
+        return r;
+      } catch (e) {
+        const err = e instanceof Error ? e : new Error(String(e));
+        setError(toError?.(err) ?? { cause: err.message });
+        setStatus("error");
+      }
+    },
+    [],
+  );
 
   const reset = useCallback(() => {
     setStatus("idle");
@@ -64,26 +67,54 @@ export interface ToolWorkspaceProps {
  */
 const noop = () => () => {};
 /** false during server render and hydration, true once React is interactive. */
-const useInteractive = () => useSyncExternalStore(noop, () => true, () => false);
+const useInteractive = () =>
+  useSyncExternalStore(
+    noop,
+    () => true,
+    () => false,
+  );
 
-export function ToolWorkspace({ input, settings, advanced, action, status, progress, error, result }: ToolWorkspaceProps) {
+export function ToolWorkspace({
+  input,
+  settings,
+  advanced,
+  action,
+  status,
+  progress,
+  error,
+  result,
+}: ToolWorkspaceProps) {
   // The tool is server-rendered, so on a slow connection it is visible before JavaScript runs. A file
   // picked, text typed or option changed in that window was silently lost (React reset it on hydration).
   // A disabled <fieldset> blocks every control until the page is interactive, with no layout shift.
   const interactive = useInteractive();
   return (
-    <section aria-label="Tool" data-ready={interactive ? "" : undefined} aria-busy={!interactive} className="rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-6">
+    <section
+      aria-label="Tool"
+      data-ready={interactive ? "" : undefined}
+      aria-busy={!interactive}
+      className="rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-6"
+    >
       <fieldset disabled={!interactive} className="min-w-0 space-y-5">
         {input}
         {settings && <div className="flex flex-wrap items-end gap-4">{settings}</div>}
         {advanced && (
           <details className="group rounded-lg border border-border px-4 py-2 text-sm">
-            <summary className="cursor-pointer select-none text-fg-muted py-2 min-h-[44px] flex items-center">Advanced options</summary>
+            <summary className="cursor-pointer select-none text-fg-muted py-2 min-h-[44px] flex items-center">
+              Advanced options
+            </summary>
             <div className="flex flex-wrap items-end gap-4 py-3">{advanced}</div>
           </details>
         )}
         {action && (
-          <Button data-testid="primary-action" variant="primary" size="lg" className="w-full sm:w-auto" onClick={action.onClick} disabled={action.disabled || status === "working"}>
+          <Button
+            data-testid="primary-action"
+            variant="primary"
+            size="lg"
+            className="w-full sm:w-auto"
+            onClick={action.onClick}
+            disabled={action.disabled || status === "working"}
+          >
             {status === "working" && <Loader2 className="size-4 animate-spin" aria-hidden />}
             {action.label}
           </Button>
@@ -94,7 +125,11 @@ export function ToolWorkspace({ input, settings, advanced, action, status, progr
               <p className="text-sm text-fg-muted">{progress?.label ?? "Working on your device…"}</p>
               <div className="h-1.5 overflow-hidden rounded-full bg-muted">
                 <div
-                  className={progress?.ratio === undefined ? "h-full w-1/3 animate-pulse rounded-full bg-fg" : "h-full rounded-full bg-fg transition-[width]"}
+                  className={
+                    progress?.ratio === undefined
+                      ? "h-full w-1/3 animate-pulse rounded-full bg-fg"
+                      : "h-full rounded-full bg-fg transition-[width]"
+                  }
                   style={progress?.ratio !== undefined ? { width: `${Math.round(progress.ratio * 100)}%` } : undefined}
                 />
               </div>
@@ -125,4 +160,5 @@ export function Field({ label, children }: { label: string; children: ReactNode 
   );
 }
 
-export const inputClass = "h-11 sm:h-10 rounded-lg border border-border bg-bg px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring";
+export const inputClass =
+  "h-11 sm:h-10 rounded-lg border border-border bg-bg px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring";

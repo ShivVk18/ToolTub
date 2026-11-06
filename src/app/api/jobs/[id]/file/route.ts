@@ -13,7 +13,11 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
   try {
     const data = await readFile(join(JOBS_DIR, id, `output.${spec.outExt}`));
     return new Response(new Uint8Array(data), {
-      headers: { "Content-Type": spec.outType, "Content-Disposition": `attachment; filename="converted.${spec.outExt}"`, "Cache-Control": "no-store" },
+      headers: {
+        "Content-Type": spec.outType,
+        "Content-Disposition": `attachment; filename="converted.${spec.outExt}"`,
+        "Cache-Control": "no-store",
+      },
     });
   } catch {
     return new Response("This file has expired and been deleted.", { status: 410 });

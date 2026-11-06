@@ -39,7 +39,12 @@ export const breadcrumb = (items: { name: string; path: string }[]) => ({
   itemListElement: items.map((it, i) => ({ "@type": "ListItem", position: i + 1, name: it.name, item: abs(it.path) })),
 });
 
-export const toolGraph = (t: ToolDefinition, hub: HubMeta, path = `/${t.slug}`, faqsOverride?: { q: string; a: string }[]) => {
+export const toolGraph = (
+  t: ToolDefinition,
+  hub: HubMeta,
+  path = `/${t.slug}`,
+  faqsOverride?: { q: string; a: string }[],
+) => {
   const s = t.seo!;
   const url = abs(path);
   const reviewer = people[s.reviewedBy];
@@ -77,7 +82,11 @@ export const toolGraph = (t: ToolDefinition, hub: HubMeta, path = `/${t.slug}`, 
       },
       {
         "@type": "FAQPage",
-        mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+        mainEntity: faqs.map((f) => ({
+          "@type": "Question",
+          name: f.q,
+          acceptedAnswer: { "@type": "Answer", text: f.a },
+        })),
       },
     ],
   };
@@ -93,7 +102,12 @@ export const hubGraph = (hub: HubMeta, items: ToolDefinition[]) => ({
     {
       "@type": "ItemList",
       name: hub.h1,
-      itemListElement: items.map((t, i) => ({ "@type": "ListItem", position: i + 1, name: t.name, url: abs(`/${t.slug}`) })),
+      itemListElement: items.map((t, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        name: t.name,
+        url: abs(`/${t.slug}`),
+      })),
     },
   ],
 });

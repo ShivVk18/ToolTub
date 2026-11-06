@@ -1,5 +1,18 @@
 import { test, expect } from "@playwright/test";
-import { assertAccessible, assertMobileFriendly, downloadFrom, fx, guard, inspectImage, output, primary, upload, workspace, alert, byTestId } from "./helpers";
+import {
+  assertAccessible,
+  assertMobileFriendly,
+  downloadFrom,
+  fx,
+  guard,
+  inspectImage,
+  output,
+  primary,
+  upload,
+  workspace,
+  alert,
+  byTestId,
+} from "./helpers";
 
 test.describe("homepage", () => {
   test("renders all sections with no console errors or hydration warnings", async ({ page }) => {
@@ -23,13 +36,19 @@ test.describe("homepage", () => {
   });
   test("no link to a tool that doesn't work", async ({ page, request }) => {
     await page.goto("/");
-    const hrefs = await page.locator("main a[href^='/']").evaluateAll((as) => [...new Set(as.map((a) => a.getAttribute("href")!))]);
+    const hrefs = await page
+      .locator("main a[href^='/']")
+      .evaluateAll((as) => [...new Set(as.map((a) => a.getAttribute("href")!))]);
     for (const h of hrefs) expect((await request.get(h)).status(), h).toBe(200);
   });
 });
 
 test.describe("search (Cmd/Ctrl+K)", () => {
-  test("opens with the shortcut, finds synonyms, navigates with the keyboard", async ({ page, browserName, isMobile }) => {
+  test("opens with the shortcut, finds synonyms, navigates with the keyboard", async ({
+    page,
+    browserName,
+    isMobile,
+  }) => {
     test.skip(isMobile, "keyboard shortcut is a desktop feature");
     await page.goto("/");
     await page.keyboard.press(browserName === "webkit" ? "Meta+k" : "Control+k");
@@ -61,7 +80,9 @@ test.describe("recents, favourites, theme", () => {
     await expect(page.getByRole("heading", { name: "Favourites" })).toBeAttached();
     await expect(page.getByRole("heading", { name: "Recently used" })).toBeAttached();
     await page.reload();
-    await expect(page.locator("section", { has: page.getByRole("heading", { name: "Favourites" }) })).toContainText("JSON Formatter");
+    await expect(page.locator("section", { has: page.getByRole("heading", { name: "Favourites" }) })).toContainText(
+      "JSON Formatter",
+    );
     await page.goto("/json-formatter");
     await expect(page.getByRole("button", { name: "Remove from favourites" })).toBeVisible();
   });
@@ -75,7 +96,11 @@ test.describe("recents, favourites, theme", () => {
   });
   test("works when localStorage is blocked (private mode)", async ({ page }) => {
     await page.addInitScript(() => {
-      Object.defineProperty(window, "localStorage", { get() { throw new DOMException("blocked", "SecurityError"); } });
+      Object.defineProperty(window, "localStorage", {
+        get() {
+          throw new DOMException("blocked", "SecurityError");
+        },
+      });
     });
     const errors: string[] = [];
     page.on("pageerror", (e) => errors.push(e.message));
@@ -86,9 +111,19 @@ test.describe("recents, favourites, theme", () => {
   });
   test("dark theme persists and is applied before first paint", async ({ page }) => {
     await page.goto("/");
-    await page.getByRole("button", { name: /toggle (theme|dark mode)/i }).first().click();
+    await page
+      .getByRole("button", { name: /toggle (theme|dark mode)/i })
+      .first()
+      .click();
     await expect(page.locator("html")).toHaveClass(/dark/);
-    await page.addInitScript(() => document.addEventListener("DOMContentLoaded", () => ((window as unknown as { __darkAtDcl: boolean }).__darkAtDcl = document.documentElement.classList.contains("dark"))));
+    await page.addInitScript(() =>
+      document.addEventListener(
+        "DOMContentLoaded",
+        () =>
+          ((window as unknown as { __darkAtDcl: boolean }).__darkAtDcl =
+            document.documentElement.classList.contains("dark")),
+      ),
+    );
     await page.reload();
     expect(await page.evaluate(() => (window as unknown as { __darkAtDcl: boolean }).__darkAtDcl)).toBe(true);
   });

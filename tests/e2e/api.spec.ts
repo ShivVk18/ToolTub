@@ -24,11 +24,13 @@ test("vendored engines and models are served with long-lived caching from our ow
 });
 
 test("no secrets or server config in client bundles; .env is not committed", () => {
-  const walk = (d: string): string[] => readdirSync(d).flatMap((f) => (statSync(join(d, f)).isDirectory() ? walk(join(d, f)) : [join(d, f)]));
+  const walk = (d: string): string[] =>
+    readdirSync(d).flatMap((f) => (statSync(join(d, f)).isDirectory() ? walk(join(d, f)) : [join(d, f)]));
   const files = walk(".next/static").filter((f) => f.endsWith(".js"));
   for (const f of files) {
     const s = readFileSync(f, "utf8");
-    for (const needle of ["RATE_LIMIT_SALT", "VALKEY_URL", "redis://", "UMAMI_SECRET", "JOBS_DIR"]) expect(s.includes(needle), `${needle} in ${f}`).toBe(false);
+    for (const needle of ["RATE_LIMIT_SALT", "VALKEY_URL", "redis://", "UMAMI_SECRET", "JOBS_DIR"])
+      expect(s.includes(needle), `${needle} in ${f}`).toBe(false);
   }
   const tracked = execSync("git ls-files", { encoding: "utf8" }).split("\n");
   expect(tracked.filter((f) => /(^|\/)\.env($|\.local|\.production)/.test(f))).toEqual([]);

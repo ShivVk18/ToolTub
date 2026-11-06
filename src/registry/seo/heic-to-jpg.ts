@@ -3,10 +3,17 @@ import { loc } from "./shared";
 
 export const heicToJpg: ToolSEO = {
   primaryKeyword: "heic to jpg",
-  secondaryKeywords: ["heic converter", "convert iphone photo to jpg", "heic to jpg on windows", "heic to png", "open heic file"],
+  secondaryKeywords: [
+    "heic converter",
+    "convert iphone photo to jpg",
+    "heic to jpg on windows",
+    "heic to png",
+    "open heic file",
+  ],
   searchIntent: "do",
   title: "HEIC to JPG Converter – Free, No Upload | KlipKit",
-  description: "Convert iPhone HEIC photos to JPG or PNG free, right in your browser. Batch convert with no upload, no sign-up and no app install. Works on Windows and Android.",
+  description:
+    "Convert iPhone HEIC photos to JPG or PNG free, right in your browser. Batch convert with no upload, no sign-up and no app install. Works on Windows and Android.",
   ogTitle: "HEIC to JPG — convert iPhone photos privately",
   ogDescription: "Batch-convert HEIC photos to JPG or PNG in your browser. Nothing is uploaded.",
   ogAlt: "KlipKit HEIC to JPG converter turning three iPhone photos into JPG files",
@@ -65,7 +72,13 @@ export const heicToJpg: ToolSEO = {
   },
   explainer:
     "HEIC uses the HEVC video codec to compress still images, which is why it is so efficient. Apple adopted it to save storage, but support outside Apple's ecosystem is still patchy: many Windows apps, web upload forms and older Android phones reject it.\n\nConvert to JPG when you need to email photos, upload them to a website, or open them on a Windows PC. Convert to PNG only when you plan to edit the photo and want no extra compression loss.\n\nCommon mistakes: renaming .heic to .jpg, which does not convert the file and makes it unreadable; uploading private photos to converter sites that keep copies; and converting Live Photos expecting video, which only gives you the still frame.\n\nIf you convert photos often, consider changing your iPhone's camera format to Most Compatible, or use AirDrop and the Mac Photos export option, which also produce JPG. For occasional photos sent from a Windows PC or an Android phone, a browser-based converter is the quickest option and needs no software.",
-  featureList: ["Batch convert up to 100 HEIC photos", "JPG or PNG output", "Removes GPS location and metadata", "Processed in your browser", "No app install"],
+  featureList: [
+    "Batch convert up to 100 HEIC photos",
+    "JPG or PNG output",
+    "Removes GPS location and metadata",
+    "Processed in your browser",
+    "No app install",
+  ],
   llmsLine: "HEIC to JPG: convert iPhone HEIC/HEIF photos to JPG or PNG in the browser (no upload), batch supported.",
   longTailVariants: [
     {
@@ -73,7 +86,8 @@ export const heicToJpg: ToolSEO = {
       keyword: "heic to jpg windows",
       h1: "Convert HEIC to JPG on Windows",
       title: "Convert HEIC to JPG on Windows 10 & 11 – Free | KlipKit",
-      description: "Open and convert iPhone HEIC photos on Windows 10 and 11 without installing codecs or apps. Free and private: it runs in your browser, nothing is uploaded.",
+      description:
+        "Open and convert iPhone HEIC photos on Windows 10 and 11 without installing codecs or apps. Free and private: it runs in your browser, nothing is uploaded.",
       intro:
         "Windows does not open iPhone HEIC photos out of the box. Instead of installing codecs, drop the photos here: KlipKit converts them to JPG in your browser, so they open in every Windows app.",
       preset: { format: "jpeg" },
