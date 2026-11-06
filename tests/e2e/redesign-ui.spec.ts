@@ -355,6 +355,26 @@ test.describe("KlipKit Redesign UI & Visual Layer", () => {
     expect(await cmp.evaluate((el) => el.clientHeight)).toBe(46);
   });
 
+  test("bento cards don't grow when they scroll into view (no layout shift)", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+    const h = () => page.evaluate(() => Math.round(document.getElementById("bento")!.getBoundingClientRect().height));
+    const before = await h();
+    await page.evaluate(() => document.getElementById("bento")!.scrollIntoView());
+    await page.waitForTimeout(2500);
+    expect(Math.abs((await h()) - before)).toBeLessThanOrEqual(2);
+  });
+
+  test("bento demos show content under reduced motion", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    await page.evaluate(() => document.getElementById("bento")!.scrollIntoView());
+    await page.waitForTimeout(800);
+    await expect(page.locator("#bdText")).not.toBeEmpty();
+    await expect(page.locator("#bpCode")).not.toBeEmpty();
+  });
+
   test("prefers-reduced-motion turns off continuous animations", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");

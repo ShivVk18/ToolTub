@@ -2575,13 +2575,20 @@ h1 {
   color: var(--ink2);
   min-height: 56px;
 }
+/* Bento demo tiles carry small white labels; a 28% inner shade keeps the category hue while meeting
+   WCAG AA (red 3.9 → ~6.7:1, amber 2.7 → ~4.9:1). Deliberate difference from the reference. */
+#bento .ftile {
+  /* !important: the tile colour is an inline `background` shorthand, which would reset the overlay. */
+  background-image: linear-gradient(rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0.28)) !important;
+}
 #bpDet {
   display: flex;
   align-items: center;
   gap: 10px;
   margin-top: 14px;
   font-size: 15px;
-  color: var(--muted);
+  /* --muted on white is 4.39:1; --ink2 meets WCAG AA (same choice as the other small muted text). */
+  color: var(--ink2);
 }
 #bpDet b {
   color: var(--ink);
