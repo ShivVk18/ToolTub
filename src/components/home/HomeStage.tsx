@@ -1,5 +1,6 @@
 "use client";
 
+import { setTheme } from "@/lib/theme";
 import React, { useEffect, useRef, useState } from "react";
 import { Orb, type OrbController } from "./Orb";
 import { Hero } from "./Hero";
@@ -15,6 +16,7 @@ import { SAMPLES, fromFile, meta as metaFile, type FileInfo, KINDS } from "@/lib
 import { type ToolItem, CATS, tint, TOOL_ICON_PATHS, TOOLS, toolBySlug } from "@/lib/designTools";
 import { tween, wait, ease, ripple, goto, addLoop, initMagneticButtons } from "@/lib/motion/animation";
 import { useUIStore } from "@/lib/store/ui";
+import { useKlip } from "@/lib/store/klip";
 import { pasteItem, type PasteItem, looksLikeContent } from "@/lib/engines/detect";
 import { PT_TILE, PT_COLOR } from "@/lib/actions";
 import { esc } from "@/lib/engines/text";
@@ -130,13 +132,7 @@ export function HomeStage() {
     orbControllerRef.current?.triggerGulp(1);
     ripple(targetX, targetY, orbRect.width * 1.05);
 
-    // Save recent
-    try {
-      const stored = localStorage.getItem("kk.recents");
-      const r: string[] = stored ? JSON.parse(stored) : [];
-      const updated = [f.name, ...r.filter((x) => x !== f.name)].slice(0, 5);
-      localStorage.setItem("kk.recents", JSON.stringify(updated));
-    } catch {}
+    useKlip.getState().addRecentFile(f.name);
 
     await wait(260);
   };
@@ -428,6 +424,23 @@ export function HomeStage() {
     }
   };
 
+  // Actions other components (voice sheet, palette) can trigger, via the UI store.
+  // Registered once with stable wrappers; the ref always points at this render's handlers.
+  const latest = useRef({ voice: () => runVoiceDemo() });
+  latest.current = { voice: () => runVoiceDemo() };
+  useEffect(() => {
+    useUIStore.getState().setHomeActions({
+      voice: () => latest.current.voice(),
+      clearInput: () => {
+        setCurrentFile(null);
+        setCurrentPaste(null);
+      },
+    });
+    return () => useUIStore.getState().setHomeActions(null);
+  }, []);
+
+  // Test hook with the same API as the reference prototype's window.__kk (used by scripts/visual-compare.ts).
+  // App code must not call it; use the UI store instead.
   useEffect(() => {
     if (typeof window === "undefined") return;
     (window as unknown as Record<string, unknown>).__kk = {
@@ -459,15 +472,7 @@ export function HomeStage() {
       goto,
       openPal: () => openPalette(),
       closePal: () => useUIStore.getState().closePalette(),
-      setTheme: (t: "light" | "dark") => {
-        document.documentElement.dataset.theme = t;
-        if (t === "dark") document.documentElement.classList.add("dark");
-        else document.documentElement.classList.remove("dark");
-        try {
-          localStorage.setItem("theme", t);
-          localStorage.setItem("kk.theme", JSON.stringify(t));
-        } catch {}
-      },
+      setTheme: (t: "light" | "dark") => setTheme(t),
       state: { mode, file: currentFile, paste: currentPaste },
     };
   }, [mode, currentFile, currentPaste, voiceDemoText, openPanel, closePanel]);

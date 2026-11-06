@@ -3,7 +3,17 @@
 import { create } from "zustand";
 import type { ToolItem } from "../designTools";
 
+/** Home-stage actions other components may trigger (registered by HomeStage while it is mounted). */
+export interface HomeActions {
+  /** Run the Pro voice demo. */
+  voice: () => void;
+  /** Drop the currently loaded file or paste. */
+  clearInput: () => void;
+}
+
 interface UIState {
+  homeActions: HomeActions | null;
+  setHomeActions: (a: HomeActions | null) => void;
   isPaletteOpen: boolean;
   isVoiceSheetOpen: boolean;
   activeTool: ToolItem | null;
@@ -21,6 +31,8 @@ interface UIState {
 }
 
 export const useUIStore = create<UIState>((set) => ({
+  homeActions: null,
+  setHomeActions: (homeActions) => set({ homeActions }),
   isPaletteOpen: false,
   isVoiceSheetOpen: false,
   activeTool: null,

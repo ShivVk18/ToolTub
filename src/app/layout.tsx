@@ -3,7 +3,7 @@ import Script from "next/script";
 import localFont from "next/font/local";
 import "../styles/globals.css";
 import { Footer, Header } from "@/components/layout/Header";
-import { themeScript } from "@/components/layout/ThemeToggle";
+import { themeScript } from "@/lib/theme";
 import { AuroraBackground } from "@/components/layout/AuroraBackground";
 import { GlobalModals } from "@/components/layout/GlobalModals";
 import { CommandPalette } from "@/components/search/CommandPalette";

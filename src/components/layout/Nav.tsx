@@ -1,5 +1,6 @@
 "use client";
 
+import { readTheme, setTheme } from "@/lib/theme";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { goto, ripple, addLoop, clamp } from "@/lib/motion/animation";
@@ -14,14 +15,7 @@ export function Nav({ onOpenSearch, onOpenPro, isHome = true }: NavProps) {
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
-    try {
-      const storedTheme = localStorage.getItem("theme") || localStorage.getItem("kk.theme");
-      const isDarkTheme =
-        storedTheme === "dark" ||
-        storedTheme === '"dark"' ||
-        (!storedTheme && window.matchMedia("(prefers-color-scheme: dark)").matches);
-      setIsDark(isDarkTheme);
-    } catch {}
+    setIsDark(readTheme() === "dark");
   }, []);
 
   // Track scroll progress and capsule morph
@@ -47,24 +41,8 @@ export function Nav({ onOpenSearch, onOpenPro, isHome = true }: NavProps) {
 
     const next = !isDark;
     setIsDark(next);
-    const themeStr = next ? "dark" : "light";
 
-    document.documentElement.classList.add("theming");
-    document.documentElement.dataset.theme = themeStr;
-    if (next) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-
-    try {
-      localStorage.setItem("theme", themeStr);
-      localStorage.setItem("kk.theme", JSON.stringify(themeStr));
-    } catch {}
-
-    setTimeout(() => {
-      document.documentElement.classList.remove("theming");
-    }, 800);
+    setTheme(next ? "dark" : "light", { animate: true });
   };
 
   const handleNavClick = (sectionId: string) => {

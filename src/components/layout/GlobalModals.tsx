@@ -17,9 +17,7 @@ export function GlobalModals() {
         onClose={closeVoiceSheet}
         onTryVoiceDemo={() => {
           closeVoiceSheet();
-          if (typeof window !== "undefined" && (window as any).__kk?.voice) {
-            (window as any).__kk.voice();
-          }
+          useUIStore.getState().homeActions?.voice();
         }}
         onSeePlans={() => {
           closeVoiceSheet();

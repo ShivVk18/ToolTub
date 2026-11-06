@@ -1,5 +1,6 @@
 "use client";
 
+import { useKlip } from "@/lib/store/klip";
 import React, { useEffect, useState, useRef, useLayoutEffect } from "react";
 import { KINDS, SAMPLES } from "@/lib/fileKind";
 import { genParse } from "@/lib/engines/generators";
@@ -30,7 +31,6 @@ export function Hero({ onPickSample, onOrbSlotClick, onPasteText, onSubmitAsk, h
   const [askValue, setAskValue] = useState("");
   const [placeholder, setPlaceholder] = useState("Try “generate 10 UUIDs” — or paste anything");
   const [mirrorHtml, setMirrorHtml] = useState("");
-  const [recents, setRecents] = useState<string[]>([]);
   const [mounted, setMounted] = useState(false);
 
   const askInputRef = useRef<HTMLInputElement>(null);
@@ -38,19 +38,12 @@ export function Hero({ onPickSample, onOrbSlotClick, onPasteText, onSubmitAsk, h
   const squigRef = useRef<SVGSVGElement>(null);
   const squigPathRef = useRef<SVGPathElement>(null);
 
-  // Load recents strictly client-only after mount (B8, B5)
+  // Recents come from the persisted store but render only after mount, so server and client HTML match (B5, B8).
+  const recentFiles = useKlip((st) => st.recentFiles);
   useEffect(() => {
     setMounted(true);
-    try {
-      const stored = localStorage.getItem("kk.recents");
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed)) {
-          setRecents(parsed.slice(0, 3));
-        }
-      }
-    } catch {}
   }, []);
+  const recents = mounted ? recentFiles.slice(0, 3) : [];
 
   // Hand-drawn squiggle underline placement
   const placeSquiggle = () => {

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { SearchEntry } from "@/registry/search-index";
 import { useKlip } from "@/lib/store/klip";
+import { useUIStore } from "@/lib/store/ui";
 import { cn } from "@/lib/utils";
 import { createToolSearch } from "@/lib/search";
 import { CATS, tint, TOOL_ICON_PATHS } from "@/lib/designTools";
@@ -68,9 +69,8 @@ export function CommandPalette({ index }: { index: SearchEntry[] }) {
   const go = (e?: SearchEntry) => {
     if (!e?.available) return;
     setOpen(false);
-    // If on homepage and __kk exists, we can open in workspace, or navigate
     // On the home page, drop any loaded file before navigating to the tool page.
-    if (window.location.pathname === "/" && (window as any).__kk) (window as any).__kk.state.file = null;
+    useUIStore.getState().homeActions?.clearInput();
     router.push(`/${e.slug}`);
   };
 
