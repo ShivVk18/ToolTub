@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import { mkdtempSync, mkdirSync, existsSync, utimesSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-// @ts-expect-error — plain ESM module from the worker package
 import { sweep } from "../../worker/src/sweep.mjs";
 
 describe("worker sweeper", () => {
