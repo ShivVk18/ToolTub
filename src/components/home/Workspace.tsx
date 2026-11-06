@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState, useCallback } from "react";
 import {
   type FileInfo,
   KINDS,
@@ -75,6 +75,18 @@ export function Workspace({
 
   const threadRef = useRef<HTMLDivElement>(null);
   const cmpRef = useRef<HTMLTextAreaElement>(null);
+
+  // Grow the composer with its text, like the reference: reset to one line, then fit (max 140 px).
+  useLayoutEffect(() => {
+    const el = cmpRef.current;
+    if (!el) return;
+    el.style.overflowY = "hidden";
+    el.style.height = "46px";
+    // Empty: stay one line (Chrome counts the wrapped placeholder in scrollHeight).
+    if (!inputText) return;
+    el.style.height = `${Math.min(140, el.scrollHeight)}px`;
+    if (el.scrollHeight > 140) el.style.overflowY = "auto";
+  }, [inputText]);
   const mirrorRef = useRef<HTMLDivElement>(null);
   const currentFileRef = useRef<FileInfo | null>(file);
   const currentPasteRef = useRef<PasteItem | null>(pasteData || null);

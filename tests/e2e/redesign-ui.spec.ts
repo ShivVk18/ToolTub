@@ -339,6 +339,22 @@ test.describe("KlipKit Redesign UI & Visual Layer", () => {
     expect(app).toEqual(ref);
   });
 
+  test("composer grows with its text on a phone (up to 140 px)", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/");
+    await page.locator('#samples [data-sample="pdf"]').click();
+    const cmp = page.locator("#cmp");
+    await expect(cmp).toBeVisible();
+    await cmp.fill("compress to under 2 mb and split pages 1-5");
+    const m = await cmp.evaluate((el) => ({ h: el.clientHeight, sh: el.scrollHeight }));
+    expect(m.h).toBeGreaterThan(46);
+    expect(m.h).toBeGreaterThanOrEqual(m.sh); // nothing scrolled out of view
+    await cmp.fill("x\n".repeat(12));
+    expect(await cmp.evaluate((el) => el.clientHeight)).toBe(140);
+    await cmp.fill("");
+    expect(await cmp.evaluate((el) => el.clientHeight)).toBe(46);
+  });
+
   test("prefers-reduced-motion turns off continuous animations", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
