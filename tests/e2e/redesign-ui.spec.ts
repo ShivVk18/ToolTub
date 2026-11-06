@@ -368,6 +368,7 @@ test.describe("KlipKit Redesign UI & Visual Layer", () => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
     const h = () => page.evaluate(() => Math.round(document.getElementById("bento")!.getBoundingClientRect().height));
+    await page.evaluate(() => document.fonts.ready); // a late font swap changes heights for reasons unrelated to this test
     const before = await h();
     await page.evaluate(() => document.getElementById("bento")!.scrollIntoView());
     await page.waitForTimeout(2500);
@@ -434,6 +435,21 @@ test.describe("KlipKit Redesign UI & Visual Layer", () => {
     await page.locator("#grid button", { hasText: "Compress PDF" }).click();
     await expect(page).toHaveURL(/\/compress-pdf$/);
   });
+
+  for (const width of [1440, 1100, 390]) {
+    test(`F6: the privacy card's lock ring doesn't cover its label at ${width}px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto("/");
+      const card = page.locator(".b-priv");
+      await card.scrollIntoViewIfNeeded();
+      const overlap = await card.evaluate((el) => {
+        const a = el.querySelector(".tagl")!.getBoundingClientRect();
+        const b = el.querySelector(".lockw .ring")!.getBoundingClientRect();
+        return !(a.right <= b.left || b.right <= a.left || a.bottom <= b.top || b.bottom <= a.top);
+      });
+      expect(overlap).toBe(false);
+    });
+  }
 
   test("prefers-reduced-motion turns off continuous animations", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });

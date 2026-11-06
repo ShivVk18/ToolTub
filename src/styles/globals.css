@@ -2628,7 +2628,8 @@ body.scrolled #nav::before {
 .lockw {
   position: absolute;
   right: 20px;
-  top: 20px;
+  /* Below the label (it covered "PRIVATE BY DESIGN" in the 3-column card), level with the big 0. */
+  top: 56px;
   width: 104px;
   height: 104px;
   display: grid;
