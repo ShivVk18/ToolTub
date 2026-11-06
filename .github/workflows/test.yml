@@ -21,10 +21,8 @@ jobs:
       - name: LibreOffice for server-tool tests
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libreoffice-writer-nogui
       - run: npx playwright install --with-deps chromium firefox webkit
-      - run: npm run lint
-      - run: npx tsc --noEmit
-      - run: npm run test:unit
-      - run: npm run build
+      # typecheck + lint + unit tests + build
+      - run: npm run verify
       # valkey-server/redis-server is not on the runner's PATH, so the server spec would skip; point it at the service instead.
       - run: npx playwright test
         env:

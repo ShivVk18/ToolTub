@@ -1,0 +1,17 @@
+# generated / vendored
+.next/
+out/
+coverage/
+public/vendor/
+public/models/
+playwright-report/
+test-results/
+.lighthouseci/
+tests/fixtures/generated/
+package-lock.json
+# reports and design references are generated or verbatim copies
+reports/
+design/
+docs/
+# reference CSS is ported verbatim from design/reference/KlipKit_UI.html
+src/app/globals.css
