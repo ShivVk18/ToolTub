@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React, { useEffect, useRef, useLayoutEffect } from 'react';
-import { addLoop, clamp, ptr } from '@/lib/animation';
+import React, { useEffect, useRef, useLayoutEffect } from "react";
+import { addLoop, clamp, ptr } from "@/lib/motion/animation";
 
 export interface OrbController {
   setTargetEnergy: (e: number) => void;
@@ -12,7 +12,7 @@ export interface OrbController {
 }
 
 interface OrbProps {
-  mode: 'hero' | 'work';
+  mode: "hero" | "work";
   isDragging?: boolean;
   onOrbClick?: () => void;
   controllerRef?: React.MutableRefObject<OrbController | null>;
@@ -37,7 +37,7 @@ export function Orb({ mode, isDragging = false, onOrbClick, controllerRef }: Orb
     hover: 0,
     gulp: 0,
     lab: 1,
-    labelText: 'Drop here',
+    labelText: "Drop here",
     init: false,
   });
 
@@ -70,9 +70,9 @@ export function Orb({ mode, isDragging = false, onOrbClick, controllerRef }: Orb
   // Measure initial target
   useLayoutEffect(() => {
     const BASE = 360;
-    const stage = document.getElementById('stage');
+    const stage = document.getElementById("stage");
     const orbEl = orbRef.current;
-    const slot = mode === 'work' ? document.getElementById('orbDock') : document.getElementById('orbSlot');
+    const slot = mode === "work" ? document.getElementById("orbDock") : document.getElementById("orbSlot");
     if (!stage || !orbEl || !slot) return;
 
     const sr = stage.getBoundingClientRect();
@@ -90,7 +90,7 @@ export function Orb({ mode, isDragging = false, onOrbClick, controllerRef }: Orb
   }, [mode]);
 
   useEffect(() => {
-    stateRef.current.te = isDragging ? 1 : mode === 'work' ? 0 : 0;
+    stateRef.current.te = isDragging ? 1 : mode === "work" ? 0 : 0;
   }, [isDragging, mode]);
 
   useEffect(() => {
@@ -98,8 +98,8 @@ export function Orb({ mode, isDragging = false, onOrbClick, controllerRef }: Orb
     const O = stateRef.current;
 
     const measureAndInit = () => {
-      const stage = document.getElementById('stage');
-      const slot = mode === 'work' ? document.getElementById('orbDock') : document.getElementById('orbSlot');
+      const stage = document.getElementById("stage");
+      const slot = mode === "work" ? document.getElementById("orbDock") : document.getElementById("orbSlot");
       if (!stage || !slot) return;
       const sr = stage.getBoundingClientRect();
       const r = slot.getBoundingClientRect();
@@ -115,18 +115,18 @@ export function Orb({ mode, isDragging = false, onOrbClick, controllerRef }: Orb
     };
 
     measureAndInit();
-    if (typeof document !== 'undefined' && 'fonts' in document) {
+    if (typeof document !== "undefined" && "fonts" in document) {
       document.fonts.ready.then(measureAndInit);
     }
-    window.addEventListener('resize', measureAndInit);
+    window.addEventListener("resize", measureAndInit);
 
     const cleanup = addLoop((t, dt) => {
-      const stage = document.getElementById('stage');
+      const stage = document.getElementById("stage");
       const orbEl = orbRef.current;
       if (!stage || !orbEl) return;
 
       const sr = stage.getBoundingClientRect();
-      const slot = mode === 'work' ? document.getElementById('orbDock') : document.getElementById('orbSlot');
+      const slot = mode === "work" ? document.getElementById("orbDock") : document.getElementById("orbSlot");
       if (!slot) return;
 
       const r = slot.getBoundingClientRect();
@@ -147,7 +147,7 @@ export function Orb({ mode, isDragging = false, onOrbClick, controllerRef }: Orb
       let ty = targetY;
 
       // Pointer magnet effect in hero mode
-      if (mode === 'hero') {
+      if (mode === "hero") {
         const dx = ptr.x - (targetX + sr.left);
         const dy = ptr.y - (targetY + sr.top);
         const dist = Math.hypot(dx, dy);
@@ -156,8 +156,8 @@ export function Orb({ mode, isDragging = false, onOrbClick, controllerRef }: Orb
         ty += dy * 0.07 * near;
         O.hover += ((dist < targetScale * BASE * 0.6 ? 1 : 0) - O.hover) * Math.min(1, dt * 6);
 
-        orbEl.style.setProperty('--hx', `${34 + clamp(dx / 8, -18, 18)}%`);
-        orbEl.style.setProperty('--hy', `${28 + clamp(dy / 8, -14, 14)}%`);
+        orbEl.style.setProperty("--hx", `${34 + clamp(dx / 8, -18, 18)}%`);
+        orbEl.style.setProperty("--hy", `${28 + clamp(dy / 8, -14, 14)}%`);
       } else {
         O.hover *= 0.9;
       }
@@ -185,28 +185,23 @@ export function Orb({ mode, isDragging = false, onOrbClick, controllerRef }: Orb
 
       const breathe = 1 + 0.018 * Math.sin(t * 1.7) + O.e * 0.09 + O.hover * 0.04 + O.amp * 0.16 + O.gulp * 0.14;
       orbEl.style.transform = `translate(${O.x - BASE / 2}px, ${O.y - BASE / 2}px) scale(${Math.max(0.05, O.s * breathe)})`;
-      orbEl.style.setProperty('--r', O.rot.toFixed(1));
-      orbEl.style.setProperty('--r2', O.rot2.toFixed(1));
+      orbEl.style.setProperty("--r", O.rot.toFixed(1));
+      orbEl.style.setProperty("--r2", O.rot2.toFixed(1));
 
       // Label opacity target
-      const labelTarget = mode === 'hero' || isDragging ? 1 : 0;
+      const labelTarget = mode === "hero" || isDragging ? 1 : 0;
       O.lab += (labelTarget - O.lab) * Math.min(1, dt * 8);
-      orbEl.style.setProperty('--lab', O.lab.toFixed(3));
+      orbEl.style.setProperty("--lab", O.lab.toFixed(3));
     });
 
     return () => {
-      window.removeEventListener('resize', measureAndInit);
+      window.removeEventListener("resize", measureAndInit);
       cleanup();
     };
   }, [mode, isDragging]);
 
   return (
-    <div
-      ref={orbRef}
-      id="orb"
-      onClick={onOrbClick}
-      aria-hidden="true"
-    >
+    <div ref={orbRef} id="orb" onClick={onOrbClick} aria-hidden="true">
       <div className="o-glow" />
       <div className="o-ball">
         <div className="o-core" />

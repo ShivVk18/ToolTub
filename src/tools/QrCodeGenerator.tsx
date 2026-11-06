@@ -1,9 +1,9 @@
 "use client";
 import QRCode from "qrcode";
 import { useEffect, useMemo, useState } from "react";
-import { ResultActions } from "@/components/workspace/ToolChrome";
-import { Field, ToolWorkspace, inputClass } from "@/components/workspace/ToolWorkspace";
-import type { Artifact } from "@/lib/store";
+import { ResultActions } from "@/components/tool/ToolChrome";
+import { Field, ToolWorkspace, inputClass } from "@/components/tool/ToolWorkspace";
+import type { Artifact } from "@/lib/store/klip";
 import type { ToolProps } from "./types";
 import { vcardPayload, wifiPayload } from "@/lib/qr-payload";
 

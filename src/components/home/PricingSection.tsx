@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import React, { useEffect, useRef, useState } from 'react';
-import { tween, ease, goto, addLoop } from '@/lib/animation';
+import React, { useEffect, useRef, useState } from "react";
+import { tween, ease, goto, addLoop } from "@/lib/motion/animation";
 
 interface PricingSectionProps {
   onOpenPro: () => void;
 }
 
 export function PricingSection({ onOpenPro }: PricingSectionProps) {
-  const [billing, setBilling] = useState<'m' | 'y'>('m');
+  const [billing, setBilling] = useState<"m" | "y">("m");
   const [priceNum, setPriceNum] = useState(299);
 
   const tabsRef = useRef<HTMLDivElement>(null);
@@ -17,7 +17,7 @@ export function PricingSection({ onOpenPro }: PricingSectionProps) {
 
   const updateIndicator = () => {
     if (!tabsRef.current || !indRef.current) return;
-    const activeTab = tabsRef.current.querySelector('.tab.on') as HTMLElement | null;
+    const activeTab = tabsRef.current.querySelector(".tab.on") as HTMLElement | null;
     if (activeTab) {
       indRef.current.style.left = `${activeTab.offsetLeft}px`;
       indRef.current.style.width = `${activeTab.offsetWidth}px`;
@@ -27,25 +27,25 @@ export function PricingSection({ onOpenPro }: PricingSectionProps) {
   useEffect(() => {
     updateIndicator();
     const handleResize = () => updateIndicator();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, [billing]);
 
   // Conic border animation loop
   useEffect(() => {
     const cleanup = addLoop((t) => {
       if (proCardRef.current) {
-        proCardRef.current.style.setProperty('--pr', `${(t * 40) % 360}`);
+        proCardRef.current.style.setProperty("--pr", `${(t * 40) % 360}`);
       }
     });
     return cleanup;
   }, []);
 
-  const handleBillingToggle = (b: 'm' | 'y') => {
+  const handleBillingToggle = (b: "m" | "y") => {
     if (b === billing) return;
     setBilling(b);
     const from = priceNum;
-    const to = b === 'y' ? 2499 : 299;
+    const to = b === "y" ? 2499 : 299;
     tween(
       700,
       (p) => {
@@ -56,10 +56,7 @@ export function PricingSection({ onOpenPro }: PricingSectionProps) {
   };
 
   return (
-    <section
-      id="pricing"
-      className="sec relative z-[2] px-[clamp(20px,6vw,140px)] py-[clamp(80px,12vh,140px)]"
-    >
+    <section id="pricing" className="sec relative z-[2] px-[clamp(20px,6vw,140px)] py-[clamp(80px,12vh,140px)]">
       <span className="eyb">
         <i>03</i>Pricing
       </span>
@@ -83,9 +80,9 @@ export function PricingSection({ onOpenPro }: PricingSectionProps) {
           <button
             type="button"
             data-b="m"
-            onClick={() => handleBillingToggle('m')}
+            onClick={() => handleBillingToggle("m")}
             className={`tab relative z-[1] h-[44px] px-[22px] rounded-full text-[15px] font-medium transition-colors cursor-pointer select-none ${
-              billing === 'm' ? 'on text-bg' : 'text-ink2 hover:text-ink'
+              billing === "m" ? "on text-bg" : "text-ink2 hover:text-ink"
             }`}
           >
             Monthly
@@ -93,9 +90,9 @@ export function PricingSection({ onOpenPro }: PricingSectionProps) {
           <button
             type="button"
             data-b="y"
-            onClick={() => handleBillingToggle('y')}
+            onClick={() => handleBillingToggle("y")}
             className={`tab relative z-[1] h-[44px] px-[22px] rounded-full text-[15px] font-medium transition-colors cursor-pointer select-none ${
-              billing === 'y' ? 'on text-bg' : 'text-ink2 hover:text-ink'
+              billing === "y" ? "on text-bg" : "text-ink2 hover:text-ink"
             }`}
           >
             Yearly <b className="font-semibold text-[#4F39E3] dark:text-[#9C8FFF] ml-[4px]">save 30%</b>
@@ -156,7 +153,7 @@ export function PricingSection({ onOpenPro }: PricingSectionProps) {
           className="plan dark relative rounded-[32px] p-[36px] bg-[#17161B] text-[#F3F1EC] border border-[#17161B] shadow-[var(--shadow)] overflow-hidden"
         >
           <div className="pn text-[20px] font-semibold flex items-center justify-between">
-            Pro{' '}
+            Pro{" "}
             <span className="pro inline-flex items-center px-[8px] py-[3px] rounded-full text-white text-[11px] font-bold tracking-[0.8px] bg-gradient-to-br from-[#8C7DFF] to-[#FF9C82]">
               MOST LOVED
             </span>
@@ -165,10 +162,10 @@ export function PricingSection({ onOpenPro }: PricingSectionProps) {
             id="proPrice"
             className="pr font-serif text-[76px] tracking-[-0.03em] mt-[14px] leading-none tabular-nums"
           >
-            ₹{priceNum.toLocaleString('en-IN')}
+            ₹{priceNum.toLocaleString("en-IN")}
           </div>
           <div id="proPer" className="pe text-[15px] text-[#A8A3B3] mt-[8px]">
-            {billing === 'y' ? 'per year · ₹208 / month' : 'per month'}
+            {billing === "y" ? "per year · ₹208 / month" : "per month"}
           </div>
 
           <ul className="list-none my-[26px] mb-[30px]">

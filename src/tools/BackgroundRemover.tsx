@@ -1,9 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Dropzone } from "@/components/workspace/Dropzone";
-import { ResultActions, useHandoff } from "@/components/workspace/ToolChrome";
-import { Field, ToolWorkspace, inputClass, useToolRun } from "@/components/workspace/ToolWorkspace";
-import type { Artifact } from "@/lib/store";
+import { Dropzone } from "@/components/tool/Dropzone";
+import { ResultActions, useHandoff } from "@/components/tool/ToolChrome";
+import { Field, ToolWorkspace, inputClass, useToolRun } from "@/components/tool/ToolWorkspace";
+import type { Artifact } from "@/lib/store/klip";
 import { bgWorker } from "@/workers/clients";
 import type { ToolProps } from "./types";
 

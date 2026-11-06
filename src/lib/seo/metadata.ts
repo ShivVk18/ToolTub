@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { SITE_NAME, SITE_URL, THEME_COLOR } from "./site";
+import { SITE_NAME, SITE_URL, THEME_COLOR } from "../site";
 
 interface PageMetaInput {
   path: string;

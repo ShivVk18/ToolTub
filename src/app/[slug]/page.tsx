@@ -3,9 +3,9 @@ import { notFound } from "next/navigation";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { ToolContent } from "@/components/seo/ToolContent";
-import { PrivacyBadge } from "@/components/workspace/PrivacyBadge";
-import { FavouriteButton, VisitTracker } from "@/components/workspace/ToolChrome";
-import { RelatedTools, ToolCard } from "@/components/workspace/RelatedTools";
+import { PrivacyBadge } from "@/components/tool/PrivacyBadge";
+import { FavouriteButton, VisitTracker } from "@/components/tool/ToolChrome";
+import { RelatedTools, ToolCard } from "@/components/tool/RelatedTools";
 import { ToolUI } from "@/tools";
 import { getHub, hubs } from "@/registry/categories";
 import {
@@ -19,8 +19,8 @@ import {
   toolsInHub,
 } from "@/registry/tools";
 import type { LongTailVariant, ToolDefinition } from "@/registry/types";
-import { hubGraph, toolGraph } from "@/lib/schema";
-import { pageMetadata } from "@/lib/metadata";
+import { hubGraph, toolGraph } from "@/lib/seo/schema";
+import { pageMetadata } from "@/lib/seo/metadata";
 
 /**
  * One flat route for every keyword URL: /compress-pdf (tool), /compress-pdf-to-100kb (long-tail variant)

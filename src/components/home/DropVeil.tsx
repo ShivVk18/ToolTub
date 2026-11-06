@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from "react";
 
 interface DropVeilProps {
   isDragging: boolean;
@@ -12,14 +12,14 @@ export function DropVeil({ isDragging }: DropVeilProps) {
   useEffect(() => {
     const handleDragOver = (e: DragEvent) => {
       if (veilRef.current) {
-        veilRef.current.style.setProperty('--vx', `${e.clientX}px`);
-        veilRef.current.style.setProperty('--vy', `${e.clientY}px`);
+        veilRef.current.style.setProperty("--vx", `${e.clientX}px`);
+        veilRef.current.style.setProperty("--vy", `${e.clientY}px`);
       }
     };
 
-    window.addEventListener('dragover', handleDragOver, { passive: true });
+    window.addEventListener("dragover", handleDragOver, { passive: true });
     return () => {
-      window.removeEventListener('dragover', handleDragOver);
+      window.removeEventListener("dragover", handleDragOver);
     };
   }, []);
 
@@ -28,11 +28,11 @@ export function DropVeil({ isDragging }: DropVeilProps) {
       ref={veilRef}
       id="veil"
       className={`fixed inset-0 z-30 pointer-events-none transition-opacity duration-350 ${
-        isDragging ? 'opacity-100' : 'opacity-0'
+        isDragging ? "opacity-100" : "opacity-0"
       }`}
       style={{
         background:
-          'radial-gradient(circle at var(--vx, 50%) var(--vy, 50%), transparent 0, rgba(14, 12, 30, 0.10) 40%, rgba(14, 12, 30, 0.22))',
+          "radial-gradient(circle at var(--vx, 50%) var(--vy, 50%), transparent 0, rgba(14, 12, 30, 0.10) 40%, rgba(14, 12, 30, 0.22))",
       }}
       aria-hidden="true"
     >
@@ -40,4 +40,3 @@ export function DropVeil({ isDragging }: DropVeilProps) {
     </div>
   );
 }
-

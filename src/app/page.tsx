@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { pageMetadata } from "@/lib/metadata";
+import { pageMetadata } from "@/lib/seo/metadata";
 import { HOME_DESCRIPTION } from "@/lib/site";
 import { Code2, FileText, Sparkles } from "lucide-react";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { ToolCard } from "@/components/workspace/RelatedTools";
+import { ToolCard } from "@/components/tool/RelatedTools";
 import { LocalLists } from "@/components/home/LocalLists";
 import { categories } from "@/registry/categories";
 import { chains, isChainLive } from "@/registry/chains";
 import { getTool, routedTools, tools } from "@/registry/tools";
 import { searchIndex } from "@/registry/search-index";
-import { HomeStage } from "@/components/design/HomeStage";
+import { HomeStage } from "@/components/home/HomeStage";
 
 export const metadata: Metadata = pageMetadata({
   path: "/",

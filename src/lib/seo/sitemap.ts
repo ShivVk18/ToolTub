@@ -1,7 +1,7 @@
 import { hubs } from "@/registry/categories";
 import { chains, isChainLive } from "@/registry/chains";
 import { isHubIndexable, isIndexable, tools } from "@/registry/tools";
-import { SITE_UPDATED, abs } from "./site";
+import { SITE_UPDATED, abs } from "../site";
 
 export interface SitemapUrl {
   loc: string;

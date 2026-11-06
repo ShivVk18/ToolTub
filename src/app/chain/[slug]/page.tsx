@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { PrivacyBadge } from "@/components/workspace/PrivacyBadge";
+import { PrivacyBadge } from "@/components/tool/PrivacyBadge";
 import { chains, getChain, isChainLive } from "@/registry/chains";
 import { getTool } from "@/registry/tools";
-import { chainGraph } from "@/lib/schema";
-import { pageMetadata } from "@/lib/metadata";
+import { chainGraph } from "@/lib/seo/schema";
+import { pageMetadata } from "@/lib/seo/metadata";
 import { ChainRunner } from "./ChainRunner";
 
 export const instant = false;

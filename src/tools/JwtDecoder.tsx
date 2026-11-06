@@ -1,7 +1,7 @@
 "use client";
 import { useMemo, useState } from "react";
-import { ResultActions } from "@/components/workspace/ToolChrome";
-import { ToolWorkspace } from "@/components/workspace/ToolWorkspace";
+import { ResultActions } from "@/components/tool/ToolChrome";
+import { ToolWorkspace } from "@/components/tool/ToolWorkspace";
 import type { ToolProps } from "./types";
 import { JWT_CLAIMS as CLAIMS, JWT_TIME_CLAIMS as TIME_CLAIMS, decodeJwt as decode, expiryStatus } from "@/lib/jwt";
 

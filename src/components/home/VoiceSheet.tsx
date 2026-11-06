@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React, { useEffect } from 'react';
+import React, { useEffect } from "react";
 
 interface VoiceSheetProps {
   isOpen: boolean;
@@ -9,27 +9,22 @@ interface VoiceSheetProps {
   onSeePlans: () => void;
 }
 
-export function VoiceSheet({
-  isOpen,
-  onClose,
-  onTryVoiceDemo,
-  onSeePlans,
-}: VoiceSheetProps) {
+export function VoiceSheet({ isOpen, onClose, onTryVoiceDemo, onSeePlans }: VoiceSheetProps) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (isOpen && e.key === 'Escape') {
+      if (isOpen && e.key === "Escape") {
         onClose();
       }
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, onClose]);
 
   return (
     <div
       id="sheet"
       className={`fixed inset-0 z-70 grid place-items-center transition-opacity duration-300 ${
-        isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
       }`}
     >
       <div
@@ -40,21 +35,19 @@ export function VoiceSheet({
 
       <div
         className={`sbox relative w-[min(520px,92vw)] rounded-[30px] bg-solid border border-line2 p-[36px] shadow-[0_50px_120px_-30px_rgba(0,0,0,0.5)] text-center transition-transform duration-450 ease-[cubic-bezier(.2,.9,.3,1.25)] ${
-          isOpen ? 'translate-y-0 scale-100' : 'translate-y-[20px] scale-[0.96]'
+          isOpen ? "translate-y-0 scale-100" : "translate-y-[20px] scale-[0.96]"
         }`}
       >
         <div
           className="sorb av w-[84px] h-[84px] mx-auto rounded-full relative overflow-hidden shadow-[inset_0_0_0_1px_rgba(255,255,255,0.4)]"
           style={{
-            background:
-              'conic-gradient(from 200deg, #7C6BFF, #B38BFF, #FF9C82, #FFD27A, #8FE0BE, #6FB7FF, #7C6BFF)',
+            background: "conic-gradient(from 200deg, #7C6BFF, #B38BFF, #FF9C82, #FFD27A, #8FE0BE, #6FB7FF, #7C6BFF)",
           }}
         >
           <div
             className="absolute inset-0"
             style={{
-              background:
-                'radial-gradient(circle at 32% 28%, rgba(255,255,255,0.9), transparent 45%)',
+              background: "radial-gradient(circle at 32% 28%, rgba(255,255,255,0.9), transparent 45%)",
             }}
           />
         </div>
@@ -64,18 +57,28 @@ export function VoiceSheet({
         </h3>
 
         <p className="text-muted text-[17px] mt-[8px]">
-          Voice commands are part of <b className="text-ink font-semibold">KlipKit Pro</b>. Your voice is turned into text on your device.
+          Voice commands are part of <b className="text-ink font-semibold">KlipKit Pro</b>. Your voice is turned into
+          text on your device.
         </p>
 
         <ul className="list-none text-left my-[22px] mb-[26px] mx-auto w-max text-ink">
           <li className="py-[6px] text-[16px] flex items-center gap-[8px]">
-            <span role="img" aria-label="microphone">🎙</span> “Compress this and send it as Word”
+            <span role="img" aria-label="microphone">
+              🎙
+            </span>{" "}
+            “Compress this and send it as Word”
           </li>
           <li className="py-[6px] text-[16px] flex items-center gap-[8px]">
-            <span role="img" aria-label="lightning">⚡</span> Batch processing & bigger files
+            <span role="img" aria-label="lightning">
+              ⚡
+            </span>{" "}
+            Batch processing & bigger files
           </li>
           <li className="py-[6px] text-[16px] flex items-center gap-[8px]">
-            <span role="img" aria-label="floppy disk">💾</span> Saved chains & history
+            <span role="img" aria-label="floppy disk">
+              💾
+            </span>{" "}
+            Saved chains & history
           </li>
         </ul>
 
@@ -101,4 +104,3 @@ export function VoiceSheet({
     </div>
   );
 }
-

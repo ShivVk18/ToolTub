@@ -1,2 +1,2 @@
-import { llmsTxt } from "@/lib/llms";
+import { llmsTxt } from "@/lib/seo/llms";
 export const GET = () => llmsTxt();

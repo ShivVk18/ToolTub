@@ -1,14 +1,14 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import localFont from "next/font/local";
-import "./globals.css";
+import "../styles/globals.css";
 import { Footer, Header } from "@/components/layout/Header";
 import { themeScript } from "@/components/layout/ThemeToggle";
-import { AuroraBackground } from "@/components/design/AuroraBackground";
-import { GlobalModals } from "@/components/design/GlobalModals";
+import { AuroraBackground } from "@/components/layout/AuroraBackground";
+import { GlobalModals } from "@/components/layout/GlobalModals";
 import { CommandPalette } from "@/components/search/CommandPalette";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { siteGraph } from "@/lib/schema";
+import { siteGraph } from "@/lib/seo/schema";
 import { ENTITY_DEFINITION, SITE_URL, THEME_COLOR } from "@/lib/site";
 import { searchIndex } from "@/registry/search-index";
 

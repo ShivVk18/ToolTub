@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { ripple } from "@/lib/animation";
+import { ripple } from "@/lib/motion/animation";
 
 export function ThemeToggle() {
   const [isDark, setIsDark] = useState(false);

@@ -1,4 +1,4 @@
-import type { NextTool } from "@/components/workspace/ToolChrome";
+import type { NextTool } from "@/components/tool/ToolChrome";
 
 export interface ToolProps {
   slug: string;

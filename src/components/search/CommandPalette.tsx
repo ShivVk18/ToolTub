@@ -4,7 +4,7 @@ import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { SearchEntry } from "@/registry/search-index";
-import { useKlip } from "@/lib/store";
+import { useKlip } from "@/lib/store/klip";
 import { cn } from "@/lib/utils";
 import { createToolSearch } from "@/lib/search";
 import { CATS, tint, TOOL_ICON_PATHS, type ToolItem } from "@/lib/designTools";

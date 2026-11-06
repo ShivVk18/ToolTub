@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useToolSearch } from "@/components/search/CommandPalette";
-import { inputClass } from "@/components/workspace/ToolWorkspace";
+import { inputClass } from "@/components/tool/ToolWorkspace";
 import type { SearchEntry } from "@/registry/search-index";
 
 export function SearchResults({ index }: { index: SearchEntry[] }) {

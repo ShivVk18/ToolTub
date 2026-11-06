@@ -1,4 +1,4 @@
-import { sitemapGroups, xml } from "@/lib/sitemap";
+import { sitemapGroups, xml } from "@/lib/seo/sitemap";
 
 export function generateStaticParams() {
   return Object.keys(sitemapGroups()).map((k) => ({ file: `${k}.xml` }));

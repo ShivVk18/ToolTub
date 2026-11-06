@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { sitemapGroups } from "@/lib/sitemap";
-import { llmsFullTxt, llmsTxt } from "@/lib/llms";
+import { sitemapGroups } from "@/lib/seo/sitemap";
+import { llmsFullTxt, llmsTxt } from "@/lib/seo/llms";
 import { isIndexable, routedTools, tools } from "@/registry/tools";
-import { toolGraph } from "@/lib/schema";
+import { toolGraph } from "@/lib/seo/schema";
 import { getHub } from "@/registry/categories";
 
 describe("sitemaps", () => {

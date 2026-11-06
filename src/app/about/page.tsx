@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { pageMetadata } from "@/lib/metadata";
+import { pageMetadata } from "@/lib/seo/metadata";
 import { people } from "@/registry/people";
 import { ENTITY_DEFINITION } from "@/lib/site";
 

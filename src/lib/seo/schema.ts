@@ -1,7 +1,7 @@
 import type { ChainPreset, ToolDefinition } from "@/registry/types";
 import type { HubMeta } from "@/registry/categories";
 import { people } from "@/registry/people";
-import { ENTITY_DEFINITION, SAME_AS, SITE_NAME, SITE_URL, abs } from "./site";
+import { ENTITY_DEFINITION, SAME_AS, SITE_NAME, SITE_URL, abs } from "../site";
 
 /** JSON-LD builders. Every node here is also rendered visibly on the page (never schema-only). */
 

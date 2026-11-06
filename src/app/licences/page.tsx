@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { pageMetadata } from "@/lib/metadata";
+import { pageMetadata } from "@/lib/seo/metadata";
 import { deps, platformDeps } from "@/registry/dependencies";
 
 export const metadata: Metadata = pageMetadata({

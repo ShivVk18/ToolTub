@@ -1,5 +1,5 @@
-import React from 'react';
-import Link from 'next/link';
+import React from "react";
+import Link from "next/link";
 
 export function DesignFooter() {
   return (
@@ -13,7 +13,7 @@ export function DesignFooter() {
           <span
             className="absolute w-[6px] h-[6px] rounded-full right-[4px] top-[4px]"
             style={{
-              background: 'linear-gradient(135deg, #A99BFF, #FF9C82)',
+              background: "linear-gradient(135deg, #A99BFF, #FF9C82)",
             }}
           />
         </div>
@@ -40,4 +40,3 @@ export function DesignFooter() {
     </footer>
   );
 }
-

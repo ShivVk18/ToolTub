@@ -1,7 +1,7 @@
 import { categories, hubs } from "@/registry/categories";
 import { chains, isChainLive } from "@/registry/chains";
 import { routedTools, tools } from "@/registry/tools";
-import { ENTITY_DEFINITION, abs } from "./site";
+import { ENTITY_DEFINITION, abs } from "../site";
 
 const md = (s: string) => new Response(s, { headers: { "Content-Type": "text/markdown; charset=utf-8" } });
 

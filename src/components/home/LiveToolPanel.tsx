@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useUIStore } from '@/lib/uiStore';
-import { PANELS } from '@/lib/livePanels';
-import { CATS, TOOL_ICON_PATHS, tint } from '@/lib/designTools';
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useUIStore } from "@/lib/store/ui";
+import { PANELS } from "@/lib/livePanels";
+import { CATS, TOOL_ICON_PATHS, tint } from "@/lib/designTools";
 
 interface LiveToolPanelProps {
   onReturnToChat?: () => void;
@@ -12,12 +12,12 @@ interface LiveToolPanelProps {
 export function LiveToolPanel({ onReturnToChat }: LiveToolPanelProps) {
   const { panelTool, panelInput, isPanelFull, closePanel, togglePanelFull } = useUIStore();
   const [selectedOpt, setSelectedOpt] = useState<string | null>(null);
-  const [inputValue, setInputValue] = useState<string>('');
-  const [patValue, setPatValue] = useState<string>('');
-  const [flValue, setFlValue] = useState<string>('g');
-  const [outputHtml, setOutputHtml] = useState<string>('');
-  const [copyText, setCopyText] = useState<string>('');
-  const [statusMsg, setStatusMsg] = useState<string>('Ready');
+  const [inputValue, setInputValue] = useState<string>("");
+  const [patValue, setPatValue] = useState<string>("");
+  const [flValue, setFlValue] = useState<string>("g");
+  const [outputHtml, setOutputHtml] = useState<string>("");
+  const [copyText, setCopyText] = useState<string>("");
+  const [statusMsg, setStatusMsg] = useState<string>("Ready");
   const [isBad, setIsBad] = useState<boolean>(false);
   const [latencyMs, setLatencyMs] = useState<number>(0.8);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
@@ -37,30 +37,29 @@ export function LiveToolPanel({ onReturnToChat }: LiveToolPanelProps) {
     setSelectedOpt(opt0);
 
     if (P.regex) {
-      let pat = P.pat || '';
-      let fl = P.flags || 'g';
+      let pat = P.pat || "";
+      let fl = P.flags || "g";
       if (panelInput && /^\/(.+)\/([gimsuy]*)$/.test(panelInput.trim())) {
         const m = /^\/(.+)\/([gimsuy]*)$/.exec(panelInput.trim())!;
         pat = m[1];
-        fl = m[2] || 'g';
+        fl = m[2] || "g";
       }
       setPatValue(pat);
       setFlValue(fl);
-      setInputValue(
-        panelInput && !/^\/.+\/[gimsuy]*$/.test(panelInput.trim())
-          ? panelInput
-          : P.sample || ''
-      );
+      setInputValue(panelInput && !/^\/.+\/[gimsuy]*$/.test(panelInput.trim()) ? panelInput : P.sample || "");
     } else if (P.gen) {
-      setInputValue('');
+      setInputValue("");
     } else {
-      setInputValue(panelInput || P.sample || '');
+      setInputValue(panelInput || P.sample || "");
     }
 
     // Hash deep linking
     try {
-      const slug = panelTool.n.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-      window.history.replaceState(null, '', '#' + slug);
+      const slug = panelTool.n
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "");
+      window.history.replaceState(null, "", "#" + slug);
     } catch {
       // ignore
     }
@@ -86,8 +85,8 @@ export function LiveToolPanel({ onReturnToChat }: LiveToolPanelProps) {
     const dt = Math.max(0.1, performance.now() - t0);
     setLatencyMs(dt);
     setOutputHtml(res.html || '<span class="pc">Output appears here as you type…</span>');
-    setCopyText(res.copy || '');
-    setStatusMsg(res.status || 'Ready');
+    setCopyText(res.copy || "");
+    setStatusMsg(res.status || "Ready");
     setIsBad(!!res.bad);
 
     setIsFlashing(true);
@@ -106,42 +105,42 @@ export function LiveToolPanel({ onReturnToChat }: LiveToolPanelProps) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (!panelTool) return;
-      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
         e.preventDefault();
         runCurrent();
       }
-      if (e.key === 'Escape' && isPanelFull) {
+      if (e.key === "Escape" && isPanelFull) {
         togglePanelFull();
       }
     };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, [panelTool, isPanelFull, togglePanelFull, runCurrent]);
 
   if (!panelTool || !P) return null;
 
   const cat = CATS[panelTool.c];
-  const iconPath = TOOL_ICON_PATHS[panelTool.i] || 'M12 2v20M2 12h20';
+  const iconPath = TOOL_ICON_PATHS[panelTool.i] || "M12 2v20M2 12h20";
 
   const handleCopy = async () => {
     if (!copyText) {
-      setToastMsg('Nothing to copy yet');
+      setToastMsg("Nothing to copy yet");
       setTimeout(() => setToastMsg(null), 1800);
       return;
     }
     try {
       await navigator.clipboard.writeText(copyText);
-      setToastMsg('Copied ✓');
+      setToastMsg("Copied ✓");
     } catch {
-      const ta = document.createElement('textarea');
+      const ta = document.createElement("textarea");
       ta.value = copyText;
       document.body.appendChild(ta);
       ta.select();
       try {
-        document.execCommand('copy');
-        setToastMsg('Copied ✓');
+        document.execCommand("copy");
+        setToastMsg("Copied ✓");
       } catch {
-        setToastMsg('Select and copy manually');
+        setToastMsg("Select and copy manually");
       }
       ta.remove();
     }
@@ -150,14 +149,14 @@ export function LiveToolPanel({ onReturnToChat }: LiveToolPanelProps) {
 
   const handleSample = () => {
     if (P.regex) {
-      setPatValue(P.pat || '');
-      setFlValue(P.flags || 'g');
+      setPatValue(P.pat || "");
+      setFlValue(P.flags || "g");
     }
-    setInputValue(P.sample || '');
+    setInputValue(P.sample || "");
   };
 
   const handleClear = () => {
-    setInputValue('');
+    setInputValue("");
     inputRef.current?.focus();
   };
 
@@ -167,24 +166,30 @@ export function LiveToolPanel({ onReturnToChat }: LiveToolPanelProps) {
   };
 
   return (
-    <div id="panel" style={{ display: 'flex' }} aria-label={`${panelTool.n} workspace`}>
+    <div id="panel" style={{ display: "flex" }} aria-label={`${panelTool.n} workspace`}>
       {/* Header */}
       <div className="pn-head">
-        <div
-          className="ti"
-          id="pnIcon"
-          style={{ background: tint(cat.c) }}
-          aria-hidden="true"
-        >
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={cat.c} strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round">
+        <div className="ti" id="pnIcon" style={{ background: tint(cat.c) }} aria-hidden="true">
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke={cat.c}
+            strokeWidth="2.1"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <path d={iconPath} />
           </svg>
         </div>
         <div>
-          <div className="pn-t" id="pnT">{panelTool.n}</div>
+          <div className="pn-t" id="pnT">
+            {panelTool.n}
+          </div>
           <div className="pn-d">
-            <span id="pnD">{panelTool.d}</span> ·{' '}
-            <span style={{ color: 'var(--ok)', fontWeight: 500 }}>Live · on your device</span>
+            <span id="pnD">{panelTool.d}</span> ·{" "}
+            <span style={{ color: "var(--ok)", fontWeight: 500 }}>Live · on your device</span>
           </div>
         </div>
         <div className="pn-r">
@@ -194,7 +199,7 @@ export function LiveToolPanel({ onReturnToChat }: LiveToolPanelProps) {
                 <button
                   key={val}
                   type="button"
-                  className={`seg ${selectedOpt === val ? 'on' : ''}`}
+                  className={`seg ${selectedOpt === val ? "on" : ""}`}
                   onClick={() => setSelectedOpt(val)}
                 >
                   {label}
@@ -202,20 +207,10 @@ export function LiveToolPanel({ onReturnToChat }: LiveToolPanelProps) {
               ))}
             </div>
           )}
-          <button
-            type="button"
-            className="pill sm"
-            id="pnFull"
-            onClick={togglePanelFull}
-          >
-            {isPanelFull ? 'Collapse' : '⤢ Full screen'}
+          <button type="button" className="pill sm" id="pnFull" onClick={togglePanelFull}>
+            {isPanelFull ? "Collapse" : "⤢ Full screen"}
           </button>
-          <button
-            type="button"
-            className="pill sm"
-            id="pnChat"
-            onClick={handleChat}
-          >
+          <button type="button" className="pill sm" id="pnChat" onClick={handleChat}>
             Chat
           </button>
         </div>
@@ -226,7 +221,7 @@ export function LiveToolPanel({ onReturnToChat }: LiveToolPanelProps) {
         {/* Left Input Box */}
         <div className="pn-box">
           <div className="pn-lab">
-            <span id="pnInLab">{P.regex ? 'Test text' : 'Input'}</span>
+            <span id="pnInLab">{P.regex ? "Test text" : "Input"}</span>
             {!P.gen && (
               <span className="sp">
                 <button type="button" className="mini" id="pnSample" onClick={handleSample}>
@@ -240,7 +235,7 @@ export function LiveToolPanel({ onReturnToChat }: LiveToolPanelProps) {
           </div>
 
           {P.regex && (
-            <div id="pnRx" style={{ display: 'flex' }}>
+            <div id="pnRx" style={{ display: "flex" }}>
               /
               <input
                 ref={patRef}
@@ -274,14 +269,9 @@ export function LiveToolPanel({ onReturnToChat }: LiveToolPanelProps) {
               onChange={(e) => setInputValue(e.target.value)}
             />
           ) : (
-            <div id="pnGen" style={{ display: 'flex' }}>
+            <div id="pnGen" style={{ display: "flex" }}>
               <div>Choose an option above — or</div>
-              <button
-                type="button"
-                className="pill ink"
-                id="pnRegen"
-                onClick={() => runCurrent()}
-              >
+              <button type="button" className="pill ink" id="pnRegen" onClick={() => runCurrent()}>
                 ↻ Generate again
               </button>
             </div>
@@ -300,7 +290,7 @@ export function LiveToolPanel({ onReturnToChat }: LiveToolPanelProps) {
           </div>
           <div
             id="pnOut"
-            className={isFlashing ? 'flash' : ''}
+            className={isFlashing ? "flash" : ""}
             aria-live="polite"
             dangerouslySetInnerHTML={{ __html: outputHtml }}
           />
@@ -309,30 +299,28 @@ export function LiveToolPanel({ onReturnToChat }: LiveToolPanelProps) {
 
       {/* Status Bar */}
       <div className="pn-status" id="pnStatus">
-        <i style={{ background: isBad ? 'var(--red)' : 'var(--ok)' }} />
+        <i style={{ background: isBad ? "var(--red)" : "var(--ok)" }} />
         <span>{statusMsg}</span>
-        <span style={{ marginLeft: 'auto' }}>
-          {latencyMs.toFixed(1)} ms · on your device · nothing uploaded
-        </span>
+        <span style={{ marginLeft: "auto" }}>{latencyMs.toFixed(1)} ms · on your device · nothing uploaded</span>
       </div>
 
       {/* Micro Toast */}
       {toastMsg && (
         <div
           style={{
-            position: 'fixed',
-            bottom: '24px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            background: 'var(--ink)',
-            color: 'var(--bg)',
-            padding: '8px 18px',
-            borderRadius: '999px',
-            fontSize: '14px',
+            position: "fixed",
+            bottom: "24px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            background: "var(--ink)",
+            color: "var(--bg)",
+            padding: "8px 18px",
+            borderRadius: "999px",
+            fontSize: "14px",
             fontWeight: 500,
             zIndex: 100,
-            boxShadow: 'var(--shadow)',
-            animation: 'msgIn .25s ease both',
+            boxShadow: "var(--shadow)",
+            animation: "msgIn .25s ease both",
           }}
         >
           {toastMsg}
@@ -341,4 +329,3 @@ export function LiveToolPanel({ onReturnToChat }: LiveToolPanelProps) {
     </div>
   );
 }
-

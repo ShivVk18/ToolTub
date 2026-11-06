@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import {
   type FileInfo,
   KINDS,
@@ -10,7 +10,7 @@ import {
   meta as metaFile,
   fmtSize,
   kindOf,
-} from '@/lib/fileKind';
+} from "@/lib/fileKind";
 import {
   type PasteItem,
   PT_TILE,
@@ -22,12 +22,12 @@ import {
   pasteAct,
   wordStats,
   ActionResult,
-} from '@/lib/detect';
-import { parse, markHTML, type IntentStep } from '@/lib/intent';
-import { tween, wait, ease } from '@/lib/animation';
-import { useUIStore } from '@/lib/uiStore';
-import { LiveToolPanel } from './LiveToolPanel';
-import { TOOLS } from '@/lib/designTools';
+} from "@/lib/detect";
+import { parse, markHTML, type IntentStep } from "@/lib/intent";
+import { tween, wait, ease } from "@/lib/motion/animation";
+import { useUIStore } from "@/lib/store/ui";
+import { LiveToolPanel } from "./LiveToolPanel";
+import { TOOLS } from "@/lib/designTools";
 
 export interface WorkspaceProps {
   file: FileInfo | null;
@@ -43,7 +43,7 @@ export interface WorkspaceProps {
 
 interface MessageItem {
   id: string;
-  type: 'bot' | 'user' | 'file' | 'paste' | 'chips' | 'plan' | 'results' | 'resultCard';
+  type: "bot" | "user" | "file" | "paste" | "chips" | "plan" | "results" | "resultCard";
   html?: string;
   file?: FileInfo;
   pasteItem?: PasteItem;
@@ -70,14 +70,14 @@ export function Workspace({
   onNew,
   onOpenVoice,
   isListening = false,
-  voiceTranscript = '',
+  voiceTranscript = "",
   onSetStatus,
 }: WorkspaceProps) {
   const [messages, setMessages] = useState<MessageItem[]>([]);
-  const [inputText, setInputText] = useState('');
+  const [inputText, setInputText] = useState("");
   const [isBusy, setIsBusy] = useState(false);
-  const [statusText, setStatusText] = useState('Ready · runs on your device');
-  const [statusColor, setStatusColor] = useState('var(--ok)');
+  const [statusText, setStatusText] = useState("Ready · runs on your device");
+  const [statusColor, setStatusColor] = useState("var(--ok)");
 
   const { panelTool, openPanel, closePanel } = useUIStore();
 
@@ -95,7 +95,7 @@ export function Workspace({
     currentPasteRef.current = pasteData || null;
   }, [pasteData]);
 
-  const updateStatus = (txt: string, color: string = 'var(--ok)', busy: boolean = false) => {
+  const updateStatus = (txt: string, color: string = "var(--ok)", busy: boolean = false) => {
     setStatusText(txt);
     setStatusColor(color);
     setIsBusy(busy);
@@ -108,17 +108,21 @@ export function Workspace({
     const to = el.scrollHeight - el.clientHeight;
     const from = el.scrollTop;
     if (to <= from + 2) return;
-    tween(650, (p) => {
-      el.scrollTop = from + (to - from) * p;
-    }, ease.io);
+    tween(
+      650,
+      (p) => {
+        el.scrollTop = from + (to - from) * p;
+      },
+      ease.io,
+    );
   };
 
   const toast = (text: string) => {
-    const el = document.getElementById('toast');
+    const el = document.getElementById("toast");
     if (el) {
       el.textContent = text;
-      el.classList.add('show');
-      setTimeout(() => el.classList.remove('show'), 2600);
+      el.classList.add("show");
+      setTimeout(() => el.classList.remove("show"), 2600);
     }
   };
 
@@ -126,17 +130,17 @@ export function Workspace({
     if (!s) return;
     try {
       await navigator.clipboard.writeText(s);
-      toast('Copied ✓');
+      toast("Copied ✓");
     } catch {
-      const ta = document.createElement('textarea');
+      const ta = document.createElement("textarea");
       ta.value = s;
       document.body.appendChild(ta);
       ta.select();
       try {
-        document.execCommand('copy');
-        toast('Copied ✓');
+        document.execCommand("copy");
+        toast("Copied ✓");
       } catch {
-        toast('Select and copy manually');
+        toast("Select and copy manually");
       }
       ta.remove();
     }
@@ -155,22 +159,22 @@ export function Workspace({
     const f = pasteData;
 
     const prev =
-      f.text.trim().split('\n').slice(0, 4).join('\n').slice(0, 260) +
-      (f.text.trim().split('\n').length > 4 || f.text.length > 260 ? '\n…' : '');
+      f.text.trim().split("\n").slice(0, 4).join("\n").slice(0, 260) +
+      (f.text.trim().split("\n").length > 4 || f.text.length > 260 ? "\n…" : "");
 
-    const art = /^[aeiou]/i.test(f.label) ? 'an' : 'a';
+    const art = /^[aeiou]/i.test(f.label) ? "an" : "a";
     const botHtml = f.bad
       ? `That's ${art} <b>${f.label}</b> snippet — but it doesn't parse. Want me to find the problem?`
       : `That's ${art} <b>${f.label}</b>${
-          f.pt === 'text' ? ` — ${wordStats(f.text)[0][1]} words` : ''
+          f.pt === "text" ? ` — ${wordStats(f.text)[0][1]} words` : ""
         }. What should we do?`;
 
-    const chips: [string, string][] = f.bad ? [['Find the error', 'fmt']] : PSUG[f.pt] || [];
+    const chips: [string, string][] = f.bad ? [["Find the error", "fmt"]] : PSUG[f.pt] || [];
 
     setMessages([
-      { id: 'paste-' + Date.now(), type: 'paste', pasteItem: f, html: prev },
-      { id: 'bot-desc-' + Date.now(), type: 'bot', html: botHtml },
-      { id: 'chips-' + Date.now(), type: 'chips', chips },
+      { id: "paste-" + Date.now(), type: "paste", pasteItem: f, html: prev },
+      { id: "bot-desc-" + Date.now(), type: "bot", html: botHtml },
+      { id: "chips-" + Date.now(), type: "chips", chips },
     ]);
     setTimeout(scrollThreadToBottom, 100);
   }, [pasteData]);
@@ -183,8 +187,8 @@ export function Workspace({
       if (contextToolName) {
         setMessages([
           {
-            id: 'ctx-bot',
-            type: 'bot',
+            id: "ctx-bot",
+            type: "bot",
             html: `<b>${contextToolName}</b> is ready.<span class="sub text-muted block text-[15px] mt-[4px]">Drop a file anywhere, paste, or try a sample.</span>`,
           },
         ]);
@@ -192,33 +196,31 @@ export function Workspace({
       return;
     }
 
-    const initialMsgs: MessageItem[] = [
-      { id: 'fcard-' + Date.now(), type: 'file', file },
-    ];
+    const initialMsgs: MessageItem[] = [{ id: "fcard-" + Date.now(), type: "file", file }];
 
     if (file.multi && file.multi.length > 1) {
       initialMsgs.push(
         {
-          id: 'multi-bot',
-          type: 'bot',
+          id: "multi-bot",
+          type: "bot",
           html: `Got ${file.multi.length} PDFs. Want me to merge them into one?`,
         },
         {
-          id: 'multi-chips',
-          type: 'chips',
-          chips: [['Merge them', 'merge them'], ...SUG.pdf.slice(0, 3)],
+          id: "multi-chips",
+          type: "chips",
+          chips: [["Merge them", "merge them"], ...SUG.pdf.slice(0, 3)],
         },
       );
     } else {
       initialMsgs.push(
         {
-          id: 'bot-desc',
-          type: 'bot',
+          id: "bot-desc",
+          type: "bot",
           html: `Got it — ${describeFile(file)}. What should we do?`,
         },
         {
-          id: 'bot-chips',
-          type: 'chips',
+          id: "bot-chips",
+          type: "chips",
           chips: SUG[file.kind] || SUG.other,
         },
       );
@@ -229,85 +231,86 @@ export function Workspace({
   }, [file, pasteData, contextToolName]);
 
   // Execute paste action
-  const doPasteAction = useCallback(async (act: string, label?: string) => {
-    const f = currentPasteRef.current;
-    if (!f) return;
+  const doPasteAction = useCallback(
+    async (act: string, label?: string) => {
+      const f = currentPasteRef.current;
+      if (!f) return;
 
-    const lab = label || (Object.values(PSUG).flat().find((x) => x[1] === act) || [act])[0];
-    setMessages((prev) => [
-      ...prev,
-      { id: 'u-' + Date.now(), type: 'user', html: lab },
-    ]);
-    setTimeout(scrollThreadToBottom, 50);
+      const lab =
+        label ||
+        (Object.values(PSUG)
+          .flat()
+          .find((x) => x[1] === act) || [act])[0];
+      setMessages((prev) => [...prev, { id: "u-" + Date.now(), type: "user", html: lab }]);
+      setTimeout(scrollThreadToBottom, 50);
 
-    updateStatus('Working…', 'var(--accent)', true);
-    await wait(450);
+      updateStatus("Working…", "var(--accent)", true);
+      await wait(450);
 
-    const fn = ACT[act];
-    if (!fn) {
-      updateStatus('Ready · runs on your device', 'var(--ok)', false);
-      return;
-    }
-
-    const r = await fn(f);
-    updateStatus('Ready · runs on your device', 'var(--ok)', false);
-
-    if (r.go && r.open) {
-      const tool = TOOLS.find((t) => t.n === r.open);
-      if (tool) openPanel(tool, f.text);
-      return;
-    }
-
-    const newMsgs: MessageItem[] = [
-      { id: 'bot-res-' + Date.now(), type: 'bot', html: r.msg },
-      { id: 'res-card-' + Date.now(), type: 'resultCard', actionResult: r },
-    ];
-
-    if (!r.bad) {
-      const nextChips = (PSUG[f.pt] || []).filter((x) => x[1] !== act).slice(0, 3);
-      if (nextChips.length) {
-        newMsgs.push(
-          { id: 'bot-next-' + Date.now(), type: 'bot', html: '<span class="text-muted">What next?</span>' },
-          { id: 'chips-next-' + Date.now(), type: 'chips', chips: nextChips }
-        );
+      const fn = ACT[act];
+      if (!fn) {
+        updateStatus("Ready · runs on your device", "var(--ok)", false);
+        return;
       }
-    }
 
-    setMessages((prev) => [...prev, ...newMsgs]);
-    setTimeout(scrollThreadToBottom, 100);
-  }, [openPanel]);
+      const r = await fn(f);
+      updateStatus("Ready · runs on your device", "var(--ok)", false);
+
+      if (r.go && r.open) {
+        const tool = TOOLS.find((t) => t.n === r.open);
+        if (tool) openPanel(tool, f.text);
+        return;
+      }
+
+      const newMsgs: MessageItem[] = [
+        { id: "bot-res-" + Date.now(), type: "bot", html: r.msg },
+        { id: "res-card-" + Date.now(), type: "resultCard", actionResult: r },
+      ];
+
+      if (!r.bad) {
+        const nextChips = (PSUG[f.pt] || []).filter((x) => x[1] !== act).slice(0, 3);
+        if (nextChips.length) {
+          newMsgs.push(
+            { id: "bot-next-" + Date.now(), type: "bot", html: '<span class="text-muted">What next?</span>' },
+            { id: "chips-next-" + Date.now(), type: "chips", chips: nextChips },
+          );
+        }
+      }
+
+      setMessages((prev) => [...prev, ...newMsgs]);
+      setTimeout(scrollThreadToBottom, 100);
+    },
+    [openPanel],
+  );
 
   // Main input handler from composer
   const handleSend = async (text: string) => {
     const trimmed = text.trim();
     if (!trimmed || isBusy) return;
 
-    setInputText('');
+    setInputText("");
 
     // Check if this is a generator request (e.g. "generate 5 uuids")
     const gen = genParse(trimmed);
     if (gen) {
-      setMessages((prev) => [
-        ...prev,
-        { id: 'u-' + Date.now(), type: 'user', html: trimmed },
-      ]);
+      setMessages((prev) => [...prev, { id: "u-" + Date.now(), type: "user", html: trimmed }]);
       setTimeout(scrollThreadToBottom, 50);
 
-      updateStatus('Generating…', 'var(--accent)', true);
+      updateStatus("Generating…", "var(--accent)", true);
       await wait(420);
       const r = await runGen(gen);
-      updateStatus('Ready · runs on your device', 'var(--ok)', false);
+      updateStatus("Ready · runs on your device", "var(--ok)", false);
 
       if (r.go && r.open) {
         const tool = TOOLS.find((t) => t.n === r.open);
-        if (tool) openPanel(tool, '');
+        if (tool) openPanel(tool, "");
         return;
       }
 
       setMessages((prev) => [
         ...prev,
-        { id: 'bot-res-' + Date.now(), type: 'bot', html: r.msg },
-        { id: 'res-card-' + Date.now(), type: 'resultCard', actionResult: r },
+        { id: "bot-res-" + Date.now(), type: "bot", html: r.msg },
+        { id: "res-card-" + Date.now(), type: "resultCard", actionResult: r },
       ]);
       setTimeout(scrollThreadToBottom, 100);
       return;
@@ -327,29 +330,29 @@ export function Workspace({
     const { steps, spans } = parse(trimmed, kind);
 
     // 1. Add user bubble
-    const userMsgId = 'u-' + Date.now();
+    const userMsgId = "u-" + Date.now();
     setMessages((prev) => [
       ...prev,
       {
         id: userMsgId,
-        type: 'user',
+        type: "user",
         html: markHTML(trimmed, spans, false),
       },
     ]);
     setTimeout(scrollThreadToBottom, 50);
 
     // 2. Think
-    updateStatus('Thinking…', 'var(--accent)', true);
+    updateStatus("Thinking…", "var(--accent)", true);
     await wait(650);
 
     if (!currentFileRef.current && !currentPasteRef.current) {
-      updateStatus('Ready · runs on your device', 'var(--ok)', false);
+      updateStatus("Ready · runs on your device", "var(--ok)", false);
       setMessages((prev) => [
         ...prev,
         {
-          id: 'bot-nofile-' + Date.now(),
-          type: 'bot',
-          html: 'Drop a file first, paste text, or try a sample:',
+          id: "bot-nofile-" + Date.now(),
+          type: "bot",
+          html: "Drop a file first, paste text, or try a sample:",
         },
       ]);
       return;
@@ -357,18 +360,18 @@ export function Workspace({
 
     const good = steps.filter((s) => s.ok);
     if (!good.length) {
-      updateStatus('Ready · runs on your device', 'var(--ok)', false);
+      updateStatus("Ready · runs on your device", "var(--ok)", false);
       setMessages((prev) => [
         ...prev,
         {
-          id: 'bot-sorry-' + Date.now(),
-          type: 'bot',
+          id: "bot-sorry-" + Date.now(),
+          type: "bot",
           html: `I didn't quite catch a plan for that. Try one of these:`,
         },
         {
-          id: 'bot-sug-' + Date.now(),
-          type: 'chips',
-          chips: SUG[kind || 'other'] || SUG.other,
+          id: "bot-sug-" + Date.now(),
+          type: "chips",
+          chips: SUG[kind || "other"] || SUG.other,
         },
       ]);
       setTimeout(scrollThreadToBottom, 50);
@@ -376,37 +379,37 @@ export function Workspace({
     }
 
     // 3. Plan card
-    const isPrivateServer = good.some((s) => ['word', 'pdf', 'protect'].includes(s.id));
+    const isPrivateServer = good.some((s) => ["word", "pdf", "protect"].includes(s.id));
     setMessages((prev) => [
       ...prev,
       {
-        id: 'bot-plan-' + Date.now(),
-        type: 'bot',
-        html: `Here's the plan — ${good.length === 1 ? 'one step' : good.length + ' steps'}, ${
-          isPrivateServer ? 'processed privately' : 'all on your device'
+        id: "bot-plan-" + Date.now(),
+        type: "bot",
+        html: `Here's the plan — ${good.length === 1 ? "one step" : good.length + " steps"}, ${
+          isPrivateServer ? "processed privately" : "all on your device"
         }.`,
       },
       {
-        id: 'card-plan-' + Date.now(),
-        type: 'plan',
+        id: "card-plan-" + Date.now(),
+        type: "plan",
         planSteps: good,
       },
     ]);
 
-    updateStatus('Ready · runs on your device', 'var(--ok)', false);
+    updateStatus("Ready · runs on your device", "var(--ok)", false);
     setTimeout(scrollThreadToBottom, 50);
   };
 
   // Plan execution simulation & real processing
   const executePlan = async (steps: IntentStep[], cardEl: HTMLElement) => {
     setIsBusy(true);
-    const runBtn = cardEl.querySelector('.run') as HTMLButtonElement | null;
+    const runBtn = cardEl.querySelector(".run") as HTMLButtonElement | null;
     if (runBtn) {
       runBtn.disabled = true;
-      runBtn.innerHTML = 'Running…';
+      runBtn.innerHTML = "Running…";
     }
 
-    const stepEls = cardEl.querySelectorAll<HTMLElement>('.step');
+    const stepEls = cardEl.querySelectorAll<HTMLElement>(".step");
     const f = currentFileRef.current;
     if (!f) return;
 
@@ -415,57 +418,61 @@ export function Workspace({
       const el = stepEls[i];
       if (!el) continue;
 
-      updateStatus(`Step ${i + 1} of ${steps.length} · ${s.t}`, 'var(--accent)', true);
-      const bar = el.querySelector<HTMLElement>('.bar b');
-      const ok = el.querySelector<HTMLElement>('.ok');
+      updateStatus(`Step ${i + 1} of ${steps.length} · ${s.t}`, "var(--accent)", true);
+      const bar = el.querySelector<HTMLElement>(".bar b");
+      const ok = el.querySelector<HTMLElement>(".ok");
 
       if (bar) {
-        await tween(650, (p) => {
-          bar.style.width = `${p * 100}%`;
-        }, ease.io);
+        await tween(
+          650,
+          (p) => {
+            bar.style.width = `${p * 100}%`;
+          },
+          ease.io,
+        );
       }
 
       if (ok) {
-        ok.style.transform = 'scale(1)';
+        ok.style.transform = "scale(1)";
       }
       await wait(180);
     }
 
-    updateStatus('Ready · runs on your device', 'var(--ok)', false);
+    updateStatus("Ready · runs on your device", "var(--ok)", false);
     setIsBusy(false);
 
     // Results
     const secs = (steps.length * 0.7).toFixed(1);
-    const base = f.name.replace(/\.[^.]+$/, '');
-    const ext = f.kind === 'pdf' ? 'pdf' : f.kind === 'image' ? 'jpg' : 'bin';
+    const base = f.name.replace(/\.[^.]+$/, "");
+    const ext = f.kind === "pdf" ? "pdf" : f.kind === "image" ? "jpg" : "bin";
 
     setMessages((prev) => [
       ...prev,
       {
-        id: 'bot-done-' + Date.now(),
-        type: 'bot',
+        id: "bot-done-" + Date.now(),
+        type: "bot",
         html: `Done in ${secs} s — your file is ready.`,
       },
       {
-        id: 'results-' + Date.now(),
-        type: 'results',
+        id: "results-" + Date.now(),
+        type: "results",
         results: [
           {
             name: `${base}-klipkit.${ext}`,
             size: Math.round(f.size * 0.42),
             gain: 58,
-            m: 'Compressed · on your device',
+            m: "Compressed · on your device",
           },
         ],
       },
       {
-        id: 'next-bot-' + Date.now(),
-        type: 'bot',
+        id: "next-bot-" + Date.now(),
+        type: "bot",
         html: '<span class="text-muted">What next?</span>',
       },
       {
-        id: 'next-chips-' + Date.now(),
-        type: 'chips',
+        id: "next-chips-" + Date.now(),
+        type: "chips",
         chips: NEXT[f.kind] || [],
       },
     ]);
@@ -475,34 +482,28 @@ export function Workspace({
 
   const handleDownload = (res: { name: string; url?: string; blob?: Blob; real?: boolean }) => {
     if (res.real && res.url) {
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = res.url;
       a.download = res.name;
       a.click();
-      toast('Saved ' + res.name);
+      toast("Saved " + res.name);
     } else {
-      toast('Saved ' + res.name + ' ✓');
+      toast("Saved " + res.name + " ✓");
     }
   };
 
-  const { steps: previewSteps, spans: mirrorSpans } = parse(
-    inputText,
-    currentFileRef.current?.kind,
-  );
+  const { steps: previewSteps, spans: mirrorSpans } = parse(inputText, currentFileRef.current?.kind);
 
   return (
     <section id="work" aria-label="Workspace" className="select-text">
-      <div className={`col ${panelTool ? 'w-[min(1600px,96vw)]' : 'w-[min(880px,92vw)]'} flex flex-col h-full`}>
+      <div className={`col ${panelTool ? "w-[min(1600px,96vw)]" : "w-[min(880px,92vw)]"} flex flex-col h-full`}>
         {/* Workspace Header */}
         <div className="wk-head flex items-center gap-[16px] py-[10px] pb-[14px] flex-none">
           <div id="orbDock" className="w-[58px] h-[58px] rounded-full flex-none" />
           <div>
             <div className="wk-name font-semibold text-[19px]">KlipKit</div>
             <div id="status" className="wk-status text-[14px] text-muted flex items-center gap-[7px]">
-              <i
-                className="w-[7px] h-[7px] rounded-full block"
-                style={{ background: statusColor }}
-              />
+              <i className="w-[7px] h-[7px] rounded-full block" style={{ background: statusColor }} />
               <span>{statusText}</span>
             </div>
           </div>
@@ -522,7 +523,15 @@ export function Workspace({
               }}
               className="pill inline-flex items-center gap-[8px] h-[44px] px-[20px] rounded-full text-[15px] font-medium border border-line2 bg-panel text-ink transition-transform active:scale-[0.96]"
             >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+              >
                 <path d="M12 5v14M5 12h14" />
               </svg>
               New
@@ -544,7 +553,7 @@ export function Workspace({
             >
               {messages.map((m) => {
                 // File Card
-                if (m.type === 'file' && m.file) {
+                if (m.type === "file" && m.file) {
                   const f = m.file;
                   const K = KINDS[f.kind];
                   return (
@@ -574,7 +583,7 @@ export function Workspace({
                 }
 
                 // Paste Card
-                if (m.type === 'paste' && m.pasteItem) {
+                if (m.type === "paste" && m.pasteItem) {
                   const p = m.pasteItem;
                   return (
                     <div
@@ -585,19 +594,17 @@ export function Workspace({
                         className="ftile flex-none grid place-items-center rounded-[10px] text-white font-bold"
                         style={{
                           background: PT_COLOR[p.pt],
-                          width: '46px',
-                          height: '46px',
-                          fontSize: PT_TILE[p.pt].length > 3 ? '10px' : '13px',
+                          width: "46px",
+                          height: "46px",
+                          fontSize: PT_TILE[p.pt].length > 3 ? "10px" : "13px",
                         }}
                       >
                         {PT_TILE[p.pt]}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="fname font-semibold text-[17px] text-ink">
-                          Pasted {p.label}
-                        </div>
+                        <div className="fname font-semibold text-[17px] text-ink">Pasted {p.label}</div>
                         <div className="fmeta text-[14px] text-muted mt-[2px]">
-                          {p.lines.toLocaleString()} line{p.lines > 1 ? 's' : ''} · {fmtSize(p.size)}
+                          {p.lines.toLocaleString()} line{p.lines > 1 ? "s" : ""} · {fmtSize(p.size)}
                         </div>
                         <pre className="pprev mt-[8px] font-mono text-[13px] text-muted whitespace-pre-wrap break-all max-h-[84px] overflow-hidden">
                           {m.html}
@@ -608,19 +615,23 @@ export function Workspace({
                 }
 
                 // Bot bubble
-                if (m.type === 'bot' && m.html) {
+                if (m.type === "bot" && m.html) {
                   return (
-                    <div key={m.id} className="msg flex gap-[14px] mb-[20px] animate-[msgIn_0.55s_cubic-bezier(.2,.8,.2,1)_both]">
+                    <div
+                      key={m.id}
+                      className="msg flex gap-[14px] mb-[20px] animate-[msgIn_0.55s_cubic-bezier(.2,.8,.2,1)_both]"
+                    >
                       <div
                         className="av w-[34px] h-[34px] rounded-full flex-none overflow-hidden relative shadow-[inset_0_0_0_1px_rgba(255,255,255,0.4)]"
                         style={{
-                          background: 'conic-gradient(from 200deg, #7C6BFF, #B38BFF, #FF9C82, #FFD27A, #8FE0BE, #6FB7FF, #7C6BFF)',
+                          background:
+                            "conic-gradient(from 200deg, #7C6BFF, #B38BFF, #FF9C82, #FFD27A, #8FE0BE, #6FB7FF, #7C6BFF)",
                         }}
                       >
                         <div
                           className="absolute inset-0"
                           style={{
-                            background: 'radial-gradient(circle at 32% 28%, rgba(255,255,255,0.9), transparent 45%)',
+                            background: "radial-gradient(circle at 32% 28%, rgba(255,255,255,0.9), transparent 45%)",
                           }}
                         />
                       </div>
@@ -633,9 +644,12 @@ export function Workspace({
                 }
 
                 // User bubble
-                if (m.type === 'user' && m.html) {
+                if (m.type === "user" && m.html) {
                   return (
-                    <div key={m.id} className="msg user flex justify-end mb-[20px] animate-[msgIn_0.55s_cubic-bezier(.2,.8,.2,1)_both]">
+                    <div
+                      key={m.id}
+                      className="msg user flex justify-end mb-[20px] animate-[msgIn_0.55s_cubic-bezier(.2,.8,.2,1)_both]"
+                    >
                       <div
                         className="ub bg-ink text-bg px-[20px] py-[14px] rounded-[22px_22px_6px_22px] text-[19px] leading-[1.45] max-w-[640px]"
                         dangerouslySetInnerHTML={{ __html: m.html }}
@@ -645,9 +659,12 @@ export function Workspace({
                 }
 
                 // Chips
-                if (m.type === 'chips' && m.chips) {
+                if (m.type === "chips" && m.chips) {
                   return (
-                    <div key={m.id} className="chips flex flex-wrap gap-[10px] my-[2px] mb-[22px] ml-[48px] max-[640px]:ml-0">
+                    <div
+                      key={m.id}
+                      className="chips flex flex-wrap gap-[10px] my-[2px] mb-[22px] ml-[48px] max-[640px]:ml-0"
+                    >
                       {m.chips.map(([label, cmd], idx) => (
                         <button
                           key={label}
@@ -671,16 +688,14 @@ export function Workspace({
                 }
 
                 // Action Result Card (for paste & generators)
-                if (m.type === 'resultCard' && m.actionResult) {
+                if (m.type === "resultCard" && m.actionResult) {
                   const r = m.actionResult;
                   return (
                     <div
                       key={m.id}
                       className="card rcard2 bg-solid border border-line rounded-[24px] shadow-[var(--shadow)] p-[20px] mb-[22px] ml-[48px] max-[640px]:ml-0"
                     >
-                      {r.html && (
-                        <div dangerouslySetInnerHTML={{ __html: r.html }} />
-                      )}
+                      {r.html && <div dangerouslySetInnerHTML={{ __html: r.html }} />}
                       <div className="rfoot flex items-center gap-[8px] mt-[14px] flex-wrap">
                         {r.copy && (
                           <button
@@ -688,7 +703,15 @@ export function Workspace({
                             className="pill sm inline-flex items-center gap-[6px] h-[38px] px-[15px] rounded-full text-[14px] font-medium border border-line bg-panel text-ink hover:-translate-y-[1px]"
                             onClick={() => copyText(r.copy)}
                           >
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+                            <svg
+                              width="15"
+                              height="15"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2.2"
+                              strokeLinecap="round"
+                            >
                               <rect x="9" y="9" width="11" height="11" rx="2.5" />
                               <path d="M5 15V6a2 2 0 0 1 2-2h9" />
                             </svg>
@@ -701,24 +724,22 @@ export function Workspace({
                             className="pill sm inline-flex items-center gap-[6px] h-[38px] px-[15px] rounded-full text-[14px] font-medium border border-line bg-panel text-ink hover:-translate-y-[1px]"
                             onClick={() => {
                               const tool = TOOLS.find((t) => t.n === r.open);
-                              if (tool) openPanel(tool, currentPasteRef.current?.text || '');
+                              if (tool) openPanel(tool, currentPasteRef.current?.text || "");
                             }}
                           >
                             Open in {r.open} <span className="opacity-60">⤢</span>
                           </button>
                         )}
-                        <span className="rnote ml-auto text-[13px] text-faint">
-                          On your device · nothing uploaded
-                        </span>
+                        <span className="rnote ml-auto text-[13px] text-faint">On your device · nothing uploaded</span>
                       </div>
                     </div>
                   );
                 }
 
                 // Plan Card
-                if (m.type === 'plan' && m.planSteps) {
+                if (m.type === "plan" && m.planSteps) {
                   const steps = m.planSteps;
-                  const hasServer = steps.some((s) => ['word', 'pdf', 'protect'].includes(s.id));
+                  const hasServer = steps.some((s) => ["word", "pdf", "protect"].includes(s.id));
                   return (
                     <div
                       key={m.id}
@@ -736,20 +757,29 @@ export function Workspace({
                                 {idx + 1}
                               </div>
                               <div className="t font-semibold text-[17px] mt-[10px]">{s.t}</div>
-                              <div className="d text-[14px] text-muted mt-[3px] tabular-nums">{s.d || '\u00A0'}</div>
+                              <div className="d text-[14px] text-muted mt-[3px] tabular-nums">{s.d || "\u00A0"}</div>
                               <div className="bar h-[5px] rounded-[5px] bg-line mt-[14px] overflow-hidden">
                                 <b
                                   className="block h-full w-0 rounded-[5px]"
-                                  style={{ background: 'linear-gradient(90deg, var(--accent), var(--peach))' }}
+                                  style={{ background: "linear-gradient(90deg, var(--accent), var(--peach))" }}
                                 />
                               </div>
                               <div className="ok absolute right-[14px] top-[14px] w-[28px] h-[28px] rounded-full bg-ok grid place-items-center scale-0 transition-transform duration-450 ease-[cubic-bezier(.2,.9,.3,1.5)]">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
+                                <svg
+                                  width="15"
+                                  height="15"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="#fff"
+                                  strokeWidth="3.2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                >
                                   <path d="M5 12l5 5L20 7" />
                                 </svg>
                               </div>
                               <div className="tag absolute right-[14px] top-[16px] text-[12px] font-semibold text-muted">
-                                {['word', 'pdf', 'protect'].includes(s.id) ? 'Private server' : 'On device'}
+                                {["word", "pdf", "protect"].includes(s.id) ? "Private server" : "On device"}
                               </div>
                             </div>
                           </React.Fragment>
@@ -757,20 +787,28 @@ export function Workspace({
                       </div>
 
                       <div className="cardfoot flex items-center gap-[10px] mt-[16px] text-[14px] text-muted">
-                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+                        <svg
+                          width="17"
+                          height="17"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.2"
+                          strokeLinecap="round"
+                        >
                           <rect x="5" y="10" width="14" height="10" rx="3" />
                           <path d="M8 10V7a4 4 0 0 1 8 0v3" />
                         </svg>
                         <span>
                           {hasServer
-                            ? 'Some steps use KlipKit’s own server · deleted after 1 hour'
-                            : 'Runs on your device · nothing is uploaded'}
+                            ? "Some steps use KlipKit’s own server · deleted after 1 hour"
+                            : "Runs on your device · nothing is uploaded"}
                         </span>
                         <button
                           type="button"
                           className="run ml-auto h-[46px] px-[22px] rounded-full bg-ink text-bg font-semibold text-[16px] inline-flex items-center gap-[10px] relative overflow-hidden transition-[transform,background] active:scale-[0.96]"
                           onClick={(e) => {
-                            const card = e.currentTarget.closest('.card') as HTMLElement;
+                            const card = e.currentTarget.closest(".card") as HTMLElement;
                             if (card) executePlan(steps, card);
                           }}
                         >
@@ -782,7 +820,7 @@ export function Workspace({
                 }
 
                 // File Results Card
-                if (m.type === 'results' && m.results) {
+                if (m.type === "results" && m.results) {
                   return (
                     <div
                       key={m.id}
@@ -810,7 +848,7 @@ export function Workspace({
                             <div className="fname font-semibold text-[17px] text-ink">{res.name}</div>
                             <div className="fmeta text-[14px] text-muted">
                               {fmtSize(res.size)}
-                              {res.m ? ` · ${res.m}` : ''}
+                              {res.m ? ` · ${res.m}` : ""}
                             </div>
                           </div>
                           {res.gain > 0 && (
@@ -824,7 +862,16 @@ export function Workspace({
                             onClick={() => handleDownload(res)}
                             className="dl ml-auto w-[42px] h-[42px] rounded-full border border-line2 grid place-items-center bg-solid transition-transform hover:-translate-y-[2px]"
                           >
-                            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                            <svg
+                              width="19"
+                              height="19"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2.2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
                               <path d="M12 4v12M6 11l6 6 6-6M5 20h14" />
                             </svg>
                           </button>
@@ -844,17 +891,14 @@ export function Workspace({
               <div
                 id="listen"
                 className={`absolute left-1/2 -top-[38px] -translate-x-1/2 flex items-center gap-[12px] px-[18px] py-[10px] rounded-full bg-ink text-bg text-[14px] font-medium transition-[opacity,transform] duration-400 ease-[cubic-bezier(.2,.9,.3,1.3)] pointer-events-none ${
-                  isListening ? 'opacity-100 -translate-y-[8px]' : 'opacity-0 translate-y-0'
+                  isListening ? "opacity-100 -translate-y-[8px]" : "opacity-0 translate-y-0"
                 }`}
               >
                 <div className="rd w-[9px] h-[9px] rounded-full bg-[#FF5A5F]" />
                 Listening · Pro
                 <div id="wave" className="flex gap-[3px] items-center h-[24px]">
                   {Array.from({ length: 22 }).map((_, i) => (
-                    <i
-                      key={i}
-                      className="w-[3px] rounded-[3px] bg-bg h-[4px] block transition-[height] duration-75"
-                    />
+                    <i key={i} className="w-[3px] rounded-[3px] bg-bg h-[4px] block transition-[height] duration-75" />
                   ))}
                 </div>
               </div>
@@ -869,7 +913,7 @@ export function Workspace({
                         {idx > 0 && <span className="text-faint">→</span>}
                         <span
                           className={`pv inline-flex items-center gap-[8px] h-[34px] px-[14px] rounded-full text-[14px] font-medium bg-solid border border-line ${
-                            s.ok ? '' : 'opacity-50 line-through'
+                            s.ok ? "" : "opacity-50 line-through"
                           }`}
                         >
                           <i
@@ -894,7 +938,7 @@ export function Workspace({
                     aria-hidden="true"
                     className="font-sans text-[19px] leading-[30px] p-[8px_0] whitespace-pre-wrap break-words absolute inset-0 text-transparent pointer-events-none select-none"
                     dangerouslySetInnerHTML={{
-                      __html: markHTML(inputText, mirrorSpans, true) + '&#8203;',
+                      __html: markHTML(inputText, mirrorSpans, true) + "&#8203;",
                     }}
                   />
                   <textarea
@@ -904,7 +948,7 @@ export function Workspace({
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey) {
+                      if (e.key === "Enter" && !e.shiftKey) {
                         e.preventDefault();
                         if (inputText.trim()) handleSend(inputText);
                       }
@@ -921,13 +965,22 @@ export function Workspace({
                   aria-label="Voice command (Pro)"
                   onClick={onOpenVoice}
                   className={`mic relative w-[52px] h-[52px] rounded-full border border-line grid place-items-center flex-none transition-colors active:scale-[0.96] ${
-                    isListening ? 'rec bg-red border-red text-white' : 'bg-soft text-ink'
+                    isListening ? "rec bg-red border-red text-white" : "bg-soft text-ink"
                   }`}
                 >
                   <span className="pro absolute -top-[8px] -right-[10px] inline-flex items-center px-[8px] py-[3px] rounded-full text-white text-[11px] font-bold tracking-[0.8px] bg-gradient-to-br from-[#8C7DFF] to-[#FF9C82] shadow-sm">
                     PRO
                   </span>
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.1"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <rect x="9" y="3" width="6" height="11" rx="3" />
                     <path d="M5 11a7 7 0 0 0 14 0M12 18v3" />
                   </svg>
@@ -941,7 +994,16 @@ export function Workspace({
                   onClick={() => handleSend(inputText)}
                   className="send w-[52px] h-[52px] rounded-full bg-ink text-bg grid place-items-center flex-none transition-[transform,opacity] disabled:opacity-35 active:scale-[0.96]"
                 >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <path d="M12 19V5M5 12l7-7 7 7" />
                   </svg>
                 </button>

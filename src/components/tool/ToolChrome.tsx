@@ -3,7 +3,7 @@ import { ArrowRight, Copy, Download, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useKlip, type Artifact } from "@/lib/store";
+import { useKlip, type Artifact } from "@/lib/store/klip";
 import { download } from "@/lib/utils";
 
 /** Bundles several outputs into one ZIP (fflate, MIT; images are already compressed, so store only). */

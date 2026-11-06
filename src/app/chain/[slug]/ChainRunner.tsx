@@ -1,9 +1,9 @@
 "use client";
 import { useState } from "react";
-import { Dropzone } from "@/components/workspace/Dropzone";
-import { ResultActions } from "@/components/workspace/ToolChrome";
-import { ToolWorkspace, useToolRun } from "@/components/workspace/ToolWorkspace";
-import type { Artifact } from "@/lib/store";
+import { Dropzone } from "@/components/tool/Dropzone";
+import { ResultActions } from "@/components/tool/ToolChrome";
+import { ToolWorkspace, useToolRun } from "@/components/tool/ToolWorkspace";
+import type { Artifact } from "@/lib/store/klip";
 import { formatBytes, renameExt } from "@/lib/utils";
 import type { ChainStep } from "@/registry/types";
 import type { ImageJob } from "@/workers/image-ops";

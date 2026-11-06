@@ -1,17 +1,14 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { useRouter } from 'next/navigation';
-import { VoiceSheet } from './VoiceSheet';
-import { useUIStore } from '@/lib/uiStore';
-import { goto } from '@/lib/animation';
+import React from "react";
+import { useRouter } from "next/navigation";
+import { VoiceSheet } from "../home/VoiceSheet";
+import { useUIStore } from "@/lib/store/ui";
+import { goto } from "@/lib/motion/animation";
 
 export function GlobalModals() {
   const router = useRouter();
-  const {
-    isVoiceSheetOpen,
-    closeVoiceSheet,
-  } = useUIStore();
+  const { isVoiceSheetOpen, closeVoiceSheet } = useUIStore();
 
   return (
     <>
@@ -20,16 +17,16 @@ export function GlobalModals() {
         onClose={closeVoiceSheet}
         onTryVoiceDemo={() => {
           closeVoiceSheet();
-          if (typeof window !== 'undefined' && (window as any).__kk?.voice) {
+          if (typeof window !== "undefined" && (window as any).__kk?.voice) {
             (window as any).__kk.voice();
           }
         }}
         onSeePlans={() => {
           closeVoiceSheet();
-          if (window.location.pathname === '/') {
-            goto('pricing');
+          if (window.location.pathname === "/") {
+            goto("pricing");
           } else {
-            router.push('/#pricing');
+            router.push("/#pricing");
           }
         }}
       />

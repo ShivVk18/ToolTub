@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { pageMetadata } from "@/lib/metadata";
+import { pageMetadata } from "@/lib/seo/metadata";
 
 export const metadata: Metadata = pageMetadata({
   path: "/privacy",

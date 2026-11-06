@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import { ResultActions, useHandoff } from "@/components/workspace/ToolChrome";
-import { Field, ToolWorkspace, inputClass } from "@/components/workspace/ToolWorkspace";
+import { ResultActions, useHandoff } from "@/components/tool/ToolChrome";
+import { Field, ToolWorkspace, inputClass } from "@/components/tool/ToolWorkspace";
 import { formatJson, type JsonResult } from "@/workers/json-ops";
 import { jsonWorker } from "@/workers/clients";
 import type { ToolProps } from "./types";

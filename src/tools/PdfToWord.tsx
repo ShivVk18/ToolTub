@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
-import { Dropzone } from "@/components/workspace/Dropzone";
-import { ResultActions } from "@/components/workspace/ToolChrome";
-import { ToolWorkspace, useToolRun } from "@/components/workspace/ToolWorkspace";
+import { Dropzone } from "@/components/tool/Dropzone";
+import { ResultActions } from "@/components/tool/ToolChrome";
+import { ToolWorkspace, useToolRun } from "@/components/tool/ToolWorkspace";
 import { formatBytes } from "@/lib/utils";
 import type { ToolProps } from "./types";
 

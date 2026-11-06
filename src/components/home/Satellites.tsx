@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import React, { useEffect, useRef } from 'react';
-import { addLoop } from '@/lib/animation';
-import { type OrbController } from './Orb';
+import React, { useEffect, useRef } from "react";
+import { addLoop } from "@/lib/motion/animation";
+import { type OrbController } from "./Orb";
 
 interface SatellitesProps {
   isHero: boolean;
@@ -11,15 +11,15 @@ interface SatellitesProps {
 }
 
 const SATS: [string, string][] = [
-  ['PDF', '#E5484D'],
-  ['{ } JSON', '#6D5DF5'],
-  ['MP3', '#D98E04'],
-  ['JWT', '#F2734F'],
-  ['PNG', '#1F9D63'],
-  ['SQL', '#2B5FD9'],
-  ['MP4', '#2F80ED'],
-  ['#HEX', '#8E5BD9'],
-  ['CSV', '#1F9D63'],
+  ["PDF", "#E5484D"],
+  ["{ } JSON", "#6D5DF5"],
+  ["MP3", "#D98E04"],
+  ["JWT", "#F2734F"],
+  ["PNG", "#1F9D63"],
+  ["SQL", "#2B5FD9"],
+  ["MP4", "#2F80ED"],
+  ["#HEX", "#8E5BD9"],
+  ["CSV", "#1F9D63"],
 ];
 
 export function Satellites({ isHero, isDragging = false, controllerRef }: SatellitesProps) {
@@ -35,15 +35,15 @@ export function Satellites({ isHero, isDragging = false, controllerRef }: Satell
 
     const cleanup = addLoop((t, dt) => {
       const hero = isHero;
-      const scrollY = typeof window !== 'undefined' ? window.scrollY : 0;
-      const innerHeight = typeof window !== 'undefined' ? window.innerHeight : 800;
+      const scrollY = typeof window !== "undefined" ? window.scrollY : 0;
+      const innerHeight = typeof window !== "undefined" ? window.innerHeight : 800;
 
       const orbState = controllerRef?.current?.getState?.();
       // Satellites MUST STAY HIDDEN until the orb has been initialized and measured
       if (!orbState || !orbState.init || orbState.x === 0 || orbState.y === 0) {
         if (!isOff) {
           satRefs.current.forEach((el) => {
-            if (el) el.style.opacity = '0';
+            if (el) el.style.opacity = "0";
           });
           isOff = true;
         }
@@ -54,7 +54,7 @@ export function Satellites({ isHero, isDragging = false, controllerRef }: Satell
       if (satV < 0.01) {
         if (!isOff) {
           satRefs.current.forEach((el) => {
-            if (el) el.style.opacity = '0';
+            if (el) el.style.opacity = "0";
           });
           isOff = true;
         }
@@ -64,7 +64,8 @@ export function Satellites({ isHero, isDragging = false, controllerRef }: Satell
       isOff = false;
 
       // Drag tightening
-      const drag = isDragging || (typeof document !== 'undefined' && document.body.classList.contains('dragging')) ? 1 : 0;
+      const drag =
+        isDragging || (typeof document !== "undefined" && document.body.classList.contains("dragging")) ? 1 : 0;
       satDrag += (drag - satDrag) * Math.min(1, dt * 4);
 
       const ox = orbState.x;
@@ -76,7 +77,7 @@ export function Satellites({ isHero, isDragging = false, controllerRef }: Satell
         satSizes = satRefs.current.map((el) => [el?.offsetWidth || 70, el?.offsetHeight || 38]);
       }
 
-      const rx = (BASE * orbState.s * 0.5) * (2.05 - satDrag * 0.55) + 34;
+      const rx = BASE * orbState.s * 0.5 * (2.05 - satDrag * 0.55) + 34;
       const ry = rx * 0.27;
       const tilt = -0.17;
       const ct = Math.cos(tilt);
@@ -96,8 +97,8 @@ export function Satellites({ isHero, isDragging = false, controllerRef }: Satell
         const [w, h] = satSizes![i];
         el.style.transform = `translate(${(x - w / 2).toFixed(1)}px, ${(y - h / 2).toFixed(1)}px) scale(${(0.74 + 0.3 * dep).toFixed(3)})`;
         el.style.opacity = ((0.28 + 0.72 * dep) * satV).toFixed(3);
-        el.style.zIndex = z > 0 ? '6' : '4';
-        el.style.filter = dep < 0.35 ? 'blur(1px)' : 'none';
+        el.style.zIndex = z > 0 ? "6" : "4";
+        el.style.filter = dep < 0.35 ? "blur(1px)" : "none";
       });
     });
 

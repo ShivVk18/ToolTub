@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React, { useEffect, useRef } from 'react';
-import { addLoop, clamp, ptr } from '@/lib/animation';
+import React, { useEffect, useRef } from "react";
+import { addLoop, clamp, ptr } from "@/lib/motion/animation";
 
 export function AuroraBackground() {
   const bARef = useRef<HTMLDivElement>(null);
@@ -13,9 +13,9 @@ export function AuroraBackground() {
   useEffect(() => {
     // Generate film-grain canvas texture
     try {
-      const c = document.createElement('canvas');
+      const c = document.createElement("canvas");
       c.width = c.height = 180;
-      const x = c.getContext('2d');
+      const x = c.getContext("2d");
       if (x) {
         const d = x.createImageData(180, 180);
         for (let i = 0; i < d.data.length; i += 4) {
@@ -34,7 +34,7 @@ export function AuroraBackground() {
       // Fallback if canvas blocked
     }
 
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (prefersReducedMotion) return;
 
     // Shared rAF loop update for blobs, aura, and nav background fade
@@ -60,9 +60,9 @@ export function AuroraBackground() {
       }
 
       // Update nav background opacity based on scroll
-      const nav = document.getElementById('nav');
+      const nav = document.getElementById("nav");
       if (nav) {
-        nav.style.setProperty('--navbg', String(clamp(window.scrollY / 120, 0, 1)));
+        nav.style.setProperty("--navbg", String(clamp(window.scrollY / 120, 0, 1)));
       }
     });
 
@@ -76,11 +76,11 @@ export function AuroraBackground() {
         id="bA"
         className="blob"
         style={{
-          width: '62vw',
-          height: '62vw',
-          left: '-14vw',
-          top: '-26vw',
-          ['--c' as any]: 'var(--blobA)',
+          width: "62vw",
+          height: "62vw",
+          left: "-14vw",
+          top: "-26vw",
+          ["--c" as any]: "var(--blobA)",
         }}
       />
       <div
@@ -88,11 +88,11 @@ export function AuroraBackground() {
         id="bB"
         className="blob"
         style={{
-          width: '56vw',
-          height: '56vw',
-          left: '58vw',
-          top: '30vh',
-          ['--c' as any]: 'var(--blobB)',
+          width: "56vw",
+          height: "56vw",
+          left: "58vw",
+          top: "30vh",
+          ["--c" as any]: "var(--blobB)",
         }}
       />
       <div
@@ -100,11 +100,11 @@ export function AuroraBackground() {
         id="bC"
         className="blob"
         style={{
-          width: '42vw',
-          height: '42vw',
-          left: '36vw',
-          top: '-22vw',
-          ['--c' as any]: 'var(--blobC)',
+          width: "42vw",
+          height: "42vw",
+          left: "36vw",
+          top: "-22vw",
+          ["--c" as any]: "var(--blobC)",
         }}
       />
       <div id="aura" ref={auraRef} />

@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useKlip } from "@/lib/store";
+import { useKlip } from "@/lib/store/klip";
 import type { SearchEntry } from "@/registry/search-index";
 
 /** Recently used + favourites. Rendered only after hydration and only when they exist. */

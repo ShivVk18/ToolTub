@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { goto, ripple, addLoop, clamp } from '@/lib/animation';
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import { goto, ripple, addLoop, clamp } from "@/lib/motion/animation";
 
 interface NavProps {
   onOpenSearch?: () => void;
@@ -15,23 +15,23 @@ export function Nav({ onOpenSearch, onOpenPro, isHome = true }: NavProps) {
 
   useEffect(() => {
     try {
-      const storedTheme = localStorage.getItem('theme') || localStorage.getItem('kk.theme');
+      const storedTheme = localStorage.getItem("theme") || localStorage.getItem("kk.theme");
       const isDarkTheme =
-        storedTheme === 'dark' ||
+        storedTheme === "dark" ||
         storedTheme === '"dark"' ||
-        (!storedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        (!storedTheme && window.matchMedia("(prefers-color-scheme: dark)").matches);
       setIsDark(isDarkTheme);
     } catch {}
   }, []);
 
   // Track scroll progress and capsule morph
   useEffect(() => {
-    const progEl = document.getElementById('prog');
+    const progEl = document.getElementById("prog");
     const cleanup = addLoop(() => {
       const scrollY = window.scrollY;
       const sc = scrollY > 60;
-      if (sc !== document.body.classList.contains('scrolled')) {
-        document.body.classList.toggle('scrolled', sc);
+      if (sc !== document.body.classList.contains("scrolled")) {
+        document.body.classList.toggle("scrolled", sc);
       }
       if (progEl) {
         const h = document.documentElement.scrollHeight - window.innerHeight;
@@ -47,23 +47,23 @@ export function Nav({ onOpenSearch, onOpenPro, isHome = true }: NavProps) {
 
     const next = !isDark;
     setIsDark(next);
-    const themeStr = next ? 'dark' : 'light';
+    const themeStr = next ? "dark" : "light";
 
-    document.documentElement.classList.add('theming');
+    document.documentElement.classList.add("theming");
     document.documentElement.dataset.theme = themeStr;
     if (next) {
-      document.documentElement.classList.add('dark');
+      document.documentElement.classList.add("dark");
     } else {
-      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.remove("dark");
     }
 
     try {
-      localStorage.setItem('theme', themeStr);
-      localStorage.setItem('kk.theme', JSON.stringify(themeStr));
+      localStorage.setItem("theme", themeStr);
+      localStorage.setItem("kk.theme", JSON.stringify(themeStr));
     } catch {}
 
     setTimeout(() => {
-      document.documentElement.classList.remove('theming');
+      document.documentElement.classList.remove("theming");
     }, 800);
   };
 
@@ -76,11 +76,11 @@ export function Nav({ onOpenSearch, onOpenPro, isHome = true }: NavProps) {
   };
 
   const handleLogin = () => {
-    const toastEl = document.getElementById('toast');
+    const toastEl = document.getElementById("toast");
     if (toastEl) {
-      toastEl.textContent = 'No account needed — KlipKit is free forever!';
-      toastEl.classList.add('show');
-      setTimeout(() => toastEl.classList.remove('show'), 2600);
+      toastEl.textContent = "No account needed — KlipKit is free forever!";
+      toastEl.classList.add("show");
+      setTimeout(() => toastEl.classList.remove("show"), 2600);
     }
   };
 
@@ -106,28 +106,16 @@ export function Nav({ onOpenSearch, onOpenPro, isHome = true }: NavProps) {
 
           {/* Links */}
           <nav aria-label="Main" className="links">
-            <button
-              type="button"
-              onClick={() => handleNavClick('explore')}
-            >
+            <button type="button" onClick={() => handleNavClick("explore")}>
               Tools
             </button>
-            <button
-              type="button"
-              onClick={() => handleNavClick('feel')}
-            >
+            <button type="button" onClick={() => handleNavClick("feel")}>
               Why KlipKit
             </button>
-            <button
-              type="button"
-              onClick={() => (onOpenPro ? onOpenPro() : handleNavClick('pricing'))}
-            >
+            <button type="button" onClick={() => (onOpenPro ? onOpenPro() : handleNavClick("pricing"))}>
               Pro
             </button>
-            <button
-              type="button"
-              onClick={() => handleNavClick('pricing')}
-            >
+            <button type="button" onClick={() => handleNavClick("pricing")}>
               Pricing
             </button>
           </nav>
@@ -140,7 +128,7 @@ export function Nav({ onOpenSearch, onOpenPro, isHome = true }: NavProps) {
               data-mag
               onClick={() => {
                 if (onOpenSearch) onOpenSearch();
-                window.dispatchEvent(new Event('klipkit:search'));
+                window.dispatchEvent(new Event("klipkit:search"));
               }}
               aria-label="Search 76 tools… (⌘K)"
               className="kbtn"
@@ -162,13 +150,7 @@ export function Nav({ onOpenSearch, onOpenPro, isHome = true }: NavProps) {
               <kbd>⌘K</kbd>
             </button>
 
-            <button
-              id="theme"
-              type="button"
-              onClick={toggleTheme}
-              aria-label="Toggle theme"
-              className="icon-btn"
-            >
+            <button id="theme" type="button" onClick={toggleTheme} aria-label="Toggle theme" className="icon-btn">
               <svg
                 id="ticon"
                 width="19"
@@ -191,12 +173,7 @@ export function Nav({ onOpenSearch, onOpenPro, isHome = true }: NavProps) {
               </svg>
             </button>
 
-            <button
-              id="login"
-              type="button"
-              className="pill"
-              onClick={handleLogin}
-            >
+            <button id="login" type="button" className="pill" onClick={handleLogin}>
               Log in
             </button>
 
@@ -205,7 +182,7 @@ export function Nav({ onOpenSearch, onOpenPro, isHome = true }: NavProps) {
               type="button"
               data-mag
               className="pill ink"
-              onClick={() => (onOpenPro ? onOpenPro() : handleNavClick('pricing'))}
+              onClick={() => (onOpenPro ? onOpenPro() : handleNavClick("pricing"))}
             >
               Go Pro
             </button>

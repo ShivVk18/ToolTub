@@ -1,4 +1,4 @@
-import { sitemapGroups, xml } from "@/lib/sitemap";
+import { sitemapGroups, xml } from "@/lib/seo/sitemap";
 import { SITE_UPDATED, abs } from "@/lib/site";
 
 /** Sitemap index → one sitemap per category (/sitemaps/pdf.xml, /sitemaps/developer.xml, …). */

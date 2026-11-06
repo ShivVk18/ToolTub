@@ -1,7 +1,7 @@
 "use client";
 
 import { create } from "zustand";
-import type { ToolItem } from "./designTools";
+import type { ToolItem } from "../designTools";
 
 interface UIState {
   isPaletteOpen: boolean;

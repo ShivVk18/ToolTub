@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState, useRef, useLayoutEffect } from 'react';
-import { KINDS, SAMPLES } from '@/lib/fileKind';
-import { genParse, looksLikeContent } from '@/lib/detect';
-import { markHTML } from '@/lib/intent';
-import { addLoop } from '@/lib/animation';
+import React, { useEffect, useState, useRef, useLayoutEffect } from "react";
+import { KINDS, SAMPLES } from "@/lib/fileKind";
+import { genParse, looksLikeContent } from "@/lib/detect";
+import { markHTML } from "@/lib/intent";
+import { addLoop } from "@/lib/motion/animation";
 
 interface HeroProps {
   onPickSample: (sampleKey: string, e: React.MouseEvent<HTMLButtonElement>) => void;
@@ -15,26 +15,20 @@ interface HeroProps {
 }
 
 const TYPEWRITER_EXAMPLES = [
-  'generate 10 UUIDs',
-  'compress to under 2 MB',
-  'is this JWT expired?',
-  'remove the background',
-  'sha256 of hello',
-  'format this JSON',
-  'convert to webp',
-  'lorem ipsum, 3 paragraphs',
+  "generate 10 UUIDs",
+  "compress to under 2 MB",
+  "is this JWT expired?",
+  "remove the background",
+  "sha256 of hello",
+  "format this JSON",
+  "convert to webp",
+  "lorem ipsum, 3 paragraphs",
 ];
 
-export function Hero({
-  onPickSample,
-  onOrbSlotClick,
-  onPasteText,
-  onSubmitAsk,
-  hintText,
-}: HeroProps) {
-  const [askValue, setAskValue] = useState('');
-  const [placeholder, setPlaceholder] = useState('Try “generate 10 UUIDs” — or paste anything');
-  const [mirrorHtml, setMirrorHtml] = useState('');
+export function Hero({ onPickSample, onOrbSlotClick, onPasteText, onSubmitAsk, hintText }: HeroProps) {
+  const [askValue, setAskValue] = useState("");
+  const [placeholder, setPlaceholder] = useState("Try “generate 10 UUIDs” — or paste anything");
+  const [mirrorHtml, setMirrorHtml] = useState("");
   const [recents, setRecents] = useState<string[]>([]);
   const [mounted, setMounted] = useState(false);
 
@@ -47,7 +41,7 @@ export function Hero({
   useEffect(() => {
     setMounted(true);
     try {
-      const stored = localStorage.getItem('kk.recents');
+      const stored = localStorage.getItem("kk.recents");
       if (stored) {
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed)) {
@@ -60,7 +54,7 @@ export function Hero({
   // Hand-drawn squiggle underline placement
   const placeSquiggle = () => {
     if (!h1Ref.current || !squigRef.current || !squigPathRef.current) return;
-    const ws = h1Ref.current.querySelectorAll('.l2 .w');
+    const ws = h1Ref.current.querySelectorAll(".l2 .w");
     if (ws.length < 3) return;
 
     // ws[1] is "just", ws[2] is "say"
@@ -73,32 +67,32 @@ export function Hero({
     sq.style.left = `${a.left - h.left - 6}px`;
     sq.style.top = `${a.bottom - h.top - 4}px`;
     sq.style.width = `${w}px`;
-    sq.setAttribute('viewBox', `0 0 ${w} 26`);
+    sq.setAttribute("viewBox", `0 0 ${w} 26`);
 
     const p = `M4 16 C ${w * 0.18} 6, ${w * 0.34} 22, ${w * 0.5} 13 S ${w * 0.82} 5, ${w - 4} 15`;
     const sqP = squigPathRef.current;
-    sqP.setAttribute('d', p);
+    sqP.setAttribute("d", p);
     const L = sqP.getTotalLength();
     sqP.style.strokeDasharray = String(L);
-    sqP.style.setProperty('--L', String(L));
-    sq.classList.add('go');
+    sqP.style.setProperty("--L", String(L));
+    sq.classList.add("go");
   };
 
   useLayoutEffect(() => {
-    if (typeof document !== 'undefined' && 'fonts' in document) {
+    if (typeof document !== "undefined" && "fonts" in document) {
       document.fonts.ready.then(() => {
         placeSquiggle();
       });
     } else {
       placeSquiggle();
     }
-    window.addEventListener('resize', placeSquiggle);
-    return () => window.removeEventListener('resize', placeSquiggle);
+    window.addEventListener("resize", placeSquiggle);
+    return () => window.removeEventListener("resize", placeSquiggle);
   }, []);
 
   // Typewriter placeholder animation loop
   useEffect(() => {
-    let lastPh = '';
+    let lastPh = "";
     const cleanup = addLoop((t) => {
       if (askValue) return;
       const cyc = 3.6;
@@ -109,9 +103,9 @@ export function Hero({
         lt < 1.5
           ? Math.floor((lt / 1.5) * s.length)
           : lt < 3.0
-          ? s.length
-          : Math.floor((1 - (lt - 3.0) / 0.6) * s.length);
-      const cursor = lt < 3.0 && Math.floor(t * 2.6) % 2 ? '▍' : '';
+            ? s.length
+            : Math.floor((1 - (lt - 3.0) / 0.6) * s.length);
+      const cursor = lt < 3.0 && Math.floor(t * 2.6) % 2 ? "▍" : "";
       const ph = `Try “${s.slice(0, Math.max(0, n))}${cursor}” — or paste anything`;
       if (ph !== lastPh) {
         setPlaceholder(ph);
@@ -128,14 +122,14 @@ export function Hero({
 
     const parsed = genParse(val);
     const spans = parsed?.spans || [];
-    setMirrorHtml(markHTML(val, spans, true) + '&#8203;');
+    setMirrorHtml(markHTML(val, spans, true) + "&#8203;");
   };
 
   const handleAskSubmit = () => {
     const v = askValue.trim();
     if (!v) return;
-    setAskValue('');
-    setMirrorHtml('');
+    setAskValue("");
+    setMirrorHtml("");
 
     if (looksLikeContent(v)) {
       onPasteText?.(v);
@@ -144,8 +138,8 @@ export function Hero({
     }
   };
 
-  const line1Words = ['Drop', 'it.', 'Paste', 'it.'];
-  const line2Words = ['Or', 'just', 'say', 'what', 'you', 'need.'];
+  const line1Words = ["Drop", "it.", "Paste", "it."];
+  const line2Words = ["Or", "just", "say", "what", "you", "need."];
 
   return (
     <section id="hero" aria-label="Drop a file">
@@ -159,7 +153,7 @@ export function Hero({
             <React.Fragment key={w + i}>
               <span className="w" style={{ animationDelay: `${0.15 + i * 0.07}s` }}>
                 {w}
-              </span>{' '}
+              </span>{" "}
             </React.Fragment>
           ))}
         </span>
@@ -168,7 +162,7 @@ export function Hero({
             <React.Fragment key={w + i}>
               <span className="w" style={{ animationDelay: `${0.15 + 0.32 + i * 0.07}s` }}>
                 {w}
-              </span>{' '}
+              </span>{" "}
             </React.Fragment>
           ))}
         </span>
@@ -191,7 +185,7 @@ export function Hero({
         aria-label="Choose a file"
         onClick={onOrbSlotClick}
         onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
+          if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
             onOrbSlotClick();
           }
@@ -199,17 +193,13 @@ export function Hero({
       />
 
       <p id="hint" className="hint">
-        {hintText || 'Drop a file, paste text or code, or just ask:'}
+        {hintText || "Drop a file, paste text or code, or just ask:"}
       </p>
 
       {/* Hero Ask Bar */}
       <div className="ask" role="search">
         <div className="askf">
-          <div
-            id="heroMirror"
-            aria-hidden="true"
-            dangerouslySetInnerHTML={{ __html: mirrorHtml }}
-          />
+          <div id="heroMirror" aria-hidden="true" dangerouslySetInnerHTML={{ __html: mirrorHtml }} />
           <input
             ref={askInputRef}
             id="heroAsk"
@@ -220,7 +210,7 @@ export function Hero({
             value={askValue}
             onChange={handleAskChange}
             onKeyDown={(e) => {
-              if (e.key === 'Enter') {
+              if (e.key === "Enter") {
                 e.preventDefault();
                 handleAskSubmit();
               }
@@ -230,7 +220,7 @@ export function Hero({
         <button
           type="button"
           id="heroGo"
-          className={askValue.trim() ? 'on' : ''}
+          className={askValue.trim() ? "on" : ""}
           aria-label="Go"
           onClick={handleAskSubmit}
         >
@@ -241,19 +231,10 @@ export function Hero({
       {/* Sample chips + Dashed alt chips (B6) */}
       <div id="samples" className="samples">
         {Object.entries(SAMPLES)
-          .filter(([k]) => ['pdf', 'image', 'audio'].includes(k))
+          .filter(([k]) => ["pdf", "image", "audio"].includes(k))
           .map(([k, s]) => (
-            <button
-              key={k}
-              type="button"
-              className="chip"
-              data-sample={k}
-              onClick={(e) => onPickSample(k, e)}
-            >
-              <span
-                className="dot"
-                style={{ background: KINDS[k as keyof typeof KINDS]?.c }}
-              />
+            <button key={k} type="button" className="chip" data-sample={k} onClick={(e) => onPickSample(k, e)}>
+              <span className="dot" style={{ background: KINDS[k as keyof typeof KINDS]?.c }} />
               {s.label}
             </button>
           ))}
@@ -265,11 +246,9 @@ export function Hero({
           type="button"
           data-alt="0"
           className="chip alt"
-          onClick={() =>
-            onPasteText?.('{"user":{"id":42,"name":"Asha Rao","roles":["admin"],"active":true}}')
-          }
+          onClick={() => onPasteText?.('{"user":{"id":42,"name":"Asha Rao","roles":["admin"],"active":true}}')}
         >
-          <span style={{ color: 'var(--accent)', fontWeight: 600 }}>&#123; &#125;</span> Paste JSON
+          <span style={{ color: "var(--accent)", fontWeight: 600 }}>&#123; &#125;</span> Paste JSON
         </button>
 
         <button
@@ -278,20 +257,15 @@ export function Hero({
           className="chip alt"
           onClick={() =>
             onPasteText?.(
-              'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkFzaGEgUmFvIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
+              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkFzaGEgUmFvIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
             )
           }
         >
-          <span style={{ color: '#F2734F', fontWeight: 600 }}>JWT</span> Paste a token
+          <span style={{ color: "#F2734F", fontWeight: 600 }}>JWT</span> Paste a token
         </button>
 
-        <button
-          type="button"
-          data-alt="2"
-          className="chip alt"
-          onClick={() => onSubmitAsk?.('generate 10 uuids')}
-        >
-          <span style={{ color: 'var(--accent)' }}>✦</span> Generate UUIDs
+        <button type="button" data-alt="2" className="chip alt" onClick={() => onSubmitAsk?.("generate 10 uuids")}>
+          <span style={{ color: "var(--accent)" }}>✦</span> Generate UUIDs
         </button>
       </div>
 
@@ -305,12 +279,12 @@ export function Hero({
                 key={r}
                 className="r"
                 style={{
-                  maxWidth: '220px',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  display: 'inline-block',
-                  verticalAlign: 'middle',
+                  maxWidth: "220px",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                  display: "inline-block",
+                  verticalAlign: "middle",
                 }}
                 title={r}
               >
