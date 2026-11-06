@@ -57,7 +57,7 @@ export function JwtDecoder({ slug, next }: ToolProps) {
         decoded?.ok && (
           <div className="space-y-4">
             <div className="flex flex-wrap gap-2 text-xs">
-              <span className="rounded-full bg-muted px-2.5 py-1">alg: {String(decoded.header.alg)}</span>
+              <span className="rounded-full bg-soft px-2.5 py-1">alg: {String(decoded.header.alg)}</span>
               {status !== "none" &&
                 (status === "expired" ? (
                   <span className="rounded-full bg-red-500/10 px-2.5 py-1 text-red-600 dark:text-red-400">Expired</span>
@@ -73,13 +73,13 @@ export function JwtDecoder({ slug, next }: ToolProps) {
             <div className="grid gap-4 md:grid-cols-2">
               <div>
                 <h3 className="mb-1 text-sm font-medium">Header</h3>
-                <pre className="overflow-auto rounded-lg bg-muted p-3 font-mono text-sm">
+                <pre className="overflow-auto rounded-lg bg-soft p-3 font-mono text-sm">
                   {JSON.stringify(decoded.header, null, 2)}
                 </pre>
               </div>
               <div>
                 <h3 className="mb-1 text-sm font-medium">Payload</h3>
-                <pre className="overflow-auto rounded-lg bg-muted p-3 font-mono text-sm">
+                <pre className="overflow-auto rounded-lg bg-soft p-3 font-mono text-sm">
                   {JSON.stringify(decoded.payload, null, 2)}
                 </pre>
               </div>

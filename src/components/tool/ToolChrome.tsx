@@ -36,7 +36,7 @@ export function FavouriteButton({ slug }: { slug: string }) {
       onClick={() => toggle(slug)}
       aria-pressed={fav}
       aria-label={fav ? "Remove from favourites" : "Add to favourites"}
-      className="grid size-11 shrink-0 place-items-center rounded-lg hover:bg-muted sm:size-9"
+      className="grid size-11 shrink-0 place-items-center rounded-lg hover:bg-soft sm:size-9"
     >
       <Star className={fav ? "size-4 fill-amber-400 text-amber-400" : "size-4"} aria-hidden />
     </button>
@@ -107,7 +107,7 @@ export function ResultActions({
         <details className="relative">
           <summary
             data-testid="send-next"
-            className="flex h-11 sm:h-10 cursor-pointer list-none items-center gap-2 rounded-lg border border-border px-4 text-sm hover:bg-muted"
+            className="flex h-11 sm:h-10 cursor-pointer list-none items-center gap-2 rounded-lg border border-border px-4 text-sm hover:bg-soft"
           >
             Send to next tool <ArrowRight className="size-4" aria-hidden />
           </summary>
@@ -115,7 +115,7 @@ export function ResultActions({
             {next.map((n) => (
               <li key={n.slug}>
                 <button
-                  className="min-h-11 w-full rounded-md px-3 py-2 text-left text-sm hover:bg-muted sm:min-h-0"
+                  className="min-h-11 w-full rounded-md px-3 py-2 text-left text-sm hover:bg-soft sm:min-h-0"
                   onClick={() => {
                     setHandoff({ from, items });
                     router.push(`/${n.slug}`);

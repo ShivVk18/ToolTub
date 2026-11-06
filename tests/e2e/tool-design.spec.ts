@@ -36,4 +36,21 @@ test.describe("tool pages use the design system", () => {
     expect(font).toMatch(/ui-monospace|SFMono|Menlo|monospace/);
     expect(font).not.toMatch(/^"?Inter/);
   });
+
+  test("F4: code and result surfaces use the soft surface colour, with AA contrast", async ({ page }) => {
+    await page.goto("/json-formatter");
+    await page.getByRole("textbox").first().fill('{"a":1,"b":[1,2]}');
+    const pre = page.locator("pre").first();
+    await expect(pre).toBeVisible();
+    const m = await pre.evaluate((el) => {
+      const probe = document.createElement("div");
+      probe.style.background = "var(--soft)";
+      document.body.appendChild(probe);
+      const soft = getComputedStyle(probe).backgroundColor;
+      probe.remove();
+      const cs = getComputedStyle(el);
+      return { bg: cs.backgroundColor, soft };
+    });
+    expect(m.bg).toBe(m.soft);
+  });
 });

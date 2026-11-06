@@ -144,7 +144,7 @@ export function QrCodeGenerator({ slug, preset, next }: ToolProps) {
       result={
         // Reserve the code's space while it renders, so the content below doesn't jump (CLS was 0.082).
         payload && !svg ? (
-          <div className="size-48 rounded-lg border border-border bg-muted" aria-hidden />
+          <div className="size-48 rounded-lg border border-border bg-soft" aria-hidden />
         ) : (
           svg && (
             <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">

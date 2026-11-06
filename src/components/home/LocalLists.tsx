@@ -29,7 +29,7 @@ export function LocalLists({ index }: { index: SearchEntry[] }) {
               <li key={e.slug}>
                 <Link
                   href={`/${e.slug}`}
-                  className="inline-block rounded-full border border-border px-3 py-1 text-sm hover:bg-muted"
+                  className="inline-block rounded-full border border-border px-3 py-1 text-sm hover:bg-soft"
                 >
                   {e.name}
                 </Link>

@@ -123,12 +123,12 @@ export function ToolWorkspace({
           {status === "working" && (
             <div className="space-y-2">
               <p className="text-sm text-fg-muted">{progress?.label ?? "Working on your device…"}</p>
-              <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+              <div className="h-1.5 overflow-hidden rounded-full bg-soft">
                 <div
                   className={
                     progress?.ratio === undefined
-                      ? "h-full w-1/3 animate-pulse rounded-full bg-fg"
-                      : "h-full rounded-full bg-fg transition-[width]"
+                      ? "h-full w-1/3 animate-pulse rounded-full bg-accent"
+                      : "h-full rounded-full bg-accent transition-[width]"
                   }
                   style={progress?.ratio !== undefined ? { width: `${Math.round(progress.ratio * 100)}%` } : undefined}
                 />

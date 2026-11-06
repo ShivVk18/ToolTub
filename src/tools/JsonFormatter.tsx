@@ -94,7 +94,7 @@ export function JsonFormatter({ slug, next }: ToolProps) {
         res?.ok && (
           <div className="space-y-3">
             <p className="text-sm text-emerald-600 dark:text-emerald-400">Valid JSON</p>
-            <pre className="max-h-[28rem] overflow-auto rounded-lg bg-muted p-3 font-mono text-sm">
+            <pre className="max-h-[28rem] overflow-auto rounded-lg bg-soft p-3 font-mono text-sm">
               {res.output.length > PREVIEW_CHARS ? res.output.slice(0, PREVIEW_CHARS) : res.output}
             </pre>
             {res.output.length > PREVIEW_CHARS && (

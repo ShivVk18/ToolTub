@@ -60,7 +60,7 @@ export function Dropzone({ accept, multiple, maxFileMb, onFiles, onReject, hint,
       }}
       className={cn(
         "flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-border px-6 py-10 text-center transition-colors",
-        over && "border-fg bg-muted",
+        over && "border-accent bg-accent-soft",
       )}
     >
       <Upload className="size-6 text-fg-muted" aria-hidden />

@@ -82,7 +82,7 @@ export function ImageTool({ slug, preset, next, mode }: ToolProps & { mode: Mode
             hint="JPG, PNG, WebP or AVIF · up to 50 images, 50 MB each"
           />
         ) : (
-          <div className="flex items-center justify-between rounded-lg bg-muted px-4 py-3 text-sm">
+          <div className="flex items-center justify-between rounded-lg bg-soft px-4 py-3 text-sm">
             <span>
               {files.length} image{files.length > 1 && "s"} · {formatBytes(files.reduce((s, f) => s + f.size, 0))}
             </span>
