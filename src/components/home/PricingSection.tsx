@@ -73,6 +73,8 @@ export function PricingSection({ onOpenPro }: PricingSectionProps) {
         <div
           ref={tabsRef}
           id="billTabs"
+          // The global .tabs rule adds margin: 40px auto 0; the reference cancels it here (style="margin:0").
+          style={{ margin: 0 }}
           className="tabs relative flex gap-[4px] p-[5px] rounded-full bg-panel border border-line w-max backdrop-blur-[10px]"
         >
           <div
@@ -111,20 +113,20 @@ export function PricingSection({ onOpenPro }: PricingSectionProps) {
           <div className="pr font-serif text-[76px] tracking-[-0.03em] mt-[14px] leading-none text-ink tabular-nums">
             ₹0
           </div>
-          <div className="pe text-[15px] text-ink2 mt-[8px]">free forever · no card</div>
+          <div className="pe text-[15px] text-muted mt-[8px]">forever · no sign-up</div>
 
-          <ul className="list-none my-[26px] mb-[30px] text-ink2">
+          <ul className="list-none my-[26px] mb-[30px]">
             <li className="flex gap-[12px] items-center text-[17px] py-[9px]">
               <b className="w-[24px] h-[24px] rounded-full grid place-items-center text-[13px] bg-okSoft text-ok flex-none">
                 ✓
               </b>
-              All 76 tools, unlimited runs
+              All 76 tools
             </li>
             <li className="flex gap-[12px] items-center text-[17px] py-[9px]">
               <b className="w-[24px] h-[24px] rounded-full grid place-items-center text-[13px] bg-okSoft text-ok flex-none">
                 ✓
               </b>
-              Runs on your device · 100% private
+              Runs on your device
             </li>
             <li className="flex gap-[12px] items-center text-[17px] py-[9px]">
               <b className="w-[24px] h-[24px] rounded-full grid place-items-center text-[13px] bg-okSoft text-ok flex-none">

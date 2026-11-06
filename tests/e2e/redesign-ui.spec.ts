@@ -283,6 +283,23 @@ test.describe("KlipKit Redesign UI & Visual Layer", () => {
     expect(footer!.x + footer!.width - (group!.x + group!.width)).toBeLessThan(160);
   });
 
+  test("pricing uses the reference copy and spacing", async ({ page }) => {
+    await page.goto("/");
+    const sec = page.locator("#pricing");
+    await sec.scrollIntoViewIfNeeded();
+    const free = sec.locator(".plan").first();
+    await expect(free.locator(".pe")).toHaveText("forever · no sign-up");
+    await expect(free.locator("li")).toHaveText([
+      /All 76 tools$/,
+      /Runs on your device$/,
+      /No watermarks, no clutter$/,
+      /Smart suggestions & Tool Chains$/,
+    ]);
+    // Heading → toggle is .bill's 30 px; the toggle has no extra margin of its own (reference: style="margin:0").
+    const [h2, tabs] = await Promise.all([sec.locator("h2").boundingBox(), sec.locator("#billTabs").boundingBox()]);
+    expect(Math.round(tabs!.y - (h2!.y + h2!.height))).toBe(30);
+  });
+
   test("prefers-reduced-motion turns off continuous animations", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
