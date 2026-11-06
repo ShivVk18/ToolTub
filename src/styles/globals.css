@@ -152,10 +152,10 @@
   --blobC: #124b57;
   --blobOp: 0.5;
 }
+/* Margin/padding reset comes from Tailwind's preflight (in @layer base). Repeating it here, unlayered,
+   overrode every Tailwind margin/padding utility (unlayered CSS beats layered CSS). */
 * {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
 }
 html {
   overflow-x: clip;

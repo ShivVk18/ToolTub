@@ -256,6 +256,33 @@ test.describe("KlipKit Redesign UI & Visual Layer", () => {
     });
   }
 
+  test("Tailwind margin/padding utilities aren't wiped by the global reset", async ({ page }) => {
+    // The JSON Formatter page is built only from Tailwind utilities; none of its spacing should resolve to 0.
+    await page.goto("/json-formatter");
+    const dead = await page.evaluate(() => {
+      const out: string[] = [];
+      for (const el of Array.from(document.querySelectorAll<HTMLElement>("[class]"))) {
+        const cs = getComputedStyle(el);
+        for (const cls of (el.getAttribute("class") ?? "").split(/\s+/)) {
+          const m = /^(m|p)([tblrxy])?-(\[?[\d.]+(?:px|rem)?\]?)$/.exec(cls);
+          if (!m || /^(0|\[0px\])$/.test(m[3])) continue;
+          const side = (
+            { t: "Top", b: "Bottom", l: "Left", r: "Right", x: "Left", y: "Top" } as Record<string, string>
+          )[m[2] ?? "t"];
+          const prop = (m[1] === "m" ? "margin" : "padding") + side;
+          if (cs.getPropertyValue(prop.replace(/[A-Z]/g, (c) => "-" + c.toLowerCase())) === "0px") out.push(cls);
+        }
+      }
+      return out;
+    });
+    expect(dead).toEqual([]);
+    // Home footer: the right-hand group is pushed to the far side with ml-auto.
+    await page.goto("/");
+    const right = page.locator("footer .ml-auto").last();
+    const [footer, group] = await Promise.all([page.locator("footer").last().boundingBox(), right.boundingBox()]);
+    expect(footer!.x + footer!.width - (group!.x + group!.width)).toBeLessThan(160);
+  });
+
   test("prefers-reduced-motion turns off continuous animations", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
