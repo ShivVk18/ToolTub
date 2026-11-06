@@ -47,3 +47,14 @@ playwright-report/
 test-results/
 .lighthouseci/
 !.env.example
+
+# generated test/visual output (re-created by scripts; never commit)
+reports/ui/**/*.png
+reports/ui/**/*.jpg
+reports/ui/**/*.webm
+*.log
+
+# local editor / agent settings
+.vscode/
+.idea/
+.claude/settings.local.json
