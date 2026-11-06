@@ -1,3 +1,4 @@
+import { PNG } from "pngjs";
 import { test, expect } from "@playwright/test";
 import { assertAccessible } from "./helpers";
 
@@ -213,6 +214,21 @@ test.describe("KlipKit Redesign UI & Visual Layer", () => {
     await expect(page.locator("body")).toHaveClass(/scrolled/);
     const blur = await page.locator(".navin").evaluate((el) => getComputedStyle(el).backdropFilter);
     expect(blur).toContain("blur(16px)");
+  });
+
+  test("the Pro plan card shows its gradient ring", async ({ page }) => {
+    await page.goto("/");
+    const card = page.locator(".plan.dark");
+    await card.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(600);
+    const box = (await card.boundingBox())!;
+    // Just outside the left edge, halfway down: the ring reaches 1 px past the 1 px border; page background without it.
+    const png = PNG.sync.read(
+      await page.screenshot({ clip: { x: box.x - 0.5, y: box.y + box.height / 2, width: 1, height: 1 } }),
+    );
+    const [r, g, b] = png.data;
+    const saturation = Math.max(r, g, b) - Math.min(r, g, b);
+    expect(saturation, `edge pixel rgb(${r},${g},${b})`).toBeGreaterThan(40);
   });
 
   test("prefers-reduced-motion turns off continuous animations", async ({ page }) => {

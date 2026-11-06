@@ -153,7 +153,7 @@ export function PricingSection({ onOpenPro }: PricingSectionProps) {
         {/* Pro Card */}
         <div
           ref={proCardRef}
-          className="plan dark relative rounded-[32px] p-[36px] bg-[#17161B] text-[#F3F1EC] border border-[#17161B] shadow-[var(--shadow)] overflow-hidden"
+          className="plan dark relative rounded-[32px] p-[36px] bg-[#17161B] text-[#F3F1EC] border border-[#17161B] shadow-[var(--shadow)]"
         >
           <div className="pn text-[20px] font-semibold flex items-center justify-between">
             Pro{" "}
