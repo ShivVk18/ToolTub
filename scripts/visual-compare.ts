@@ -165,9 +165,13 @@ const STATES: Record<string, { desc: string; run: StateHandler }> = {
 const clickText = (p: Page, scope: string, text: string) =>
   p.evaluate(
     ([sc, t]) => {
-      const el = Array.from(document.querySelectorAll<HTMLElement>(`${sc} *`)).find(
-        (e) => e.children.length === 0 && e.textContent?.includes(t),
-      );
+      // Match on the element's own text nodes (a tab may hold extra markup, e.g. "Yearly <b>save 30%</b>").
+      const ownText = (e: Element) =>
+        Array.from(e.childNodes)
+          .filter((n) => n.nodeType === Node.TEXT_NODE)
+          .map((n) => n.textContent)
+          .join("");
+      const el = Array.from(document.querySelectorAll<HTMLElement>(`${sc} *`)).find((e) => ownText(e).includes(t));
       ((el?.closest("button, [role=tab], .tab") as HTMLElement | null) ?? el)?.click();
     },
     [scope, text] as const,
