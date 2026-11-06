@@ -26,4 +26,14 @@ test.describe("tool pages use the design system", () => {
     await page.goto("/");
     expect(await page.locator("#h1").evaluate((el) => getComputedStyle(el).textAlign)).toBe("center");
   });
+
+  test("F3: code renders in a monospace font", async ({ page }) => {
+    await page.goto("/json-formatter");
+    const font = await page
+      .locator(".font-mono")
+      .first()
+      .evaluate((el) => getComputedStyle(el).fontFamily);
+    expect(font).toMatch(/ui-monospace|SFMono|Menlo|monospace/);
+    expect(font).not.toMatch(/^"?Inter/);
+  });
 });

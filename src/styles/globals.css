@@ -29,7 +29,9 @@
 
   --font-serif: var(--font-serif), "KKSerif", Georgia, serif;
   --font-sans: var(--font-sans), "Inter", system-ui, -apple-system, sans-serif;
-  --font-mono: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  /* System monospace (as the reference). No next/font variable exists for mono, and var(--font-mono)
+     here referred to itself, which made the declaration invalid (code rendered in Inter). */
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "DejaVu Sans Mono", monospace;
 }
 
 /* Backward compatibility variables for existing tools/workspaces */
