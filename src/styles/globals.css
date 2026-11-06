@@ -418,7 +418,8 @@ body.is-work #hero {
   color: var(--accent);
   font-weight: 600;
 }
-h1 {
+/* Hero headline only (#h1). As a bare h1 rule it also restyled every page title. */
+#h1 {
   font-family: var(--serif);
   font-weight: 500;
   text-align: center;
@@ -427,12 +428,12 @@ h1 {
   font-size: clamp(48px, 5.9vw, 112px);
   margin-top: 22px;
 }
-h1 .l2 {
+#h1 .l2 {
   display: block;
   font-style: italic;
   color: var(--muted);
 }
-h1 .w {
+#h1 .w {
   display: inline-block;
   animation: wordIn 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
@@ -452,7 +453,7 @@ h1 .w {
   #sats {
     display: none;
   }
-  h1 .w {
+  #h1 .w {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
@@ -2356,7 +2357,7 @@ body.scrolled #nav::before {
   border-radius: 3px;
   display: block;
 }
-h1 {
+#h1 {
   position: relative;
 }
 #squig {

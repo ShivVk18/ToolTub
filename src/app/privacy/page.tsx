@@ -1,3 +1,4 @@
+import { PageTitle } from "@/components/ui/PageTitle";
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo/metadata";
 
@@ -14,7 +15,7 @@ export const metadata: Metadata = pageMetadata({
 export default function Privacy() {
   return (
     <main className="prose-klip mx-auto max-w-3xl space-y-6 px-4 py-12">
-      <h1 className="text-3xl font-semibold">Privacy, in plain language</h1>
+      <PageTitle>Privacy, in plain language</PageTitle>
       <h2>Tools that run on your device</h2>
       <p>
         Most KlipKit tools say “Runs on your device — nothing uploaded”. Your files are processed by code running in

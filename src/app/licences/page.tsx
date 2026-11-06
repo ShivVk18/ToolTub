@@ -1,3 +1,4 @@
+import { PageTitle } from "@/components/ui/PageTitle";
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo/metadata";
 import { deps, platformDeps } from "@/registry/dependencies";
@@ -16,7 +17,7 @@ export default function Licences() {
   const rows = [...Object.values(deps), ...platformDeps];
   return (
     <main className="prose-klip mx-auto max-w-4xl space-y-6 px-4 py-12">
-      <h1 className="text-3xl font-semibold">Open-source licences</h1>
+      <PageTitle>Open-source licences</PageTitle>
       <p>
         KlipKit is built in-house on these open-source projects. All of them are served from klipkit.com; none makes a
         network call to a third party. LGPL components are loaded as separate files so they can be replaced.

@@ -1,3 +1,4 @@
+import { PageTitle } from "@/components/ui/PageTitle";
 import type { Metadata } from "next";
 import { SearchResults } from "./SearchResults";
 import { searchIndex } from "@/registry/search-index";
@@ -8,7 +9,7 @@ export const metadata: Metadata = { title: "Search tools", robots: { index: fals
 export default function SearchPage() {
   return (
     <main className="mx-auto max-w-3xl px-4 py-12">
-      <h1 className="mb-6 text-3xl font-semibold">Search tools</h1>
+      <PageTitle className="mb-6">Search tools</PageTitle>
       <SearchResults index={searchIndex} />
     </main>
   );

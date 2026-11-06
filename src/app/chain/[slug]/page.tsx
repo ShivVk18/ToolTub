@@ -1,3 +1,4 @@
+import { PageTitle } from "@/components/ui/PageTitle";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
@@ -42,7 +43,7 @@ export default async function ChainPage({ params }: { params: Promise<{ slug: st
           { name: c.name, path: `/chain/${c.slug}` },
         ]}
       />
-      <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">{c.name}</h1>
+      <PageTitle className="mt-4">{c.name}</PageTitle>
       <p className="mt-3 text-lg text-fg-muted">{c.description}</p>
       <ol className="my-6 flex flex-wrap items-center gap-2 text-sm">
         {steps.map((s, i) => (

@@ -1,3 +1,4 @@
+import { PageTitle } from "@/components/ui/PageTitle";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -118,7 +119,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
       <Breadcrumbs items={crumbs} />
       <header className="mb-6 mt-4 space-y-3">
         <div className="flex items-start justify-between gap-4">
-          <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">{variant?.h1 ?? t.seo?.h1 ?? t.name}</h1>
+          <PageTitle>{variant?.h1 ?? t.seo?.h1 ?? t.name}</PageTitle>
           <FavouriteButton slug={t.slug} />
         </div>
         <p className="text-lg text-fg-muted">{variant?.intro ?? t.tagline}</p>
@@ -151,7 +152,7 @@ function HubPage({ hub }: { hub: NonNullable<ReturnType<typeof getHub>> }) {
           { name: hub.name, path: `/${hub.id}` },
         ]}
       />
-      <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">{hub.h1}</h1>
+      <PageTitle className="mt-4">{hub.h1}</PageTitle>
       <p className="mt-3 max-w-2xl text-lg text-fg-muted">{hub.description}</p>
       {available.length > 0 && (
         <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

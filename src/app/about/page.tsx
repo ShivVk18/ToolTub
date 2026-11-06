@@ -1,3 +1,4 @@
+import { PageTitle } from "@/components/ui/PageTitle";
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo/metadata";
 import { people } from "@/registry/people";
@@ -17,7 +18,7 @@ export default function About() {
   const f = people.founder;
   return (
     <main className="prose-klip mx-auto max-w-3xl space-y-6 px-4 py-12">
-      <h1 className="text-3xl font-semibold">About KlipKit</h1>
+      <PageTitle>About KlipKit</PageTitle>
       <p>{ENTITY_DEFINITION}</p>
       <p>
         KlipKit is an independent service. Every tool runs either in your browser or on KlipKit&apos;s own servers. We
