@@ -1413,6 +1413,11 @@ section.sec {
     left 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
     width 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
+/* Coming-soon tools: desaturated icon only, so their text keeps AA contrast. */
+.tcard[data-soon] .ti {
+  filter: grayscale(1);
+  opacity: 0.55;
+}
 /* Explore tool grid. Scoped to #grid: as a class it overrode Tailwind's `grid` utility everywhere. */
 #grid {
   display: grid;

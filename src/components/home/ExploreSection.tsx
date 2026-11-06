@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { TOOLS, CATS, tint, TOOL_ICON_PATHS, type ToolItem } from "@/lib/designTools";
+import { TOOLS, CATS, tint, TOOL_ICON_PATHS, TOOL_COUNTS, type ToolItem } from "@/lib/designTools";
 import { addLoop, tween, ease } from "@/lib/motion/animation";
 
 interface ExploreSectionProps {
@@ -56,7 +56,7 @@ export function ExploreSection({ onSelectTool }: ExploreSectionProps) {
           tween(
             1400,
             (p) => {
-              setCount(Math.round(p * 76));
+              setCount(Math.round(p * TOOL_COUNTS.total));
             },
             ease.out,
           );
@@ -90,12 +90,13 @@ export function ExploreSection({ onSelectTool }: ExploreSectionProps) {
 
       <h2 className="sh font-serif font-medium text-[clamp(40px,4.4vw,84px)] tracking-[-0.025em] leading-[1.04] text-center text-ink">
         <span ref={countRef} id="cnt" className="tabular-nums">
-          {count || 76}
+          {count || TOOL_COUNTS.total}
         </span>{" "}
         tools. <em className="text-muted italic">One place.</em>
       </h2>
       <p className="sp text-center text-ink2 text-[19px] mt-[14px]">
-        For everyday work, developers and creators. Fast, private and free.
+        For everyday work, developers and creators. {TOOL_COUNTS.live} live today,{" "}
+        {TOOL_COUNTS.total - TOOL_COUNTS.live} on the way.
       </p>
 
       {/* Tabs */}
@@ -144,6 +145,7 @@ export function ExploreSection({ onSelectTool }: ExploreSectionProps) {
               type="button"
               data-c={t.c}
               data-i={idx}
+              data-soon={!isLive && !t.routed ? "" : undefined}
               onClick={() => onSelectTool(t)}
               onPointerMove={handlePointerMove}
               onPointerLeave={handlePointerLeave}
@@ -180,6 +182,8 @@ export function ExploreSection({ onSelectTool }: ExploreSectionProps) {
                 <span className="tg absolute right-0 top-0 text-[12px] text-ink2 font-medium">
                   {isLive ? (
                     <b style={{ color: "var(--ok)", fontWeight: 600 }}>● Live</b>
+                  ) : !t.routed ? (
+                    "Coming soon"
                   ) : t.s ? (
                     "Private server"
                   ) : (

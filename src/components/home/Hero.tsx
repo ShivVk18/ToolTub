@@ -1,5 +1,6 @@
 "use client";
 
+import { TOOL_COUNTS } from "@/lib/designTools";
 import { useKlip } from "@/lib/store/klip";
 import React, { useEffect, useState, useRef, useLayoutEffect } from "react";
 import { KINDS, SAMPLES } from "@/lib/fileKind";
@@ -143,7 +144,7 @@ export function Hero({ onPickSample, onOrbSlotClick, onPasteText, onSubmitAsk, h
   return (
     <section id="hero" aria-label="Drop a file">
       <div className="eyebrow">
-        <b>✦</b> 76 tools · Runs on your device · Free forever
+        <b>✦</b> {TOOL_COUNTS.live} tools live · {TOOL_COUNTS.total - TOOL_COUNTS.live} on the way · Free forever
       </div>
 
       <h1 ref={h1Ref} id="h1">

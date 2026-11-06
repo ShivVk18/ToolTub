@@ -120,7 +120,7 @@ export function PricingSection({ onOpenPro }: PricingSectionProps) {
               <b className="w-[24px] h-[24px] rounded-full grid place-items-center text-[13px] bg-okSoft text-ok flex-none">
                 ✓
               </b>
-              All 76 tools
+              Every tool, as it ships
             </li>
             <li className="flex gap-[12px] items-center text-[17px] py-[9px]">
               <b className="w-[24px] h-[24px] rounded-full grid place-items-center text-[13px] bg-okSoft text-ok flex-none">

@@ -38,6 +38,12 @@ export const TOOLS: ToolItem[] = homeTools().map((t) => ({
   routed: t.status !== "planned",
 }));
 
+/** Tool counts for honest copy: live = works today (live panel or own page); total = whole catalog. */
+export const TOOL_COUNTS = {
+  total: TOOLS.length,
+  live: TOOLS.filter((t) => t.live || t.routed).length,
+};
+
 /** Look up a home card by registry slug. */
 export const toolBySlug = (slug: string): ToolItem | undefined => TOOLS.find((t) => t.slug === slug);
 

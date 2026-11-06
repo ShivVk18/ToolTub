@@ -21,7 +21,7 @@ test.describe("homepage", () => {
     await expect(page.locator("h1")).toHaveCount(1);
     await expect(page.locator("h1")).toContainText("Drop it. Paste it.");
     await expect(page.locator("h1")).toContainText("Or just say what you need.");
-    await expect(page.getByText("76 tools · Runs on your device · Free forever")).toBeVisible();
+    await expect(page.getByText(/\d+ tools live · \d+ on the way · Free forever/)).toBeVisible();
     await expect(page.locator("#feel")).toBeVisible();
     await expect(page.locator("#explore")).toBeVisible();
     await expect(page.locator("#pricing")).toBeVisible();

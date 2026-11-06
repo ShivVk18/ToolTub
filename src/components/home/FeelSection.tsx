@@ -1,5 +1,6 @@
 "use client";
 
+import { TOOL_COUNTS } from "@/lib/designTools";
 import React, { useEffect, useRef, useState } from "react";
 import { addLoop } from "@/lib/motion/animation";
 import { parse, markHTML } from "@/lib/engines/intent";
@@ -244,8 +245,8 @@ export function FeelSection() {
 
           <div className="bstat">
             <div>
-              <b>76</b>
-              <span>tools in one place</span>
+              <b>{TOOL_COUNTS.live}</b>
+              <span>tools live today</span>
             </div>
             <div>
               <b>0.8 ms</b>

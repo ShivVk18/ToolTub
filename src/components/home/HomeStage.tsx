@@ -2,6 +2,7 @@
 
 import { setTheme } from "@/lib/theme";
 import React, { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Orb, type OrbController } from "./Orb";
 import { Hero } from "./Hero";
 import { DropVeil } from "./DropVeil";
@@ -31,6 +32,7 @@ export function HomeStage() {
   // Dragging state
   const [isDragging, setIsDragging] = useState(false);
   const dragDepthRef = useRef(0);
+  const router = useRouter();
 
   // Voice state
   const [isListening, setIsListening] = useState(false);
@@ -313,20 +315,16 @@ export function HomeStage() {
   }, []);
 
   const handleSelectTool = async (t: ToolItem) => {
+    // Tools with their own page open it; unbuilt tools say so instead of faking a workspace.
+    if (!PANELS[t.slug]) {
+      if (t.routed) router.push(`/${t.slug}`);
+      else showToast(`${t.n} is coming soon.`);
+      return;
+    }
     if (window.scrollY > 10) {
       await goto(0);
     }
-    if (PANELS[t.slug]) {
-      openPanel(t, "");
-      return;
-    }
-    closePanel();
-    setContextTool(t);
-    setCurrentFile(null);
-    setCurrentPaste(null);
-    setMode("work");
-    document.body.classList.add("is-work");
-    orbControllerRef.current?.triggerGulp(0.8);
+    openPanel(t, "");
   };
 
   // Hash deep links: klipkit.com/#json-formatter opens the live tool

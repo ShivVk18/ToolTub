@@ -12,7 +12,7 @@ test.describe("KlipKit Redesign UI & Visual Layer", () => {
     // 1. Eyebrow
     const eyebrow = page.locator("#hero .eyebrow");
     await expect(eyebrow).toBeVisible();
-    await expect(eyebrow).toContainText("76 tools · Runs on your device · Free forever");
+    await expect(eyebrow).toHaveText(/\d+ tools live · \d+ on the way · Free forever/);
 
     // 2. Headline with squiggle
     const h1 = page.locator("#h1");
@@ -58,7 +58,7 @@ test.describe("KlipKit Redesign UI & Visual Layer", () => {
 
     // b-big: typing demo
     await expect(bento.locator(".b-big")).toBeVisible();
-    await expect(bento.locator(".bstat")).toContainText("76");
+    await expect(bento.locator(".bstat")).toContainText("tools live today");
     await expect(bento.locator(".bstat")).toContainText("0.8 ms");
 
     // b-paste: detector cycle
@@ -298,7 +298,7 @@ test.describe("KlipKit Redesign UI & Visual Layer", () => {
     const free = sec.locator(".plan").first();
     await expect(free.locator(".pe")).toHaveText("forever · no sign-up");
     await expect(free.locator("li")).toHaveText([
-      /All 76 tools$/,
+      /Every tool, as it ships$/,
       /Runs on your device$/,
       /No watermarks, no clutter$/,
       /Smart suggestions & Tool Chains$/,
@@ -421,6 +421,18 @@ test.describe("KlipKit Redesign UI & Visual Layer", () => {
     expect(g.dy).toBeLessThan(6);
     expect(Math.abs(g.w - g.dw)).toBeLessThan(6);
     expect(g.maxSat).toBeLessThan(0.05);
+  });
+
+  test("A1/F5: unbuilt tools say Coming soon; page tools open their page", async ({ page }) => {
+    await page.goto("/");
+    await page.locator("#explore").scrollIntoViewIfNeeded();
+    const merge = page.locator("#grid button", { hasText: "Merge PDF" });
+    await expect(merge.locator(".tg")).toHaveText("Coming soon");
+    await merge.click();
+    await expect(page.locator("#toast")).toHaveText("Merge PDF is coming soon.");
+    await expect(page.locator("body")).not.toHaveClass(/is-work/);
+    await page.locator("#grid button", { hasText: "Compress PDF" }).click();
+    await expect(page).toHaveURL(/\/compress-pdf$/);
   });
 
   test("prefers-reduced-motion turns off continuous animations", async ({ page }) => {
