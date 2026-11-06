@@ -7,7 +7,8 @@
 import { Worker } from "bullmq";
 import IORedis from "ioredis";
 import { execFile } from "node:child_process";
-import { readdir, rename, rm, stat } from "node:fs/promises";
+import { rename, rm } from "node:fs/promises";
+import { sweep } from "./sweep.mjs";
 import { join } from "node:path";
 import { promisify } from "node:util";
 
@@ -35,7 +36,19 @@ const TOOLS = {
   },
 };
 
+/** Job ids being converted right now; the sweeper never deletes their folders. */
+const active = new Set();
+
 async function convert(job) {
+  active.add(job.data.id);
+  try {
+    return await convertJob(job);
+  } finally {
+    active.delete(job.data.id);
+  }
+}
+
+async function convertJob(job) {
   const spec = TOOLS[job.data.tool];
   if (!spec) throw new Error(`Unknown tool ${job.data.tool}`);
   const dir = join(JOBS_DIR, job.data.id);
@@ -78,16 +91,9 @@ async function convert(job) {
 
 new Worker("convert", convert, { connection, concurrency: Number(process.env.CONCURRENCY ?? 1) });
 
-async function sweep() {
-  const now = Date.now();
-  for (const name of await readdir(JOBS_DIR).catch(() => [])) {
-    const p = join(JOBS_DIR, name);
-    const s = await stat(p).catch(() => null);
-    if (s && now - s.mtimeMs > RETENTION_MS) await rm(p, { recursive: true, force: true });
-  }
-}
-setInterval(sweep, SWEEP_INTERVAL_MS);
-sweep();
+const sweepNow = () => sweep(JOBS_DIR, RETENTION_MS, active, Date.now());
+setInterval(sweepNow, SWEEP_INTERVAL_MS);
+sweepNow();
 
 // Heartbeat: the web app refuses new server jobs (503) when no worker has checked in recently.
 const beat = () => connection.set(HEARTBEAT_KEY, String(Date.now()), "PX", HEARTBEAT_MS * 3).catch(() => {});
