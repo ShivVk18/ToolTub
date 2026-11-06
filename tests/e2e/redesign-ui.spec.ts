@@ -399,6 +399,30 @@ test.describe("KlipKit Redesign UI & Visual Layer", () => {
     expect(rows).toBe(0);
   });
 
+  test("opening a live panel docks the orb and hides the satellites", async ({ page }) => {
+    await page.goto("/#base64");
+    await expect(page.locator("#panel")).toBeVisible();
+    await page.waitForTimeout(2500);
+    const g = await page.evaluate(() => {
+      const o = document.getElementById("orb")!.getBoundingClientRect();
+      const d = document.getElementById("orbDock")!.getBoundingClientRect();
+      const sats = Array.from(document.querySelectorAll<HTMLElement>("#sats .sat")).map(
+        (e) => +getComputedStyle(e).opacity,
+      );
+      return {
+        dx: Math.abs(o.x + o.width / 2 - (d.x + d.width / 2)),
+        dy: Math.abs(o.y + o.height / 2 - (d.y + d.height / 2)),
+        w: o.width,
+        dw: d.width,
+        maxSat: Math.max(0, ...sats),
+      };
+    });
+    expect(g.dx).toBeLessThan(6);
+    expect(g.dy).toBeLessThan(6);
+    expect(Math.abs(g.w - g.dw)).toBeLessThan(6);
+    expect(g.maxSat).toBeLessThan(0.05);
+  });
+
   test("prefers-reduced-motion turns off continuous animations", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");

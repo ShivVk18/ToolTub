@@ -40,7 +40,13 @@ export function HomeStage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const orbControllerRef = useRef<OrbController | null>(null);
 
-  const { openPalette, openVoiceSheet, activeTool, setActiveTool, openPanel, closePanel } = useUIStore();
+  const { openPalette, openVoiceSheet, activeTool, setActiveTool, openPanel, closePanel, panelTool } = useUIStore();
+
+  // As in the reference's openPanel (state.mode = 'work'): a live panel is a workspace view, so the orb
+  // docks and the satellites leave. Closing the panel keeps the workspace.
+  useEffect(() => {
+    if (panelTool) setMode("work");
+  }, [panelTool]);
 
   // Watch activeTool from store
   useEffect(() => {
