@@ -3,7 +3,10 @@
  * Matches design/reference/KlipKit_UI.html motion specifications.
  */
 
-export const now = (): number => (typeof performance !== "undefined" ? performance.now() : Date.now());
+import { addLoop, animationLoop, now, type FrameCallback } from "./loop";
+import { prefersReducedMotion } from "./reducedMotion";
+
+export { addLoop, animationLoop, now };
 
 export const wait = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -15,59 +18,6 @@ export const ease = {
   io4: (p: number): number => (p < 0.5 ? 8 * p * p * p * p : 1 - Math.pow(-2 * p + 2, 4) / 2),
 };
 
-type FrameCallback = (t: number, dt: number) => void;
-
-class AnimationLoop {
-  private loops = new Set<FrameCallback>();
-  private lastT = now();
-  private running = false;
-
-  constructor() {
-    if (typeof window !== "undefined") {
-      this.start();
-    }
-  }
-
-  private start() {
-    if (this.running) return;
-    this.running = true;
-    this.lastT = now();
-    const frame = () => {
-      const t = now();
-      const dt = Math.min(0.05, (t - this.lastT) / 1000);
-      this.lastT = t;
-      for (const cb of this.loops) {
-        try {
-          cb(t / 1000, dt);
-        } catch (e) {
-          console.error("Frame loop error:", e);
-        }
-      }
-      if (this.running) {
-        requestAnimationFrame(frame);
-      }
-    };
-    requestAnimationFrame(frame);
-  }
-
-  public add(cb: FrameCallback): () => void {
-    this.loops.add(cb);
-    return () => {
-      this.loops.delete(cb);
-    };
-  }
-
-  public remove(cb: FrameCallback): void {
-    this.loops.delete(cb);
-  }
-}
-
-export const animationLoop = new AnimationLoop();
-
-export function addLoop(cb: FrameCallback): () => void {
-  return animationLoop.add(cb);
-}
-
 export function tween(ms: number, fn: (p: number) => void, e: (p: number) => number = ease.out): Promise<void> {
   if (typeof window === "undefined") {
     fn(1);
@@ -75,16 +25,20 @@ export function tween(ms: number, fn: (p: number) => void, e: (p: number) => num
   }
   return new Promise((resolve) => {
     const s = now();
+    let off: (() => void) | null = null;
+    let done = false;
     const f: FrameCallback = () => {
+      if (done) return;
       const p = clamp((now() - s) / ms, 0, 1);
       fn(e(p));
       if (p >= 1) {
-        animationLoop.remove(f);
+        done = true;
+        off?.();
         resolve();
       }
     };
-    animationLoop.add(f);
     f(s / 1000, 0);
+    if (!done) off = addLoop(f);
   });
 }
 
@@ -106,7 +60,8 @@ if (typeof window !== "undefined") {
     { passive: true },
   );
 
-  addLoop((_t, dt) => {
+  // Smoothed pointer for followers (aurora, wordmark spotlight). Runs only while the loop runs.
+  animationLoop.beforeFrame((dt) => {
     ptr.sx += (ptr.x - ptr.sx) * Math.min(1, dt * 3);
     ptr.sy += (ptr.y - ptr.sy) * Math.min(1, dt * 3);
   });
@@ -166,25 +121,39 @@ export const getPointer = () => ptr;
  */
 export function initMagneticButtons(): () => void {
   if (typeof window === "undefined") return () => {};
-  return addLoop(() => {
-    const els = document.querySelectorAll<HTMLElement>("[data-mag]");
-    for (const el of Array.from(els)) {
-      const r = el.getBoundingClientRect();
-      if (!r.width) continue;
-      const cx = r.left + r.width / 2;
-      const cy = r.top + r.height / 2;
-      const dx = ptr.x - cx;
-      const dy = ptr.y - cy;
-      const d = Math.hypot(dx, dy);
-      const R = Math.max(r.width, r.height) * 0.9 + 40;
-      const k = d < R ? 1 - d / R : 0;
-      const tx = dx * 0.28 * k;
-      const ty = dy * 0.38 * k;
-      const cur = ((el as unknown as Record<string, unknown>)._mg as [number, number]) || [0, 0];
-      cur[0] += (tx - cur[0]) * 0.2;
-      cur[1] += (ty - cur[1]) * 0.2;
-      (el as unknown as Record<string, unknown>)._mg = cur;
-      el.style.translate = `${cur[0].toFixed(2)}px ${cur[1].toFixed(2)}px`;
-    }
-  });
+  let lastX = NaN;
+  let lastY = NaN;
+  let settling = false;
+  return addLoop(
+    () => {
+      // Idle pointer and every button at rest: nothing to measure this frame.
+      if (ptr.x === lastX && ptr.y === lastY && !settling) return;
+      lastX = ptr.x;
+      lastY = ptr.y;
+      settling = false;
+      const els = document.querySelectorAll<HTMLElement>("[data-mag]");
+      for (const el of Array.from(els)) {
+        const r = el.getBoundingClientRect();
+        if (!r.width) continue;
+        const cx = r.left + r.width / 2;
+        const cy = r.top + r.height / 2;
+        const dx = ptr.x - cx;
+        const dy = ptr.y - cy;
+        const d = Math.hypot(dx, dy);
+        const R = Math.max(r.width, r.height) * 0.9 + 40;
+        const k = d < R ? 1 - d / R : 0;
+        const tx = dx * 0.28 * k;
+        const ty = dy * 0.38 * k;
+        const cur = ((el as unknown as Record<string, unknown>)._mg as [number, number]) || [0, 0];
+        cur[0] += (tx - cur[0]) * 0.2;
+        cur[1] += (ty - cur[1]) * 0.2;
+        if (Math.abs(tx - cur[0]) > 0.05 || Math.abs(ty - cur[1]) > 0.05) settling = true;
+        (el as unknown as Record<string, unknown>)._mg = cur;
+        el.style.translate = `${cur[0].toFixed(2)}px ${cur[1].toFixed(2)}px`;
+      }
+    },
+    { motion: true },
+  );
 }
+
+export { prefersReducedMotion };

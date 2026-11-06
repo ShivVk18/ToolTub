@@ -26,24 +26,27 @@ export function MarqueeBand() {
     let w1 = 0;
     let w2 = 0;
 
-    const cleanup = addLoop((t) => {
-      if (!bandRef.current || !br1Ref.current || !br2Ref.current) return;
-      const r = bandRef.current.getBoundingClientRect();
-      const innerHeight = typeof window !== "undefined" ? window.innerHeight : 800;
-      if (r.bottom < 0 || r.top > innerHeight) return;
+    const cleanup = addLoop(
+      (t) => {
+        if (!bandRef.current || !br1Ref.current || !br2Ref.current) return;
+        const r = bandRef.current.getBoundingClientRect();
+        const innerHeight = typeof window !== "undefined" ? window.innerHeight : 800;
+        if (r.bottom < 0 || r.top > innerHeight) return;
 
-      if (!w1 || !w2) {
-        w1 = br1Ref.current.scrollWidth / 3;
-        w2 = br2Ref.current.scrollWidth / 3;
-      }
-      if (!w1 || !w2) return;
+        if (!w1 || !w2) {
+          w1 = br1Ref.current.scrollWidth / 3;
+          w2 = br2Ref.current.scrollWidth / 3;
+        }
+        if (!w1 || !w2) return;
 
-      const scrollY = typeof window !== "undefined" ? window.scrollY : 0;
-      const k = t * 42 + scrollY * 0.35;
+        const scrollY = typeof window !== "undefined" ? window.scrollY : 0;
+        const k = t * 42 + scrollY * 0.35;
 
-      br1Ref.current.style.transform = `translateX(${-(k % w1)}px)`;
-      br2Ref.current.style.transform = `translateX(${((k * 0.8) % w2) - w2}px)`;
-    });
+        br1Ref.current.style.transform = `translateX(${-(k % w1)}px)`;
+        br2Ref.current.style.transform = `translateX(${((k * 0.8) % w2) - w2}px)`;
+      },
+      { target: bandRef.current, motion: true },
+    );
 
     return cleanup;
   }, []);

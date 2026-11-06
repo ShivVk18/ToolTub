@@ -38,33 +38,36 @@ export function AuroraBackground() {
     if (prefersReducedMotion) return;
 
     // Shared rAF loop update for blobs, aura, and nav background fade
-    const cleanup = addLoop((t) => {
-      const w = window.innerWidth || 1200;
-      const h = window.innerHeight || 800;
-      const px = ptr.sx / w - 0.5;
-      const py = ptr.sy / h - 0.5;
+    const cleanup = addLoop(
+      (t) => {
+        const w = window.innerWidth || 1200;
+        const h = window.innerHeight || 800;
+        const px = ptr.sx / w - 0.5;
+        const py = ptr.sy / h - 0.5;
 
-      if (bARef.current) {
-        bARef.current.style.transform = `translate(${Math.sin(t * 0.3) * 4 + px * -3}vw, ${Math.cos(t * 0.27) * 3 + py * -3}vw)`;
-      }
-      if (bBRef.current) {
-        bBRef.current.style.transform = `translate(${Math.cos(t * 0.25) * 5 + px * 4}vw, ${Math.sin(t * 0.31) * 4 + py * 3}vw)`;
-      }
-      if (bCRef.current) {
-        bCRef.current.style.transform = `translate(${Math.sin(t * 0.36 + 1) * 4 + px * 2}vw, ${Math.cos(t * 0.22) * 3 + py * 2}vw)`;
-      }
+        if (bARef.current) {
+          bARef.current.style.transform = `translate(${Math.sin(t * 0.3) * 4 + px * -3}vw, ${Math.cos(t * 0.27) * 3 + py * -3}vw)`;
+        }
+        if (bBRef.current) {
+          bBRef.current.style.transform = `translate(${Math.cos(t * 0.25) * 5 + px * 4}vw, ${Math.sin(t * 0.31) * 4 + py * 3}vw)`;
+        }
+        if (bCRef.current) {
+          bCRef.current.style.transform = `translate(${Math.sin(t * 0.36 + 1) * 4 + px * 2}vw, ${Math.cos(t * 0.22) * 3 + py * 2}vw)`;
+        }
 
-      // Cursor aura update
-      if (auraRef.current) {
-        auraRef.current.style.transform = `translate(${ptr.sx - 340}px, ${ptr.sy - 340}px)`;
-      }
+        // Cursor aura update
+        if (auraRef.current) {
+          auraRef.current.style.transform = `translate(${ptr.sx - 340}px, ${ptr.sy - 340}px)`;
+        }
 
-      // Update nav background opacity based on scroll
-      const nav = document.getElementById("nav");
-      if (nav) {
-        nav.style.setProperty("--navbg", String(clamp(window.scrollY / 120, 0, 1)));
-      }
-    });
+        // Update nav background opacity based on scroll
+        const nav = document.getElementById("nav");
+        if (nav) {
+          nav.style.setProperty("--navbg", String(clamp(window.scrollY / 120, 0, 1)));
+        }
+      },
+      { motion: true },
+    );
 
     return cleanup;
   }, []);

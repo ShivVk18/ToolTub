@@ -171,7 +171,26 @@ test.describe("KlipKit Redesign UI & Visual Layer", () => {
   test("prefers-reduced-motion turns off continuous animations", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
-    await page.waitForLoadState("domcontentloaded");
+    await page.waitForLoadState("networkidle");
     await expect(page.locator("#hero")).toBeVisible();
+    // Satellites are hidden; the orb is placed in its slot but doesn't spin.
+    await expect(page.locator("#sats")).toBeHidden();
+    const snap = () =>
+      page.evaluate(() => ({
+        rot: getComputedStyle(document.getElementById("orb")!).getPropertyValue("--r"),
+        placeholder: (document.getElementById("heroAsk") as HTMLInputElement).placeholder,
+        band: Array.from(document.querySelectorAll<HTMLElement>(".band [style*='translate']"))
+          .map((e) => e.style.transform)
+          .join("|"),
+      }));
+    const a = await snap();
+    await page.waitForTimeout(1500);
+    const b = await snap();
+    expect(b.rot).toBe(a.rot);
+    expect(b.placeholder).toBe(a.placeholder);
+    expect(b.band).toBe(a.band);
+    // Still usable: the orb sits in its slot and the ask bar works.
+    const [orb, slot] = await Promise.all([page.locator("#orb").boundingBox(), page.locator("#orbSlot").boundingBox()]);
+    expect(Math.abs(orb!.x + orb!.width / 2 - (slot!.x + slot!.width / 2))).toBeLessThan(12);
   });
 });

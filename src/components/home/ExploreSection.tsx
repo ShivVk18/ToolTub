@@ -47,20 +47,23 @@ export function ExploreSection({ onSelectTool }: ExploreSectionProps) {
 
   // Scroll count-up animation
   useEffect(() => {
-    const cleanup = addLoop(() => {
-      if (countedRef.current || !countRef.current) return;
-      const r = countRef.current.getBoundingClientRect();
-      if (r.top < window.innerHeight * 0.85) {
-        countedRef.current = true;
-        tween(
-          1400,
-          (p) => {
-            setCount(Math.round(p * 76));
-          },
-          ease.out,
-        );
-      }
-    });
+    const cleanup = addLoop(
+      () => {
+        if (countedRef.current || !countRef.current) return;
+        const r = countRef.current.getBoundingClientRect();
+        if (r.top < window.innerHeight * 0.85) {
+          countedRef.current = true;
+          tween(
+            1400,
+            (p) => {
+              setCount(Math.round(p * 76));
+            },
+            ease.out,
+          );
+        }
+      },
+      { target: countRef.current },
+    );
     return cleanup;
   }, []);
 

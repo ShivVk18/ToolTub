@@ -50,152 +50,156 @@ export function FeelSection() {
     let lastDemoKey = "";
     let lastPasteIdx = -1;
 
-    const cleanup = addLoop((t) => {
-      if (!sectionRef.current) return;
-      const r = sectionRef.current.getBoundingClientRect();
-      const innerHeight = typeof window !== "undefined" ? window.innerHeight : 800;
-      if (r.bottom < 0 || r.top > innerHeight) return;
+    const cleanup = addLoop(
+      (t) => {
+        if (!sectionRef.current) return;
+        const r = sectionRef.current.getBoundingClientRect();
+        const innerHeight = typeof window !== "undefined" ? window.innerHeight : 800;
+        if (r.bottom < 0 || r.top > innerHeight) return;
 
-      // 1. Bento Big: Live typing intent demo
-      const cyc = 5.2;
-      const demoIdx = Math.floor(t / cyc) % DEMOS.length;
-      const lt = t % cyc;
-      const [demoStr, demoKind, demoFile] = DEMOS[demoIdx];
-      const charCount = lt < 2.6 ? Math.floor((lt / 2.6) * demoStr.length) : demoStr.length;
-      const textVal = demoStr.slice(0, charCount);
-      const isBlink = lt < 4.4 && Math.floor(t * 2.4) % 2 === 0;
+        // 1. Bento Big: Live typing intent demo
+        const cyc = 5.2;
+        const demoIdx = Math.floor(t / cyc) % DEMOS.length;
+        const lt = t % cyc;
+        const [demoStr, demoKind, demoFile] = DEMOS[demoIdx];
+        const charCount = lt < 2.6 ? Math.floor((lt / 2.6) * demoStr.length) : demoStr.length;
+        const textVal = demoStr.slice(0, charCount);
+        const isBlink = lt < 4.4 && Math.floor(t * 2.4) % 2 === 0;
 
-      const demoKey = `${demoIdx}|${charCount}|${isBlink ? 1 : 0}`;
-      if (demoKey !== lastDemoKey) {
-        lastDemoKey = demoKey;
+        const demoKey = `${demoIdx}|${charCount}|${isBlink ? 1 : 0}`;
+        if (demoKey !== lastDemoKey) {
+          lastDemoKey = demoKey;
 
-        let spans: [number, number, { i: number }][] = [];
-        let steps: { t: string; d?: string; i?: number }[] = [];
+          let spans: [number, number, { i: number }][] = [];
+          let steps: { t: string; d?: string; i?: number }[] = [];
 
-        if (demoKind) {
-          const res = parse(textVal, demoKind);
-          spans = res.spans;
-          steps = res.steps;
-        } else {
-          const g = genParse(textVal);
-          if (g) {
-            spans = g.spans;
-            steps = [{ t: g.g.t, d: g.n ? String(g.n) : "", i: 0 }];
+          if (demoKind) {
+            const res = parse(textVal, demoKind);
+            spans = res.spans;
+            steps = res.steps;
+          } else {
+            const g = genParse(textVal);
+            if (g) {
+              spans = g.spans;
+              steps = [{ t: g.g.t, d: g.n ? String(g.n) : "", i: 0 }];
+            }
+          }
+
+          if (bdTextRef.current) {
+            const hl = markHTML(textVal, spans, false).replace(
+              /<mark style="border-color:var\(--u(\d)\)">/g,
+              '<mark class="bm" style="--hl:var(--h$1);--ul:var(--u$1)">',
+            );
+            bdTextRef.current.innerHTML = `${hl}<span class="bcar" style="opacity:${isBlink ? 1 : 0}"></span>`;
+          }
+
+          if (bdFileRef.current) {
+            bdFileRef.current.innerHTML =
+              demoFile && demoKind
+                ? `<span class="ftile" style="background:${KINDS[demoKind].c};width:26px;height:30px;font-size:9px;border-radius:7px;display:grid;place-items:center;color:#fff;font-weight:bold">${KINDS[demoKind].l}</span>${demoFile}`
+                : `<span class="ftile" style="background:var(--accent);width:26px;height:30px;font-size:11px;border-radius:7px;display:grid;place-items:center;color:#fff">✦</span>No file needed`;
+          }
+
+          if (bdPlanRef.current) {
+            bdPlanRef.current.innerHTML = steps
+              .map(
+                (s, j) =>
+                  `${j ? '<span style="color:var(--faint)">→</span>' : ""}<span class="pv inline-flex items-center gap-[6px] px-[12px] py-[6px] rounded-full text-[13px] font-medium bg-solid border border-line"><i style="width:7px;height:7px;border-radius:50%;display:inline-block;background:var(--u${(s.i ?? j) % 4})"></i>${s.t}${s.d ? ` <span style="color:var(--muted);font-weight:400">· ${s.d}</span>` : ""}</span>`,
+              )
+              .join("");
           }
         }
 
-        if (bdTextRef.current) {
-          const hl = markHTML(textVal, spans, false).replace(
-            /<mark style="border-color:var\(--u(\d)\)">/g,
-            '<mark class="bm" style="--hl:var(--h$1);--ul:var(--u$1)">',
-          );
-          bdTextRef.current.innerHTML = `${hl}<span class="bcar" style="opacity:${isBlink ? 1 : 0}"></span>`;
+        // 2. Bento Paste: Live snippet cycle
+        const pCyc = 2.8;
+        const pIdx = Math.floor(t / pCyc) % PASTE_SAMPLES.length;
+        const pLt = t % pCyc;
+
+        if (bpBoxRef.current) {
+          bpBoxRef.current.style.opacity = String(pLt < 0.35 ? pLt / 0.35 : pLt > 2.45 ? (pCyc - pLt) / 0.35 : 1);
+          bpBoxRef.current.style.transform = `translateY(${pLt < 0.35 ? (1 - pLt / 0.35) * 8 : 0}px)`;
         }
 
-        if (bdFileRef.current) {
-          bdFileRef.current.innerHTML =
-            demoFile && demoKind
-              ? `<span class="ftile" style="background:${KINDS[demoKind].c};width:26px;height:30px;font-size:9px;border-radius:7px;display:grid;place-items:center;color:#fff;font-weight:bold">${KINDS[demoKind].l}</span>${demoFile}`
-              : `<span class="ftile" style="background:var(--accent);width:26px;height:30px;font-size:11px;border-radius:7px;display:grid;place-items:center;color:#fff">✦</span>No file needed`;
+        if (pIdx !== lastPasteIdx) {
+          lastPasteIdx = pIdx;
+          const raw = PASTE_SAMPLES[pIdx];
+          const d = detect(raw);
+
+          if (bpCodeRef.current) bpCodeRef.current.textContent = raw;
+          if (bpDetRef.current) {
+            bpDetRef.current.innerHTML = `<span class="ftile" style="background:${PT_COLOR[d.pt]};width:28px;height:28px;border-radius:8px;font-size:${PT_TILE[d.pt].length > 3 ? 8 : 11}px;display:grid;place-items:center;color:#fff;font-weight:bold">${PT_TILE[d.pt]}</span>Detected: <b>${cap(d.l)}</b>`;
+          }
+          if (bpChipsRef.current) {
+            bpChipsRef.current.innerHTML = (PSUG[d.pt] || [])
+              .slice(0, 3)
+              .map(
+                (x) =>
+                  `<span class="pv inline-flex items-center px-[12px] py-[6px] rounded-full text-[13px] font-medium bg-solid border border-line">${x[0]}</span>`,
+              )
+              .join("");
+          }
         }
 
-        if (bdPlanRef.current) {
-          bdPlanRef.current.innerHTML = steps
-            .map(
-              (s, j) =>
-                `${j ? '<span style="color:var(--faint)">→</span>' : ""}<span class="pv inline-flex items-center gap-[6px] px-[12px] py-[6px] rounded-full text-[13px] font-medium bg-solid border border-line"><i style="width:7px;height:7px;border-radius:50%;display:inline-block;background:var(--u${(s.i ?? j) % 4})"></i>${s.t}${s.d ? ` <span style="color:var(--muted);font-weight:400">· ${s.d}</span>` : ""}</span>`,
-            )
-            .join("");
+        // 3. Bento Keys: 3D keycaps pressing
+        const keyCyc = t % 2.2;
+        const k1Down = keyCyc > 0.35 && keyCyc < 0.67;
+        const k2Down = keyCyc > 0.47 && keyCyc < 0.79;
+        if (keyK1Ref.current) keyK1Ref.current.classList.toggle("dn", k1Down);
+        if (keyK2Ref.current) keyK2Ref.current.classList.toggle("dn", k2Down);
+        if (kHintRef.current) {
+          kHintRef.current.style.opacity = String(keyCyc > 0.7 && keyCyc < 1.9 ? 1 : 0.35);
         }
-      }
 
-      // 2. Bento Paste: Live snippet cycle
-      const pCyc = 2.8;
-      const pIdx = Math.floor(t / pCyc) % PASTE_SAMPLES.length;
-      const pLt = t % pCyc;
-
-      if (bpBoxRef.current) {
-        bpBoxRef.current.style.opacity = String(pLt < 0.35 ? pLt / 0.35 : pLt > 2.45 ? (pCyc - pLt) / 0.35 : 1);
-        bpBoxRef.current.style.transform = `translateY(${pLt < 0.35 ? (1 - pLt / 0.35) * 8 : 0}px)`;
-      }
-
-      if (pIdx !== lastPasteIdx) {
-        lastPasteIdx = pIdx;
-        const raw = PASTE_SAMPLES[pIdx];
-        const d = detect(raw);
-
-        if (bpCodeRef.current) bpCodeRef.current.textContent = raw;
-        if (bpDetRef.current) {
-          bpDetRef.current.innerHTML = `<span class="ftile" style="background:${PT_COLOR[d.pt]};width:28px;height:28px;border-radius:8px;font-size:${PT_TILE[d.pt].length > 3 ? 8 : 11}px;display:grid;place-items:center;color:#fff;font-weight:bold">${PT_TILE[d.pt]}</span>Detected: <b>${cap(d.l)}</b>`;
+        // 4. Bento Privacy: Orbiting lock dot
+        const lockAngle = t * 1.4;
+        if (lockDotRef.current) {
+          lockDotRef.current.style.transform = `translate(${Math.cos(lockAngle) * 44}px, ${Math.sin(lockAngle) * 44}px)`;
         }
-        if (bpChipsRef.current) {
-          bpChipsRef.current.innerHTML = (PSUG[d.pt] || [])
-            .slice(0, 3)
-            .map(
-              (x) =>
-                `<span class="pv inline-flex items-center px-[12px] py-[6px] rounded-full text-[13px] font-medium bg-solid border border-line">${x[0]}</span>`,
-            )
-            .join("");
+
+        // 5. One drop animation
+        const c = t % 1.8;
+        const p = Math.min(1, c / 0.55);
+        const y =
+          c < 0.55 ? -90 + 126 * p * p : 36 - Math.abs(Math.sin((c - 0.55) * 9)) * Math.exp(-(c - 0.55) * 5) * 14;
+        if (fdropRef.current) {
+          fdropRef.current.style.transform = `translateY(${y}px)`;
+          fdropRef.current.style.opacity = String(c > 1.55 ? 1 - (c - 1.55) / 0.25 : 1);
         }
-      }
 
-      // 3. Bento Keys: 3D keycaps pressing
-      const keyCyc = t % 2.2;
-      const k1Down = keyCyc > 0.35 && keyCyc < 0.67;
-      const k2Down = keyCyc > 0.47 && keyCyc < 0.79;
-      if (keyK1Ref.current) keyK1Ref.current.classList.toggle("dn", k1Down);
-      if (keyK2Ref.current) keyK2Ref.current.classList.toggle("dn", k2Down);
-      if (kHintRef.current) {
-        kHintRef.current.style.opacity = String(keyCyc > 0.7 && keyCyc < 1.9 ? 1 : 0.35);
-      }
+        // 6. One tap animation
+        const c2 = t % 1.4;
+        const pr = c2 < 0.2 ? Math.sin((c2 / 0.2) * Math.PI) : 0;
+        if (ftapRef.current) {
+          ftapRef.current.style.transform = `scale(${1 - 0.07 * pr})`;
+          const dn = c2 > 0.15 && c2 < 0.9;
+          ftapRef.current.style.background = dn ? "var(--ok)" : "var(--ink)";
+          ftapRef.current.style.color = dn ? "#fff" : "var(--bg)";
+          ftapRef.current.textContent = dn ? "✓ Done" : "Compress";
+        }
+        if (fringRef.current) {
+          fringRef.current.style.opacity = String(c2 < 0.7 ? 0.8 * (1 - c2 / 0.7) : 0);
+          fringRef.current.style.transform = `scale(${0.4 + c2 * 2.4})`;
+        }
 
-      // 4. Bento Privacy: Orbiting lock dot
-      const lockAngle = t * 1.4;
-      if (lockDotRef.current) {
-        lockDotRef.current.style.transform = `translate(${Math.cos(lockAngle) * 44}px, ${Math.sin(lockAngle) * 44}px)`;
-      }
-
-      // 5. One drop animation
-      const c = t % 1.8;
-      const p = Math.min(1, c / 0.55);
-      const y = c < 0.55 ? -90 + 126 * p * p : 36 - Math.abs(Math.sin((c - 0.55) * 9)) * Math.exp(-(c - 0.55) * 5) * 14;
-      if (fdropRef.current) {
-        fdropRef.current.style.transform = `translateY(${y}px)`;
-        fdropRef.current.style.opacity = String(c > 1.55 ? 1 - (c - 1.55) / 0.25 : 1);
-      }
-
-      // 6. One tap animation
-      const c2 = t % 1.4;
-      const pr = c2 < 0.2 ? Math.sin((c2 / 0.2) * Math.PI) : 0;
-      if (ftapRef.current) {
-        ftapRef.current.style.transform = `scale(${1 - 0.07 * pr})`;
-        const dn = c2 > 0.15 && c2 < 0.9;
-        ftapRef.current.style.background = dn ? "var(--ok)" : "var(--ink)";
-        ftapRef.current.style.color = dn ? "#fff" : "var(--bg)";
-        ftapRef.current.textContent = dn ? "✓ Done" : "Compress";
-      }
-      if (fringRef.current) {
-        fringRef.current.style.opacity = String(c2 < 0.7 ? 0.8 * (1 - c2 / 0.7) : 0);
-        fringRef.current.style.transform = `scale(${0.4 + c2 * 2.4})`;
-      }
-
-      // 7. Done check + sparks
-      const c3 = t % 2.2;
-      if (fchkRef.current) {
-        fchkRef.current.style.transform = `scale(${
-          Math.min(1, c3 / 0.35) * (1 + 0.15 * Math.sin(Math.min(1, c3 / 0.5) * Math.PI))
-        })`;
-      }
-      sparksRef.current.forEach((s, i) => {
-        if (!s) return;
-        const a = (i / 10) * Math.PI * 2;
-        const pp = 1 - Math.pow(1 - Math.min(1, c3 / 0.9), 3);
-        s.style.opacity = String(c3 < 1.2 ? 1 - pp * 0.9 : 0);
-        s.style.transform = `translate(${Math.cos(a) * (20 + pp * 110)}px, ${
-          Math.sin(a) * (20 + pp * 80) - 5
-        }px) rotate(${pp * 180}deg)`;
-      });
-    });
+        // 7. Done check + sparks
+        const c3 = t % 2.2;
+        if (fchkRef.current) {
+          fchkRef.current.style.transform = `scale(${
+            Math.min(1, c3 / 0.35) * (1 + 0.15 * Math.sin(Math.min(1, c3 / 0.5) * Math.PI))
+          })`;
+        }
+        sparksRef.current.forEach((s, i) => {
+          if (!s) return;
+          const a = (i / 10) * Math.PI * 2;
+          const pp = 1 - Math.pow(1 - Math.min(1, c3 / 0.9), 3);
+          s.style.opacity = String(c3 < 1.2 ? 1 - pp * 0.9 : 0);
+          s.style.transform = `translate(${Math.cos(a) * (20 + pp * 110)}px, ${
+            Math.sin(a) * (20 + pp * 80) - 5
+          }px) rotate(${pp * 180}deg)`;
+        });
+      },
+      { target: sectionRef.current, motion: true },
+    );
 
     return cleanup;
   }, []);

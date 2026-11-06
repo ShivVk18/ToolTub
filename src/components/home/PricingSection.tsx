@@ -33,11 +33,14 @@ export function PricingSection({ onOpenPro }: PricingSectionProps) {
 
   // Conic border animation loop
   useEffect(() => {
-    const cleanup = addLoop((t) => {
-      if (proCardRef.current) {
-        proCardRef.current.style.setProperty("--pr", `${(t * 40) % 360}`);
-      }
-    });
+    const cleanup = addLoop(
+      (t) => {
+        if (proCardRef.current) {
+          proCardRef.current.style.setProperty("--pr", `${(t * 40) % 360}`);
+        }
+      },
+      { target: proCardRef.current, motion: true },
+    );
     return cleanup;
   }, []);
 

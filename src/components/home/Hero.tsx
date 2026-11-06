@@ -87,25 +87,28 @@ export function Hero({ onPickSample, onOrbSlotClick, onPasteText, onSubmitAsk, h
   // Typewriter placeholder animation loop
   useEffect(() => {
     let lastPh = "";
-    const cleanup = addLoop((t) => {
-      if (askValue) return;
-      const cyc = 3.6;
-      const i = Math.floor(t / cyc) % TYPEWRITER_EXAMPLES.length;
-      const lt = t % cyc;
-      const s = TYPEWRITER_EXAMPLES[i];
-      const n =
-        lt < 1.5
-          ? Math.floor((lt / 1.5) * s.length)
-          : lt < 3.0
-            ? s.length
-            : Math.floor((1 - (lt - 3.0) / 0.6) * s.length);
-      const cursor = lt < 3.0 && Math.floor(t * 2.6) % 2 ? "▍" : "";
-      const ph = `Try “${s.slice(0, Math.max(0, n))}${cursor}” — or paste anything`;
-      if (ph !== lastPh) {
-        setPlaceholder(ph);
-        lastPh = ph;
-      }
-    });
+    const cleanup = addLoop(
+      (t) => {
+        if (askValue) return;
+        const cyc = 3.6;
+        const i = Math.floor(t / cyc) % TYPEWRITER_EXAMPLES.length;
+        const lt = t % cyc;
+        const s = TYPEWRITER_EXAMPLES[i];
+        const n =
+          lt < 1.5
+            ? Math.floor((lt / 1.5) * s.length)
+            : lt < 3.0
+              ? s.length
+              : Math.floor((1 - (lt - 3.0) / 0.6) * s.length);
+        const cursor = lt < 3.0 && Math.floor(t * 2.6) % 2 ? "▍" : "";
+        const ph = `Try “${s.slice(0, Math.max(0, n))}${cursor}” — or paste anything`;
+        if (ph !== lastPh) {
+          setPlaceholder(ph);
+          lastPh = ph;
+        }
+      },
+      { motion: true },
+    );
     return cleanup;
   }, [askValue]);
 

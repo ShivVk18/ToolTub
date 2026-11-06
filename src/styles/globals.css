@@ -430,6 +430,9 @@ h1 .w {
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  #sats {
+    display: none;
+  }
   h1 .w {
     animation: none !important;
     opacity: 1 !important;

@@ -1,5 +1,7 @@
 "use client";
 
+import { stepSpring } from "@/lib/motion/spring";
+import { prefersReducedMotion } from "@/lib/motion/reducedMotion";
 import React, { useEffect, useRef, useLayoutEffect } from "react";
 import { addLoop, clamp, ptr } from "@/lib/motion/animation";
 
@@ -146,8 +148,11 @@ export function Orb({ mode, isDragging = false, onOrbClick, controllerRef }: Orb
       let tx = targetX;
       let ty = targetY;
 
+      // Reduced motion: the orb still follows its slot, but doesn't lean, spin or breathe.
+      const still = prefersReducedMotion();
+
       // Pointer magnet effect in hero mode
-      if (mode === "hero") {
+      if (mode === "hero" && !still) {
         const dx = ptr.x - (targetX + sr.left);
         const dy = ptr.y - (targetY + sr.top);
         const dist = Math.hypot(dx, dy);
@@ -162,28 +167,24 @@ export function Orb({ mode, isDragging = false, onOrbClick, controllerRef }: Orb
         O.hover *= 0.9;
       }
 
-      // Spring physics (stiffness 150, damping ratio 0.78)
-      const k = 150;
-      const c = 2 * Math.sqrt(k) * 0.78;
-      O.vx += ((tx - O.x) * k - O.vx * c) * dt;
-      O.vy += ((ty - O.y) * k - O.vy * c) * dt;
-      O.x += O.vx * dt;
-      O.y += O.vy * dt;
-
-      // Scale spring
-      const ks = 120;
-      const cs = 2 * Math.sqrt(ks) * 0.7;
-      O.vs += ((targetScale - O.s) * ks - O.vs * cs) * dt;
-      O.s += O.vs * dt;
+      // Position spring (stiffness 150, damping ratio 0.78) and scale spring (120, 0.7)
+      const sx = stepSpring({ x: O.x, v: O.vx }, tx, 150, 0.78, dt);
+      const sy = stepSpring({ x: O.y, v: O.vy }, ty, 150, 0.78, dt);
+      const ss = stepSpring({ x: O.s, v: O.vs }, targetScale, 120, 0.7, dt);
+      [O.x, O.vx, O.y, O.vy, O.s, O.vs] = [sx.x, sx.v, sy.x, sy.v, ss.x, ss.v];
 
       // Energy easing
       O.e += (O.te - O.e) * Math.min(1, dt * 3);
       O.gulp *= Math.pow(0.02, dt);
 
-      O.rot += dt * (22 + O.e * 190 + O.hover * 30);
-      O.rot2 -= dt * (30 + O.e * 120);
+      if (!still) {
+        O.rot += dt * (22 + O.e * 190 + O.hover * 30);
+        O.rot2 -= dt * (30 + O.e * 120);
+      }
 
-      const breathe = 1 + 0.018 * Math.sin(t * 1.7) + O.e * 0.09 + O.hover * 0.04 + O.amp * 0.16 + O.gulp * 0.14;
+      const breathe = still
+        ? 1
+        : 1 + 0.018 * Math.sin(t * 1.7) + O.e * 0.09 + O.hover * 0.04 + O.amp * 0.16 + O.gulp * 0.14;
       orbEl.style.transform = `translate(${O.x - BASE / 2}px, ${O.y - BASE / 2}px) scale(${Math.max(0.05, O.s * breathe)})`;
       orbEl.style.setProperty("--r", O.rot.toFixed(1));
       orbEl.style.setProperty("--r2", O.rot2.toFixed(1));

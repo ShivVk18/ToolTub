@@ -7,17 +7,20 @@ export function SpotlightWordmark() {
   const giantRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const cleanup = addLoop((t) => {
-      if (!giantRef.current) return;
-      const r = giantRef.current.getBoundingClientRect();
-      const innerHeight = typeof window !== "undefined" ? window.innerHeight : 800;
-      if (r.bottom < 0 || r.top > innerHeight) return;
+    const cleanup = addLoop(
+      (t) => {
+        if (!giantRef.current) return;
+        const r = giantRef.current.getBoundingClientRect();
+        const innerHeight = typeof window !== "undefined" ? window.innerHeight : 800;
+        if (r.bottom < 0 || r.top > innerHeight) return;
 
-      const ptr = getPointer();
-      giantRef.current.style.setProperty("--gx", `${ptr.sx - r.left}px`);
-      giantRef.current.style.setProperty("--gy", `${ptr.sy - r.top}px`);
-      giantRef.current.style.setProperty("--gr", `${(t * 30) % 360}`);
-    });
+        const ptr = getPointer();
+        giantRef.current.style.setProperty("--gx", `${ptr.sx - r.left}px`);
+        giantRef.current.style.setProperty("--gy", `${ptr.sy - r.top}px`);
+        giantRef.current.style.setProperty("--gr", `${(t * 30) % 360}`);
+      },
+      { target: giantRef.current },
+    );
 
     return cleanup;
   }, []);

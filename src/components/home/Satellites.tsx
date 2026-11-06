@@ -33,74 +33,77 @@ export function Satellites({ isHero, isDragging = false, controllerRef }: Satell
     let isOff = false;
     const BASE = 360;
 
-    const cleanup = addLoop((t, dt) => {
-      const hero = isHero;
-      const scrollY = typeof window !== "undefined" ? window.scrollY : 0;
-      const innerHeight = typeof window !== "undefined" ? window.innerHeight : 800;
+    const cleanup = addLoop(
+      (t, dt) => {
+        const hero = isHero;
+        const scrollY = typeof window !== "undefined" ? window.scrollY : 0;
+        const innerHeight = typeof window !== "undefined" ? window.innerHeight : 800;
 
-      const orbState = controllerRef?.current?.getState?.();
-      // Satellites MUST STAY HIDDEN until the orb has been initialized and measured
-      if (!orbState || !orbState.init || orbState.x === 0 || orbState.y === 0) {
-        if (!isOff) {
-          satRefs.current.forEach((el) => {
-            if (el) el.style.opacity = "0";
-          });
-          isOff = true;
+        const orbState = controllerRef?.current?.getState?.();
+        // Satellites MUST STAY HIDDEN until the orb has been initialized and measured
+        if (!orbState || !orbState.init || orbState.x === 0 || orbState.y === 0) {
+          if (!isOff) {
+            satRefs.current.forEach((el) => {
+              if (el) el.style.opacity = "0";
+            });
+            isOff = true;
+          }
+          return;
         }
-        return;
-      }
 
-      satV += ((hero && scrollY < innerHeight * 0.8 ? 1 : 0) - satV) * Math.min(1, dt * (hero ? 2.2 : 6));
-      if (satV < 0.01) {
-        if (!isOff) {
-          satRefs.current.forEach((el) => {
-            if (el) el.style.opacity = "0";
-          });
-          isOff = true;
+        satV += ((hero && scrollY < innerHeight * 0.8 ? 1 : 0) - satV) * Math.min(1, dt * (hero ? 2.2 : 6));
+        if (satV < 0.01) {
+          if (!isOff) {
+            satRefs.current.forEach((el) => {
+              if (el) el.style.opacity = "0";
+            });
+            isOff = true;
+          }
+          return;
         }
-        return;
-      }
 
-      isOff = false;
+        isOff = false;
 
-      // Drag tightening
-      const drag =
-        isDragging || (typeof document !== "undefined" && document.body.classList.contains("dragging")) ? 1 : 0;
-      satDrag += (drag - satDrag) * Math.min(1, dt * 4);
+        // Drag tightening
+        const drag =
+          isDragging || (typeof document !== "undefined" && document.body.classList.contains("dragging")) ? 1 : 0;
+        satDrag += (drag - satDrag) * Math.min(1, dt * 4);
 
-      const ox = orbState.x;
-      const oy = orbState.y;
-      const orbEnergy = orbState.e || 0;
-      const orbHover = orbState.hover || 0;
+        const ox = orbState.x;
+        const oy = orbState.y;
+        const orbEnergy = orbState.e || 0;
+        const orbHover = orbState.hover || 0;
 
-      if (!satSizes) {
-        satSizes = satRefs.current.map((el) => [el?.offsetWidth || 70, el?.offsetHeight || 38]);
-      }
+        if (!satSizes) {
+          satSizes = satRefs.current.map((el) => [el?.offsetWidth || 70, el?.offsetHeight || 38]);
+        }
 
-      const rx = BASE * orbState.s * 0.5 * (2.05 - satDrag * 0.55) + 34;
-      const ry = rx * 0.27;
-      const tilt = -0.17;
-      const ct = Math.cos(tilt);
-      const st = Math.sin(tilt);
-      const base = t * (0.22 + orbEnergy * 0.9 + orbHover * 0.12 + satDrag * 1.4);
+        const rx = BASE * orbState.s * 0.5 * (2.05 - satDrag * 0.55) + 34;
+        const ry = rx * 0.27;
+        const tilt = -0.17;
+        const ct = Math.cos(tilt);
+        const st = Math.sin(tilt);
+        const base = t * (0.22 + orbEnergy * 0.9 + orbHover * 0.12 + satDrag * 1.4);
 
-      satRefs.current.forEach((el, i) => {
-        if (!el) return;
-        const a = base + (i / SATS.length) * Math.PI * 2;
-        const ex = Math.cos(a) * rx;
-        const ey = Math.sin(a) * ry;
-        const x = ox + ex * ct - ey * st;
-        const y = oy + ex * st + ey * ct;
-        const z = Math.sin(a);
-        const dep = (z + 1) / 2;
+        satRefs.current.forEach((el, i) => {
+          if (!el) return;
+          const a = base + (i / SATS.length) * Math.PI * 2;
+          const ex = Math.cos(a) * rx;
+          const ey = Math.sin(a) * ry;
+          const x = ox + ex * ct - ey * st;
+          const y = oy + ex * st + ey * ct;
+          const z = Math.sin(a);
+          const dep = (z + 1) / 2;
 
-        const [w, h] = satSizes![i];
-        el.style.transform = `translate(${(x - w / 2).toFixed(1)}px, ${(y - h / 2).toFixed(1)}px) scale(${(0.74 + 0.3 * dep).toFixed(3)})`;
-        el.style.opacity = ((0.28 + 0.72 * dep) * satV).toFixed(3);
-        el.style.zIndex = z > 0 ? "6" : "4";
-        el.style.filter = dep < 0.35 ? "blur(1px)" : "none";
-      });
-    });
+          const [w, h] = satSizes![i];
+          el.style.transform = `translate(${(x - w / 2).toFixed(1)}px, ${(y - h / 2).toFixed(1)}px) scale(${(0.74 + 0.3 * dep).toFixed(3)})`;
+          el.style.opacity = ((0.28 + 0.72 * dep) * satV).toFixed(3);
+          el.style.zIndex = z > 0 ? "6" : "4";
+          el.style.filter = dep < 0.35 ? "blur(1px)" : "none";
+        });
+      },
+      { target: document.getElementById("stage"), motion: true },
+    );
 
     return cleanup;
   }, [isHero, isDragging, controllerRef]);
