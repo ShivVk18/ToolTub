@@ -168,6 +168,19 @@ test.describe("KlipKit Redesign UI & Visual Layer", () => {
     await assertAccessible(page, "home page");
   });
 
+  test("the Explore grid rule doesn't leak onto other Tailwind `grid` elements", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+    const leaks = await page.evaluate(() =>
+      Array.from(document.querySelectorAll<HTMLElement>(".grid:not(#grid)"))
+        .filter((el) => !/(^|\s)(m|mt|my)-/.test(el.className))
+        .map((el) => ({ el: el.id || el.className.slice(0, 40), cs: getComputedStyle(el) }))
+        .filter(({ cs }) => cs.marginTop === "34px" || cs.maxWidth === "1500px")
+        .map(({ el }) => el),
+    );
+    expect(leaks).toEqual([]);
+  });
+
   test("prefers-reduced-motion turns off continuous animations", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");

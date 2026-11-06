@@ -1391,7 +1391,8 @@ section.sec {
     left 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
     width 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
-.grid {
+/* Explore tool grid. Scoped to #grid: as a class it overrode Tailwind's `grid` utility everywhere. */
+#grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 18px;
@@ -2749,7 +2750,7 @@ h1 {
 }
 
 @media (max-width: 1100px) {
-  .grid {
+  #grid {
     grid-template-columns: repeat(2, 1fr);
   }
   .feel {
@@ -2769,7 +2770,7 @@ h1 {
   }
 }
 @media (max-width: 640px) {
-  .grid {
+  #grid {
     grid-template-columns: 1fr;
   }
   .navr .pill:not(.ink) {
