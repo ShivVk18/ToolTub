@@ -1,7 +1,7 @@
 // KlipKit service worker: browser tools keep working offline after the first visit.
 // Strategy: pages = network-first (fresh content, cached fallback); static assets, vendor engines
 // and models = cache-first (immutable, versioned by filename). Never caches /api.
-const VERSION = "klipkit-v1";
+const VERSION = "klipkit-v2"; // bump to purge caches from older builds
 
 self.addEventListener("install", () => self.skipWaiting());
 self.addEventListener("activate", (e) =>

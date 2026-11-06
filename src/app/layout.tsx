@@ -39,7 +39,15 @@ export const metadata: Metadata = {
 };
 
 /** Registers the service worker, then hands it every same-origin URL this page already loaded (first-visit offline). */
-const swScript = `if("serviceWorker"in navigator){var reg=function(){navigator.serviceWorker.register("/sw.js").then(function(){return navigator.serviceWorker.ready}).then(function(r){var u=[location.href].concat(performance.getEntriesByType("resource").map(function(e){return e.name}).filter(function(n){return n.indexOf(location.origin)===0}));r.active&&r.active.postMessage({type:"cache-urls",urls:u})}).catch(function(){})};if(document.readyState==="complete")reg();else addEventListener("load",reg)}`;
+const swProdScript = `if("serviceWorker"in navigator){var reg=function(){navigator.serviceWorker.register("/sw.js").then(function(){return navigator.serviceWorker.ready}).then(function(r){var u=[location.href].concat(performance.getEntriesByType("resource").map(function(e){return e.name}).filter(function(n){return n.indexOf(location.origin)===0}));r.active&&r.active.postMessage({type:"cache-urls",urls:u})}).catch(function(){})};if(document.readyState==="complete")reg();else addEventListener("load",reg)}`;
+
+/**
+ * Dev chunk filenames stay the same when code changes, so the worker's cache-first strategy would serve
+ * stale JS and break hydration. In dev, remove any worker and its caches left over from earlier visits.
+ */
+const swDevScript = `if("serviceWorker"in navigator){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()})});if(self.caches)caches.keys().then(function(ks){ks.forEach(function(k){if(k.indexOf("klipkit-v")===0)caches.delete(k)})})}`;
+
+const isProd = process.env.NODE_ENV === "production";
 
 export const viewport: Viewport = { themeColor: THEME_COLOR, width: "device-width", initialScale: 1 };
 
@@ -53,6 +61,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        {!isProd && <script dangerouslySetInnerHTML={{ __html: swDevScript }} />}
       </head>
       <body className="min-h-dvh flex flex-col font-sans bg-bg text-ink relative">
         <a
@@ -70,7 +79,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Footer />
         <CommandPalette index={searchIndex} />
         <GlobalModals />
-        <Script id="sw-register" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html: swScript }} />
+        {isProd && <Script id="sw-register" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html: swProdScript }} />}
       </body>
     </html>
   );

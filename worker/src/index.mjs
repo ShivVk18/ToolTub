@@ -35,16 +35,31 @@ async function convert(job) {
   const spec = TOOLS[job.data.tool];
   if (!spec) throw new Error(`Unknown tool ${job.data.tool}`);
   const dir = join(JOBS_DIR, job.data.id);
-  await run(
-    "soffice",
-    ["--headless", "--norestore", "--nolockcheck", `-env:UserInstallation=file://${dir}/profile`, ...spec.args, "--outdir", dir, join(dir, spec.input)],
-    { timeout: TIMEOUT_MS, killSignal: "SIGKILL" },
-  ).catch((e) => {
-    throw new Error(e.killed ? "timeout" : "conversion failed");
-  });
   const produced = spec.input.replace(/\.[^.]+$/, "") + "." + spec.output.split(".").pop();
-  await rename(join(dir, produced), join(dir, spec.output));
-  await rm(join(dir, "profile"), { recursive: true, force: true });
+  const once = async () => {
+    await run(
+      "soffice",
+      ["--headless", "--norestore", "--nolockcheck", `-env:UserInstallation=file://${dir}/profile`, ...spec.args, "--outdir", dir, join(dir, spec.input)],
+      { timeout: TIMEOUT_MS, killSignal: "SIGKILL" },
+    ).catch((e) => {
+      throw new Error(e.killed ? "timeout" : "conversion failed");
+    });
+    await rename(join(dir, produced), join(dir, spec.output)).catch(() => {
+      throw new Error("conversion failed");
+    });
+  };
+  try {
+    await once();
+  } catch (e) {
+    // LibreOffice occasionally fails to start under heavy load. Retry once with a fresh profile;
+    // a timeout is not retried because a second try would double the user's wait.
+    if (e.message === "timeout") throw e;
+    console.warn(`[worker] job ${job.data.id}: first attempt failed, retrying`);
+    await rm(join(dir, "profile"), { recursive: true, force: true });
+    await once();
+  } finally {
+    await rm(join(dir, "profile"), { recursive: true, force: true });
+  }
   return { ok: true };
 }
 
