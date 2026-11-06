@@ -12,7 +12,7 @@ import { Satellites } from "./Satellites";
 import { MarqueeBand } from "./MarqueeBand";
 import { SpotlightWordmark } from "./SpotlightWordmark";
 import { SAMPLES, fromFile, meta as metaFile, type FileInfo, KINDS } from "@/lib/fileKind";
-import { type ToolItem, CATS, tint, TOOL_ICON_PATHS, TOOLS } from "@/lib/designTools";
+import { type ToolItem, CATS, tint, TOOL_ICON_PATHS, TOOLS, toolBySlug } from "@/lib/designTools";
 import { tween, wait, ease, ripple, goto, addLoop, initMagneticButtons } from "@/lib/motion/animation";
 import { useUIStore } from "@/lib/store/ui";
 import { pasteItem, type PasteItem, looksLikeContent } from "@/lib/engines/detect";
@@ -43,7 +43,7 @@ export function HomeStage() {
   // Watch activeTool from store
   useEffect(() => {
     if (activeTool) {
-      if (PANELS[activeTool.n]) {
+      if (PANELS[activeTool.slug]) {
         openPanel(activeTool, "");
       } else {
         setContextTool(activeTool);
@@ -314,7 +314,7 @@ export function HomeStage() {
     if (window.scrollY > 10) {
       await goto(0);
     }
-    if (PANELS[t.n]) {
+    if (PANELS[t.slug]) {
       openPanel(t, "");
       return;
     }
@@ -341,7 +341,7 @@ export function HomeStage() {
             .replace(/^-|-$/g, "") === h,
       );
       if (t) {
-        if (PANELS[t.n]) {
+        if (PANELS[t.slug]) {
           openPanel(t, "");
         } else {
           handleSelectTool(t);
@@ -432,9 +432,9 @@ export function HomeStage() {
     if (typeof window === "undefined") return;
     (window as unknown as Record<string, unknown>).__kk = {
       pasteIn: (t: string) => handlePasteIn(t),
-      openPanel: (n: string, i?: string) => {
-        const t = TOOLS.find((x) => x.n === n);
-        if (t && PANELS[n]) openPanel(t, i || "");
+      openPanel: (slugOrName: string, i?: string) => {
+        const t = toolBySlug(slugOrName) ?? TOOLS.find((x) => x.n === slugOrName);
+        if (t && PANELS[t.slug]) openPanel(t, i || "");
         else if (t) handleSelectTool(t);
       },
       startWork: () => {

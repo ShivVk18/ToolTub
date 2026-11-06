@@ -56,6 +56,7 @@ export interface ActionResult {
   msg: string;
   html?: string;
   copy?: string;
+  /** Registry slug of the tool that can continue this result. */
   open?: string;
   bad?: number;
   go?: number;
@@ -71,7 +72,7 @@ export const ACT: Record<string, (f: PasteItem) => ActionResult | Promise<Action
         msg: `Valid JSON ✓ — ${s.split("\n").length.toLocaleString()} lines, ${keys.toLocaleString()} keys.`,
         html: codeBlock(s, "json"),
         copy: s,
-        open: "JSON Formatter",
+        open: "json-formatter",
       };
     } catch (e: unknown) {
       const er = jsonErr(f.text, e as Error);
@@ -79,7 +80,7 @@ export const ACT: Record<string, (f: PasteItem) => ActionResult | Promise<Action
       return {
         msg: `Found a problem${er.line ? ` on <b>line ${er.line}, column ${er.col}</b>` : ""}: ${esc(er.msg)}.`,
         html: er.line ? `<pre class="code err">${esc(ln)}\n${" ".repeat(Math.max(0, (er.col || 1) - 1))}^</pre>` : "",
-        open: "JSON Formatter",
+        open: "json-formatter",
         bad: 1,
       };
     }
@@ -91,7 +92,7 @@ export const ACT: Record<string, (f: PasteItem) => ActionResult | Promise<Action
         msg: `Minified — ${f.size} B → ${byteLength(s)} B.`,
         html: codeBlock(s.length > 1600 ? s.slice(0, 1600) + "…" : s),
         copy: s,
-        open: "JSON Formatter",
+        open: "json-formatter",
       };
     } catch {
       return ACT.fmt(f);
@@ -104,7 +105,7 @@ export const ACT: Record<string, (f: PasteItem) => ActionResult | Promise<Action
         msg: `Converted to CSV — ${(s.split("\n").length - 1).toLocaleString()} rows.`,
         html: codeBlock(s),
         copy: s,
-        open: "CSV ↔ JSON",
+        open: "json-to-csv",
       };
     } catch {
       return ACT.fmt(f);
@@ -119,7 +120,7 @@ export const ACT: Record<string, (f: PasteItem) => ActionResult | Promise<Action
         msg: `Here are your TypeScript types.`,
         html: codeBlock(s),
         copy: s,
-        open: "JSON to TypeScript",
+        open: "json-to-typescript",
       };
     } catch {
       return ACT.fmt(f);
@@ -132,7 +133,7 @@ export const ACT: Record<string, (f: PasteItem) => ActionResult | Promise<Action
       msg: `Converted ${v.length} rows to JSON.`,
       html: codeBlock(s, "json"),
       copy: s,
-      open: "CSV ↔ JSON",
+      open: "json-to-csv",
     };
   },
   jwt: (f) => {
@@ -154,7 +155,7 @@ export const ACT: Record<string, (f: PasteItem) => ActionResult | Promise<Action
         msg: `Decoded. <span class="stpill ${exp ? "bad" : P.exp ? "ok" : ""}">${esc(st)}</span> <span class="sub">Signature isn't verified — and the token never left your device.</span>`,
         html: table(rows) + codeBlock(JSON.stringify({ header: H, payload: P }, null, 2), "json"),
         copy: JSON.stringify(P, null, 2),
-        open: "JWT Decoder",
+        open: "jwt-decoder",
       };
     } catch {
       return { msg: "That doesn't look like a valid JWT.", bad: 1 };
@@ -167,7 +168,7 @@ export const ACT: Record<string, (f: PasteItem) => ActionResult | Promise<Action
           msg: `That's <b>${esc(r[0][1])}</b>.`,
           html: table(r),
           copy: r[2][1],
-          open: "Timestamp",
+          open: "timestamp-converter",
         }
       : { msg: "Not a valid timestamp." };
   },
@@ -187,7 +188,7 @@ export const ACT: Record<string, (f: PasteItem) => ActionResult | Promise<Action
           ["Contrast with black", c.cb.toFixed(2) + " : 1 · " + aa(c.cb)],
         ]),
       copy: c.rgb,
-      open: "Color Converter",
+      open: "color-converter",
     };
   },
   cron: (f) => {
@@ -207,7 +208,7 @@ export const ACT: Record<string, (f: PasteItem) => ActionResult | Promise<Action
         ]),
       ),
       copy: f.text.trim(),
-      open: "Cron Builder",
+      open: "cron-generator",
     };
   },
   sql: (f) => {
@@ -216,7 +217,7 @@ export const ACT: Record<string, (f: PasteItem) => ActionResult | Promise<Action
       msg: "Formatted.",
       html: codeBlock(s),
       copy: s,
-      open: "SQL Formatter",
+      open: "sql-formatter",
     };
   },
   url: (f) => {
@@ -232,7 +233,7 @@ export const ACT: Record<string, (f: PasteItem) => ActionResult | Promise<Action
         msg: `Parsed — ${[...u.searchParams].length} query parameters.`,
         html: table(rows),
         copy: decodeURIComponent(f.text.trim()),
-        open: "URL Encoder",
+        open: "url-encoder",
       };
     } catch {
       return { msg: "Not a valid URL." };
@@ -245,7 +246,7 @@ export const ACT: Record<string, (f: PasteItem) => ActionResult | Promise<Action
         msg: "Decoded.",
         html: codeBlock(s),
         copy: s,
-        open: "Base64",
+        open: "base64",
       };
     } catch {
       return { msg: "That isn't valid Base64." };
@@ -257,7 +258,7 @@ export const ACT: Record<string, (f: PasteItem) => ActionResult | Promise<Action
       msg: "Encoded to Base64.",
       html: codeBlock(s),
       copy: s,
-      open: "Base64",
+      open: "base64",
     };
   },
   count: (f) => {
@@ -265,7 +266,7 @@ export const ACT: Record<string, (f: PasteItem) => ActionResult | Promise<Action
     return {
       msg: `<b>${Number(r[0][1]).toLocaleString()} words</b>, ${r[5][1]} to read.`,
       html: table(r),
-      open: "Word Counter",
+      open: "word-counter",
     };
   },
   title: (f) => {
@@ -274,7 +275,7 @@ export const ACT: Record<string, (f: PasteItem) => ActionResult | Promise<Action
       msg: "Done.",
       html: codeBlock(s),
       copy: s,
-      open: "Case Converter",
+      open: "case-converter",
     };
   },
   upper: (f) => {
@@ -283,7 +284,7 @@ export const ACT: Record<string, (f: PasteItem) => ActionResult | Promise<Action
       msg: "Done.",
       html: codeBlock(s),
       copy: s,
-      open: "Case Converter",
+      open: "case-converter",
     };
   },
   lower: (f) => {
@@ -292,7 +293,7 @@ export const ACT: Record<string, (f: PasteItem) => ActionResult | Promise<Action
       msg: "Done.",
       html: codeBlock(s),
       copy: s,
-      open: "Case Converter",
+      open: "case-converter",
     };
   },
   clean: (f) => {
@@ -301,12 +302,12 @@ export const ACT: Record<string, (f: PasteItem) => ActionResult | Promise<Action
       msg: "Cleaned up line breaks and extra spaces.",
       html: codeBlock(s),
       copy: s,
-      open: "Clean Text",
+      open: "clean-text",
     };
   },
   regex: () => ({
     msg: "Opening the Regex Tester…",
-    open: "Regex Tester",
+    open: "regex-tester",
     go: 1,
   }),
 };
@@ -322,7 +323,7 @@ export async function runGen(p: GenParsed): Promise<ActionResult> {
       msg: `${n} fresh UUIDs (v4), generated on your device.`,
       html: codeBlock(l.join("\n")),
       copy: l.join("\n"),
-      open: "UUID Generator",
+      open: "uuid-generator",
     };
   }
   if (g === "pass") {
@@ -332,7 +333,7 @@ export async function runGen(p: GenParsed): Promise<ActionResult> {
       msg: `A strong ${n}-character password. <span class="sub">Generated locally with your browser's secure random generator.</span>`,
       html: `<pre class="code big">${esc(pw)}</pre>`,
       copy: pw,
-      open: "Password Generator",
+      open: "password-generator",
     };
   }
   if (g === "lorem") {
@@ -342,7 +343,7 @@ export async function runGen(p: GenParsed): Promise<ActionResult> {
       msg: `${n} paragraph${n > 1 ? "s" : ""} of placeholder text.`,
       html: codeBlock(s),
       copy: s,
-      open: "Lorem Ipsum",
+      open: "lorem-ipsum",
     };
   }
   if (g === "hash") {
@@ -352,7 +353,7 @@ export async function runGen(p: GenParsed): Promise<ActionResult> {
       msg: `Hashes of “${esc(s)}”.`,
       html: table(r),
       copy: r[1] ? r[1][1] : "",
-      open: "Hash Generator",
+      open: "hash-generator",
     };
   }
   if (g === "b64e") {
@@ -362,7 +363,7 @@ export async function runGen(p: GenParsed): Promise<ActionResult> {
       msg: `“${esc(s)}” in Base64.`,
       html: codeBlock(o),
       copy: o,
-      open: "Base64",
+      open: "base64",
     };
   }
   if (g === "now") {
@@ -372,13 +373,13 @@ export async function runGen(p: GenParsed): Promise<ActionResult> {
       msg: `Right now it's <b>${Math.floor(ms / 1000)}</b>.`,
       html: r ? table(r) : "",
       copy: String(Math.floor(ms / 1000)),
-      open: "Timestamp",
+      open: "timestamp-converter",
     };
   }
   if (g === "qr") {
     return {
       msg: "Opening the QR Code tool…",
-      open: "QR Code",
+      open: "qr-code-generator",
       go: 1,
     };
   }

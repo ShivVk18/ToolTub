@@ -4,13 +4,19 @@ import { chains } from "@/registry/chains";
 import { hubs } from "@/registry/categories";
 import { people } from "@/registry/people";
 import { deps, platformDeps } from "@/registry/dependencies";
+import { catalog, PANEL_SLUGS } from "@/registry/catalog";
+import { HOME } from "@/registry/home";
+import { TOOLS } from "@/lib/designTools";
+import { PANELS } from "@/lib/livePanels";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 
 const words = (s: string) => s.trim().split(/\s+/).filter(Boolean).length;
 const live = tools.filter(isIndexable);
 
 describe("registry integrity", () => {
-  it("has 78 tools with unique slugs", () => {
-    expect(tools.length).toBe(78);
+  it("has 79 tools with unique slugs", () => {
+    expect(tools.length).toBe(79);
     expect(new Set(tools.map((t) => t.slug)).size).toBe(tools.length);
   });
   it("uses lowercase-hyphen slugs only", () => {
@@ -131,5 +137,36 @@ describe("SEO/AEO content rules (every tool with content)", () => {
   });
   it("every routed tool has a UI or is clearly marked beta", () => {
     for (const t of routedTools()) expect(["live", "beta"]).toContain(t.status);
+  });
+});
+
+describe("single source of truth (ADR 0002)", () => {
+  it("home grid has 76 cards, every one a registry tool, in a stable order", () => {
+    expect(Object.keys(HOME)).toHaveLength(76);
+    for (const slug of Object.keys(HOME)) expect(getTool(slug), slug).toBeDefined();
+    expect(TOOLS.map((t) => t.slug)).toEqual(Object.keys(HOME));
+  });
+  it("live panels and the registry agree exactly", () => {
+    expect(new Set(Object.keys(PANELS))).toEqual(new Set(PANEL_SLUGS));
+    for (const slug of PANEL_SLUGS) expect(getTool(slug)?.panel, slug).toBe(true);
+  });
+  it("every action and generator target is a registry slug", () => {
+    const src = readFileSync(join(__dirname, "../../src/lib/actions.ts"), "utf8");
+    const targets = [...src.matchAll(/open: "([^"]+)"/g)].map((m) => m[1]);
+    expect(targets.length).toBeGreaterThan(20);
+    for (const slug of targets) expect(getTool(slug), slug).toBeDefined();
+  });
+  it("grid cards take name, category and server flag from the registry", () => {
+    const protect = TOOLS.find((t) => t.slug === "protect-pdf")!;
+    expect(protect.s).toBeUndefined(); // runs on the device (qpdf wasm), so no "Private server" tag
+    expect(TOOLS.find((t) => t.slug === "pdf-to-word")!.s).toBe("server");
+    expect(TOOLS.filter((t) => t.live)).toHaveLength(18);
+  });
+  it("every routed tool has a page component", () => {
+    const src = readFileSync(join(__dirname, "../../src/tools/index.tsx"), "utf8");
+    for (const t of routedTools()) expect(src, t.slug).toContain(`"${t.slug}":`);
+  });
+  it("the client catalog carries no SEO copy", () => {
+    for (const t of catalog) expect("seo" in t, t.slug).toBe(false);
   });
 });

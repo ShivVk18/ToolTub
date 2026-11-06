@@ -19,7 +19,7 @@ import { parse, markHTML, type IntentStep } from "@/lib/engines/intent";
 import { tween, wait, ease } from "@/lib/motion/animation";
 import { useUIStore } from "@/lib/store/ui";
 import { LiveToolPanel } from "./LiveToolPanel";
-import { TOOLS } from "@/lib/designTools";
+import { toolBySlug } from "@/lib/designTools";
 
 export interface WorkspaceProps {
   file: FileInfo | null;
@@ -249,7 +249,7 @@ export function Workspace({
       updateStatus("Ready · runs on your device", "var(--ok)", false);
 
       if (r.go && r.open) {
-        const tool = TOOLS.find((t) => t.n === r.open);
+        const tool = toolBySlug(r.open);
         if (tool) openPanel(tool, f.text);
         return;
       }
@@ -294,7 +294,7 @@ export function Workspace({
       updateStatus("Ready · runs on your device", "var(--ok)", false);
 
       if (r.go && r.open) {
-        const tool = TOOLS.find((t) => t.n === r.open);
+        const tool = toolBySlug(r.open);
         if (tool) openPanel(tool, "");
         return;
       }
@@ -715,11 +715,11 @@ export function Workspace({
                             type="button"
                             className="pill sm inline-flex items-center gap-[6px] h-[38px] px-[15px] rounded-full text-[14px] font-medium border border-line bg-panel text-ink hover:-translate-y-[1px]"
                             onClick={() => {
-                              const tool = TOOLS.find((t) => t.n === r.open);
+                              const tool = toolBySlug(r.open!);
                               if (tool) openPanel(tool, currentPasteRef.current?.text || "");
                             }}
                           >
-                            Open in {r.open} <span className="opacity-60">⤢</span>
+                            Open in {toolBySlug(r.open)?.n ?? r.open} <span className="opacity-60">⤢</span>
                           </button>
                         )}
                         <span className="rnote ml-auto text-[13px] text-faint">On your device · nothing uploaded</span>

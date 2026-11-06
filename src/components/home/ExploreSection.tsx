@@ -2,7 +2,6 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { TOOLS, CATS, tint, TOOL_ICON_PATHS, type ToolItem } from "@/lib/designTools";
-import { PANELS } from "@/lib/livePanels";
 import { addLoop, tween, ease } from "@/lib/motion/animation";
 
 interface ExploreSectionProps {
@@ -135,7 +134,7 @@ export function ExploreSection({ onSelectTool }: ExploreSectionProps) {
       >
         {visibleTools.map((t, idx) => {
           const cat = CATS[t.c];
-          const isLive = !!PANELS[t.n];
+          const isLive = t.live;
           return (
             <button
               key={t.n}

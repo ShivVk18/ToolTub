@@ -220,6 +220,6 @@ describe("pasteItem & pasteAct", () => {
     const res = ACT.fmt(item) as { msg: string; copy: string; open: string };
     expect(res.msg).toContain("Valid JSON");
     expect(res.copy).toContain('"hello": "world"');
-    expect(res.open).toBe("JSON Formatter");
+    expect(res.open).toBe("json-formatter");
   });
 });

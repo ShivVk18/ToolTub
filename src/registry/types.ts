@@ -105,6 +105,17 @@ export interface ToolSEO {
   reviewedBy: string; // person id from people.ts
 }
 
+/** Icon keys for home-page cards (paths in lib/designTools.ts TOOL_ICON_PATHS). */
+export type HomeIcon = "pdf" | "doc" | "img" | "txt" | "code" | "lock" | "qr" | "audio" | "video" | "spark";
+
+/** Presentation for the home-page Explore card. */
+export interface HomeCard {
+  /** Short display name on the card, e.g. "Word to PDF". */
+  name: string;
+  icon: HomeIcon;
+  blurb: string;
+}
+
 export interface ToolDefinition {
   slug: string;
   name: string;
@@ -127,7 +138,14 @@ export interface ToolDefinition {
   metaDescription?: string;
   /** Full SEO/AEO content. Required for status "live". */
   seo?: ToolSEO;
+  /** Card on the home page (Explore grid, palette icons). */
+  home?: HomeCard;
+  /** True when the tool runs as a live panel on the home page. */
+  panel: boolean;
 }
+
+/** Tool facts without SEO copy (registry/catalog.ts); light enough for client bundles. */
+export type ToolCore = Omit<ToolDefinition, "seo" | "metaDescription">;
 
 export interface Person {
   id: string;

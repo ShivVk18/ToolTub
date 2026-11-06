@@ -27,7 +27,7 @@ export function LiveToolPanel({ onReturnToChat }: LiveToolPanelProps) {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const patRef = useRef<HTMLInputElement>(null);
 
-  const P = panelTool ? PANELS[panelTool.n] : null;
+  const P = panelTool ? PANELS[panelTool.slug] : null;
 
   // Initialize tool state when panelTool changes
   useEffect(() => {
@@ -55,11 +55,7 @@ export function LiveToolPanel({ onReturnToChat }: LiveToolPanelProps) {
 
     // Hash deep linking
     try {
-      const slug = panelTool.n
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "");
-      window.history.replaceState(null, "", "#" + slug);
+      window.history.replaceState(null, "", "#" + panelTool.slug);
     } catch {
       // ignore
     }

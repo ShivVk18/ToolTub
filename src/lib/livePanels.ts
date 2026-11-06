@@ -33,8 +33,9 @@ export interface PanelConfig {
   run: (v: string, o?: string | null, pat?: string, fl?: string) => PanelRunResult | Promise<PanelRunResult>;
 }
 
+/** Live panel tools keyed by registry slug (see PANEL_SLUGS in registry/tools.ts). */
 export const PANELS: Record<string, PanelConfig> = {
-  "JSON Formatter": {
+  "json-formatter": {
     opts: [
       ["2 spaces", "2"],
       ["4 spaces", "4"],
@@ -65,7 +66,7 @@ export const PANELS: Record<string, PanelConfig> = {
     },
   },
 
-  "JWT Decoder": {
+  "jwt-decoder": {
     sample:
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyXzQyIiwibmFtZSI6IkFzaGEgUmFvIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzMwNTAwMDAwLCJleHAiOjE5MDAwMDAwMDB9.c2lnbmF0dXJl",
     run: (v) => {
@@ -90,7 +91,7 @@ export const PANELS: Record<string, PanelConfig> = {
     },
   },
 
-  Base64: {
+  base64: {
     opts: [
       ["Encode", "e"],
       ["Decode", "d"],
@@ -112,7 +113,7 @@ export const PANELS: Record<string, PanelConfig> = {
     },
   },
 
-  "URL Encoder": {
+  "url-encoder": {
     opts: [
       ["Encode", "e"],
       ["Decode", "d"],
@@ -142,7 +143,7 @@ export const PANELS: Record<string, PanelConfig> = {
     },
   },
 
-  Timestamp: {
+  "timestamp-converter": {
     sample: "1730592000",
     run: (v) => {
       if (!v.trim()) return {};
@@ -158,7 +159,7 @@ export const PANELS: Record<string, PanelConfig> = {
     },
   },
 
-  "Word Counter": {
+  "word-counter": {
     sample:
       "KlipKit brings 76 genuinely useful tools under one roof. Drop a file, paste anything, or just ask — and it is done in seconds.\n\nNo sign-ups. No pop-ups. No waiting.",
     run: (v) => {
@@ -181,7 +182,7 @@ export const PANELS: Record<string, PanelConfig> = {
     },
   },
 
-  "Case Converter": {
+  "case-converter": {
     opts: [
       ["Title Case", "t"],
       ["UPPER", "u"],
@@ -211,7 +212,7 @@ export const PANELS: Record<string, PanelConfig> = {
     },
   },
 
-  "Hash Generator": {
+  "hash-generator": {
     sample: "hello world",
     run: async (v) => {
       const r = await hashAll(v);
@@ -220,7 +221,7 @@ export const PANELS: Record<string, PanelConfig> = {
     },
   },
 
-  "UUID Generator": {
+  "uuid-generator": {
     gen: 1,
     opts: [
       ["1", "1"],
@@ -235,7 +236,7 @@ export const PANELS: Record<string, PanelConfig> = {
     },
   },
 
-  "Password Generator": {
+  "password-generator": {
     gen: 1,
     opts: [
       ["16", "16"],
@@ -253,7 +254,7 @@ export const PANELS: Record<string, PanelConfig> = {
     },
   },
 
-  "Lorem Ipsum": {
+  "lorem-ipsum": {
     gen: 1,
     opts: [
       ["1 ¶", "1"],
@@ -267,7 +268,7 @@ export const PANELS: Record<string, PanelConfig> = {
     },
   },
 
-  "Color Converter": {
+  "color-converter": {
     sample: "#6D5DF5",
     run: (v) => {
       const c = parseColor(v);
@@ -285,7 +286,7 @@ export const PANELS: Record<string, PanelConfig> = {
     },
   },
 
-  "Cron Builder": {
+  "cron-generator": {
     sample: "*/15 9-18 * * 1-5",
     run: (v) => {
       const p = v.trim().split(/\s+/);
@@ -317,7 +318,7 @@ export const PANELS: Record<string, PanelConfig> = {
     },
   },
 
-  "SQL Formatter": {
+  "sql-formatter": {
     sample:
       "select u.id, u.name, count(o.id) as orders from users u left join orders o on o.user_id = u.id where u.active = true and o.total > 500 group by u.id, u.name order by orders desc limit 10",
     run: (v) => {
@@ -333,7 +334,7 @@ export const PANELS: Record<string, PanelConfig> = {
     },
   },
 
-  "CSV ↔ JSON": {
+  "json-to-csv": {
     sample: 'name,city,orders\nAsha,Pune,12\nRohan,"Delhi, NCR",7\nMeera,Bengaluru,21',
     run: (v) => {
       const t = v.trim();
@@ -352,7 +353,7 @@ export const PANELS: Record<string, PanelConfig> = {
     },
   },
 
-  "JSON to TypeScript": {
+  "json-to-typescript": {
     sample:
       '{"id":42,"name":"Asha","tags":["pro"],"address":{"city":"Pune","pin":411001},"orders":[{"sku":"KK-01","qty":2}]}',
     run: (v) => {
@@ -373,7 +374,7 @@ export const PANELS: Record<string, PanelConfig> = {
     },
   },
 
-  "Clean Text": {
+  "clean-text": {
     sample: "This line was\nbroken in the\nmiddle by a PDF   copy.\n\n\n\nToo many    spaces too.",
     run: (v) => {
       const s = cleanText(v);
@@ -381,7 +382,7 @@ export const PANELS: Record<string, PanelConfig> = {
     },
   },
 
-  "Regex Tester": {
+  "regex-tester": {
     regex: 1,
     sample: "Contact asha@klipkit.com or rohan.dev@example.in — not @nobody or test@.",
     pat: "[\\w.+-]+@[\\w-]+\\.[\\w.]+",

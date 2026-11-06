@@ -7,7 +7,7 @@ import type { SearchEntry } from "@/registry/search-index";
 import { useKlip } from "@/lib/store/klip";
 import { cn } from "@/lib/utils";
 import { createToolSearch } from "@/lib/search";
-import { CATS, tint, TOOL_ICON_PATHS, type ToolItem } from "@/lib/designTools";
+import { CATS, tint, TOOL_ICON_PATHS } from "@/lib/designTools";
 import { esc } from "@/lib/engines/intent";
 
 export function useToolSearch(index: SearchEntry[]) {
@@ -69,24 +69,8 @@ export function CommandPalette({ index }: { index: SearchEntry[] }) {
     if (!e?.available) return;
     setOpen(false);
     // If on homepage and __kk exists, we can open in workspace, or navigate
-    if (window.location.pathname === "/" && (window as any).__kk) {
-      const match = {
-        n: e.name,
-        c: e.hub.startsWith("dev") ? "d" : e.hub.startsWith("creat") ? "c" : "p",
-        i: e.slug.includes("pdf")
-          ? "pdf"
-          : e.slug.includes("image") || e.slug.includes("heic")
-            ? "img"
-            : e.slug.includes("audio") || e.slug.includes("transcribe")
-              ? "audio"
-              : e.slug.includes("video")
-                ? "video"
-                : "code",
-        d: e.tagline,
-        slug: e.slug,
-      } as ToolItem;
-      (window as any).__kk.state.file = null;
-    }
+    // On the home page, drop any loaded file before navigating to the tool page.
+    if (window.location.pathname === "/" && (window as any).__kk) (window as any).__kk.state.file = null;
     router.push(`/${e.slug}`);
   };
 
