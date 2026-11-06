@@ -7,11 +7,10 @@ import { goto, ripple, addLoop, clamp } from "@/lib/motion/animation";
 
 interface NavProps {
   onOpenSearch?: () => void;
-  onOpenPro?: () => void;
   isHome?: boolean;
 }
 
-export function Nav({ onOpenSearch, onOpenPro, isHome = true }: NavProps) {
+export function Nav({ onOpenSearch, isHome = true }: NavProps) {
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
@@ -90,7 +89,7 @@ export function Nav({ onOpenSearch, onOpenPro, isHome = true }: NavProps) {
             <button type="button" onClick={() => handleNavClick("feel")}>
               Why KlipKit
             </button>
-            <button type="button" onClick={() => (onOpenPro ? onOpenPro() : handleNavClick("pricing"))}>
+            <button type="button" onClick={() => handleNavClick("pricing")}>
               Pro
             </button>
             <button type="button" onClick={() => handleNavClick("pricing")}>
@@ -155,13 +154,7 @@ export function Nav({ onOpenSearch, onOpenPro, isHome = true }: NavProps) {
               Log in
             </button>
 
-            <button
-              id="gopro"
-              type="button"
-              data-mag
-              className="pill ink"
-              onClick={() => (onOpenPro ? onOpenPro() : handleNavClick("pricing"))}
-            >
+            <button id="gopro" type="button" data-mag className="pill ink" onClick={() => handleNavClick("pricing")}>
               Go Pro
             </button>
           </div>

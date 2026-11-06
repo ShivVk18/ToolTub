@@ -182,19 +182,27 @@ test.describe("KlipKit Redesign UI & Visual Layer", () => {
     expect(leaks).toEqual([]);
   });
 
-  test("Go Pro opens a visible, clickable voice sheet; Escape closes it", async ({ page }) => {
+  test("nav Go Pro scrolls to pricing; the Pro plan's Go Pro opens a visible voice sheet", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
-    await page.locator("#gopro").click();
     const sheet = page.locator("#sheet");
-    await expect.poll(() => sheet.evaluate((el) => getComputedStyle(el).opacity)).toBe("1");
+    const opacity = () => sheet.evaluate((el) => getComputedStyle(el).opacity);
+    // Reference: <button class="pill ink" data-go="pricing">Go Pro</button>
+    await page.locator("#gopro").click();
+    await expect
+      .poll(() => page.evaluate(() => Math.abs(document.getElementById("pricing")!.getBoundingClientRect().top) < 120))
+      .toBe(true);
+    expect(await opacity()).toBe("0");
+    // Reference: $('#proBtn').onclick = openSheet
+    await page.locator("#proBtn").click();
+    await expect.poll(opacity).toBe("1");
     const onTop = await page.locator("#tryVoice").evaluate((btn) => {
       const r = btn.getBoundingClientRect();
       return document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2)?.closest("#tryVoice") === btn;
     });
     expect(onTop).toBe(true);
     await page.keyboard.press("Escape");
-    await expect.poll(() => sheet.evaluate((el) => getComputedStyle(el).opacity)).toBe("0");
+    await expect.poll(opacity).toBe("0");
   });
 
   test("section headings keep their italic second phrase", async ({ page }) => {

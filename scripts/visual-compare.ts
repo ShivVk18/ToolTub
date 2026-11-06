@@ -118,8 +118,10 @@ const STATES: Record<string, { desc: string; run: StateHandler }> = {
   j: {
     desc: "Pro voice sheet",
     run: async (p) => {
-      await p.locator("#nav .pill.ink, #gopro").first().click();
-      await settle(p, 600);
+      // Reference: the Pro plan's Go Pro opens the sheet ($('#proBtn').onclick = openSheet).
+      await scrollTo(p, "#pricing");
+      await p.evaluate(() => document.getElementById("proBtn")?.click());
+      await settle(p, 800);
     },
   },
   k: {

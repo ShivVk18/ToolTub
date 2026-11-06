@@ -9,8 +9,9 @@ import { useUIStore } from "@/lib/store/ui";
 export function Header() {
   const pathname = usePathname();
   const isHome = pathname === "/";
-  const { openPalette, openVoiceSheet } = useUIStore();
-  return <Nav onOpenSearch={openPalette} onOpenPro={openVoiceSheet} isHome={isHome} />;
+  const { openPalette } = useUIStore();
+  // As in the reference, Pro and Go Pro scroll to pricing; the voice sheet opens from the Pro plan and the mic.
+  return <Nav onOpenSearch={openPalette} isHome={isHome} />;
 }
 
 export function Footer() {
