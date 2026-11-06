@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import { spawn, execSync, type ChildProcess } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
-import { docxText, downloadFrom, fx, output, primary, upload, alert, byTestId } from "./helpers";
+import { docxText, downloadFrom, fx, gen, output, primary, upload, alert, byTestId } from "./helpers";
 import { JOBS_DIR, REDIS_PORT } from "../../playwright.config";
 
 /**
@@ -42,7 +42,7 @@ test.afterAll(async () => { await stopWorker(); redis?.kill("SIGKILL"); });
 
 const post = (request: import("@playwright/test").APIRequestContext, file: { name: string; mimeType: string; buffer: Buffer }, tool = "pdf-to-word") =>
   request.post(`/api/jobs?tool=${tool}`, { multipart: { file } });
-const pdf = () => ({ name: "text.pdf", mimeType: "application/pdf", buffer: readFileSync(fx("text.pdf")) });
+const pdf = () => ({ name: "text.pdf", mimeType: "application/pdf", buffer: readFileSync(gen("text.pdf")) });
 
 async function waitDone(request: import("@playwright/test").APIRequestContext, id: string, ms = 60_000) {
   const end = Date.now() + ms;
@@ -61,7 +61,7 @@ test("queue down: API answers 503 fast and the UI says 'temporarily unavailable'
   expect(res.status()).toBe(503);
   expect(Date.now() - t0).toBeLessThan(5000);
   await page.goto("/pdf-to-word");
-  await upload(page, fx("text.pdf"));
+  await upload(page, gen("text.pdf"));
   await primary(page).click();
   await expect(alert(page)).toContainText(/temporarily unavailable/i);
 });
@@ -76,7 +76,7 @@ test("worker stopped (queue up): server tools say 'temporarily unavailable' inst
 test("PDF to Word: real DOCX with the PDF's text, downloaded in the browser", async ({ page }) => {
   await startWorker();
   await page.goto("/pdf-to-word");
-  await upload(page, fx("text.pdf"));
+  await upload(page, gen("text.pdf"));
   await primary(page).click();
   await expect(output(page)).toContainText("Done", { timeout: 60_000 });
   const { name, bytes } = await downloadFrom(page, () => byTestId(page, "download").click());
@@ -86,7 +86,7 @@ test("PDF to Word: real DOCX with the PDF's text, downloaded in the browser", as
 
 test("upload validation: unknown tool, wrong content type, size limit", async ({ request }) => {
   expect((await post(request, pdf(), "nope")).status()).toBe(400);
-  expect((await post(request, { name: "fake.pdf", mimeType: "application/pdf", buffer: readFileSync(fx("fake.pdf")) })).status()).toBe(415);
+  expect((await post(request, { name: "fake.pdf", mimeType: "application/pdf", buffer: readFileSync(gen("fake.pdf")) })).status()).toBe(415);
   const big = Buffer.concat([Buffer.from("%PDF-1.7\n"), Buffer.alloc(51 * 1024 * 1024)]);
   expect((await post(request, { name: "big.pdf", mimeType: "application/pdf", buffer: big })).status()).toBe(413);
 });

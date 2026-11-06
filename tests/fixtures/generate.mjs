@@ -4,7 +4,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { deflateSync } from "node:zlib";
 import { fileURLToPath } from "node:url";
-import { PDFDocument, StandardFonts } from "pdf-lib";
+import { PDFDocument, PDFHexString, StandardFonts } from "pdf-lib";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const out = join(here, "generated");
@@ -40,6 +40,28 @@ put("twenty-pages.pdf", await textPdf(20));
   for (let i = 0; i < 6; i++) { const img = await doc.embedJpg(jpg); doc.addPage([842, 595]).drawImage(img, { x: 0, y: 0, width: 842, height: 595 }); }
   put("image-heavy.pdf", await doc.save());
 }
+// Text PDF for PDF to Word: the server test expects this sentence in the .docx.
+{
+  const doc = await PDFDocument.create();
+  const font = await doc.embedFont(StandardFonts.Helvetica);
+  const page = doc.addPage([595, 842]);
+  ["KlipKit test document", "This paragraph should become editable text in Word.", "Second line with numbers 12345."].forEach((line, i) =>
+    page.drawText(line, { x: 72, y: 760 - i * 28, size: 14, font }),
+  );
+  put("text.pdf", await doc.save());
+}
+// Declares Standard encryption in the trailer, so PDF readers (pdf-lib included) treat it as password-protected.
+{
+  const doc = await PDFDocument.create();
+  doc.addPage([595, 842]);
+  const ctx = doc.context;
+  const pad = PDFHexString.of("28BF4E5E4E758A4164004E56FFFA01082E2E00B6D0683E802F0CA9FE6453697A");
+  ctx.trailerInfo.Encrypt = ctx.register(ctx.obj({ Filter: "Standard", V: 1, R: 2, Length: 40, P: -4, O: pad, U: pad }));
+  ctx.trailerInfo.ID = ctx.obj([PDFHexString.of("4B6C69704B6974"), PDFHexString.of("4B6C69704B6974")]);
+  put("protected.pdf", await doc.save({ useObjectStreams: false }));
+}
+// Plain text with a .pdf name: must be rejected as "not a readable PDF".
+put("fake.pdf", "This is plain text, not a PDF.\n");
 
 // ---- JSON ----
 put("valid.json", JSON.stringify({ name: "KlipKit", tools: 78, nested: { ok: true, list: [1, 2, 3] } }));

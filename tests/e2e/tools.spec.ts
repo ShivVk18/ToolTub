@@ -294,13 +294,13 @@ test.describe("Compress PDF", () => {
   });
   test("password-protected PDF → asks to unlock first", async ({ page }) => {
     await page.goto("/compress-pdf");
-    await upload(page, fx("protected.pdf"));
+    await upload(page, gen("protected.pdf"));
     await primary(page).click();
     await expect(alert(page)).toContainText(/password-protected/i);
   });
   test("fake PDF (.txt renamed) → clear error", async ({ page }) => {
     await page.goto("/compress-pdf");
-    await upload(page, fx("fake.pdf"));
+    await upload(page, gen("fake.pdf"));
     await primary(page).click();
     await expect(alert(page)).toContainText(/isn't a readable PDF/i);
   });
