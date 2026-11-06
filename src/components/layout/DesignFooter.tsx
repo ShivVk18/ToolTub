@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export function DesignFooter() {
   return (
-    <footer className="relative z-[2] px-[clamp(20px,6vw,140px)] py-[40px] pb-[60px] flex items-center gap-[18px] text-ink2 text-[14px] border-t border-line flex-wrap">
+    <footer className="relative z-[2] px-[clamp(20px,6vw,140px)] py-[40px] pb-[60px] flex items-center gap-[18px] text-ink2 text-[14px] border-t border-line">
       <Link
         href="/"
         className="brand flex items-center gap-[12px] font-semibold text-ink no-underline select-none mr-[6px]"
@@ -28,21 +28,25 @@ export function DesignFooter() {
 
       <span>Drop anything. Done in seconds.</span>
 
-      <div className="ml-auto flex items-center gap-[16px] flex-wrap max-sm:ml-0 max-sm:w-full max-sm:mt-[12px]">
-        <span>© 2026 KlipKit</span>
+      {/* One "·"-separated line on the right, like the reference ("© 2026 KlipKit · Privacy · Terms"). */}
+      <span className="ml-auto text-right">
+        © 2026 KlipKit ·{" "}
         <Link href="/privacy" className="hover:text-ink transition-colors">
           Privacy
-        </Link>
+        </Link>{" "}
+        ·{" "}
         <Link href="/about" className="hover:text-ink transition-colors">
           About
-        </Link>
+        </Link>{" "}
+        ·{" "}
         <Link href="/licences" className="hover:text-ink transition-colors">
           Licences
-        </Link>
+        </Link>{" "}
+        ·{" "}
         <a href="/llms.txt" className="hover:text-ink transition-colors">
           llms.txt
         </a>
-      </div>
+      </span>
     </footer>
   );
 }

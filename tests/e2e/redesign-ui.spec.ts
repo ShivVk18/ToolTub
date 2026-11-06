@@ -383,6 +383,22 @@ test.describe("KlipKit Redesign UI & Visual Layer", () => {
     await expect(page.locator("#bpCode")).not.toBeEmpty();
   });
 
+  test("footer keeps the reference's single row on a phone", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/");
+    const rows = await page.evaluate(() => {
+      const f = document.querySelectorAll("footer")[document.querySelectorAll("footer").length - 1];
+      const tops = Array.from(f.children).map((c) => Math.round(c.getBoundingClientRect().top));
+      const brand = f.children[0].getBoundingClientRect();
+      // every child starts on the brand's row (allowing for vertical centring)
+      return (
+        Array.from(f.children).filter((c) => c.getBoundingClientRect().top > brand.bottom).length +
+        (tops.length ? 0 : 1)
+      );
+    });
+    expect(rows).toBe(0);
+  });
+
   test("prefers-reduced-motion turns off continuous animations", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
