@@ -18,8 +18,6 @@ const MIME: Record<string, "image/jpeg" | "image/png" | "image/webp"> = {
   png: "image/png",
   webp: "image/webp",
 };
-/** Platform sizes for "resize for …". Anything else fits within the resizer's 1600 px default. */
-const PLATFORM: Record<string, [number, number]> = { instagram: [1080, 1350] };
 
 /**
  * Runs one plan step for real, on the device (workers). Only steps that planFor() marks "run" come here;
@@ -48,8 +46,8 @@ export async function runStep(step: IntentStep, input: PlanFile): Promise<PlanFi
     };
   }
   if (kind === "image" && (step.id === "compress" || step.id === "resize" || step.id === "conv")) {
-    const platform = /for (\w+)/i.exec(step.d)?.[1]?.toLowerCase();
-    const [w, h] = step.id === "resize" ? (PLATFORM[platform ?? ""] ?? [1600, 1600]) : [undefined, undefined];
+    // Resize fits the box the plan card shows (step.w × step.h); without one, the resizer's 1600 px default.
+    const [w, h] = step.id === "resize" ? [step.w ?? 1600, step.h ?? 1600] : [undefined, undefined];
     const mime = step.id === "conv" ? MIME[step.fmt ?? ""] : "auto";
     const r = await imageWorker.call("process", {
       blob: input.blob,

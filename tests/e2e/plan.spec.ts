@@ -82,4 +82,32 @@ test.describe("Plan → Run → Results is real", () => {
     ]);
     expect((await PDFDocument.load(readFileSync((await dl.path())!))).getPageCount()).toBe(5);
   });
+
+  /** Decodes the downloaded bytes in the browser: proves it's a valid image and gives its real size. */
+  async function decode(page: Page, bytes: Buffer, type: string) {
+    return page.evaluate(
+      async ([b64, t]) => {
+        const bin = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+        const bmp = await createImageBitmap(new Blob([bin], { type: t }));
+        return { w: bmp.width, h: bmp.height };
+      },
+      [bytes.toString("base64"), type] as const,
+    );
+  }
+
+  test("§4 Resize: 'resize for instagram' fits within 1080×1350 and keeps the aspect ratio", async ({ page }) => {
+    await dropOnHome(page, gen("photo-1600x1200.png"));
+    await runPlan(page, "resize for instagram");
+    const row = work(page).locator(".rrow").last();
+    await expect(row).toContainText("-resized", { timeout: 60_000 });
+    const [dl] = await Promise.all([
+      page.waitForEvent("download"),
+      row.getByRole("button", { name: "Download" }).click(),
+    ]);
+    const { w, h } = await decode(page, readFileSync((await dl.path())!), "image/png");
+    expect(w).toBeLessThanOrEqual(1080);
+    expect(h).toBeLessThanOrEqual(1350);
+    expect(Math.abs(w / h - 1600 / 1200)).toBeLessThan(0.01);
+    expect(w).toBe(1080); // fits the width exactly (the limiting side)
+  });
 });

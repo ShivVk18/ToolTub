@@ -22,6 +22,9 @@ export interface IntentStep {
   a?: number;
   b?: number;
   fmt?: string;
+  /** Resize: the box to fit within, in px (what the plan card shows). */
+  w?: number;
+  h?: number;
 }
 
 export type Span = [number, number, { i: number } | IntentStep];
@@ -188,7 +191,10 @@ export function parse(text: string, kind?: FileKind): { steps: IntentStep[]; spa
 
     if (r.id === "resize") {
       const mm = /for (\w+)/i.exec(m[0]);
+      const dims = /(\d{3,4})\s*(?:x|×)\s*(\d{3,4})/i.exec(text);
       s.d = mm ? `${mm[1][0].toUpperCase()}${mm[1].slice(1)} · 1080 × 1350` : m[0];
+      if (mm) [s.w, s.h] = [1080, 1350];
+      else if (dims) [s.w, s.h] = [+dims[1], +dims[2]];
     }
 
     if (r.id === "compress" && !s.d) s.d = "best balance";

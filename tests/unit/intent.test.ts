@@ -157,7 +157,11 @@ describe("intent parser (35 phrase cases)", () => {
       phrase: "resize for instagram",
       kind: "image",
       expectedIds: ["resize"],
-      check: (s) => expect(s[0].d).toBe("Instagram · 1080 × 1350"),
+      check: (s) => {
+        expect(s[0].d).toBe("Instagram · 1080 × 1350");
+        // the runner resizes to what the card says (it used to fall back to 1600 px)
+        expect([s[0].w, s[0].h]).toEqual([1080, 1350]);
+      },
     },
     {
       phrase: "resize for youtube",
@@ -165,7 +169,12 @@ describe("intent parser (35 phrase cases)", () => {
       expectedIds: ["resize"],
       check: (s) => expect(s[0].d).toBe("Youtube · 1080 × 1350"),
     },
-    { phrase: "resize 1920x1080", kind: "image", expectedIds: ["resize"] },
+    {
+      phrase: "resize 1920x1080",
+      kind: "image",
+      expectedIds: ["resize"],
+      check: (s) => expect([s[0].w, s[0].h]).toEqual([1920, 1080]),
+    },
     {
       phrase: "convert to webp",
       kind: "image",
