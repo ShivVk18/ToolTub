@@ -87,7 +87,7 @@ test.describe("search (Cmd/Ctrl+K)", () => {
 test.describe("recents, favourites, theme", () => {
   test("recents and favourites survive a reload", async ({ page }) => {
     await page.goto("/json-formatter");
-    await page.getByRole("button", { name: "Add to favourites" }).click();
+    await page.getByRole("button", { name: "Save to favourites" }).click();
     await page.goto("/jwt-decoder");
     await page.goto("/");
     await expect(page.getByRole("heading", { name: "Favourites" })).toBeAttached();
@@ -97,12 +97,13 @@ test.describe("recents, favourites, theme", () => {
       "JSON Formatter",
     );
     await page.goto("/json-formatter");
-    await expect(page.getByRole("button", { name: "Remove from favourites" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Saved to favourites" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Saved to favourites" })).toHaveAttribute("aria-pressed", "true");
   });
   test("favourite star renders without a hydration mismatch", async ({ page }) => {
     const g = guard(page);
     await page.goto("/json-formatter");
-    await page.getByRole("button", { name: "Add to favourites" }).click();
+    await page.getByRole("button", { name: "Save to favourites" }).click();
     await page.reload();
     await page.waitForLoadState("networkidle");
     g.assertClean();

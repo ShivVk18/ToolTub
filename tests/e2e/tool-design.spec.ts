@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { assertAccessible, primary } from "./helpers";
+import { assertAccessible, fx, primary, upload } from "./helpers";
 
 /** Design-system checks for tool pages (Phase 3 audit). */
 test.describe("tool pages use the design system", () => {
@@ -98,5 +98,49 @@ test.describe("tool pages use the design system", () => {
       }),
     );
     await assertAccessible(page, "/search");
+  });
+
+  test("F13: result actions are pills with one primary; Save is a labelled chip beside the badges", async ({
+    page,
+  }) => {
+    await page.goto("/json-formatter");
+    const radius = (sel: string) =>
+      page
+        .locator(sel)
+        .first()
+        .evaluate((e) => {
+          const r = e.getBoundingClientRect();
+          return parseFloat(getComputedStyle(e).borderTopLeftRadius) >= r.height / 2 - 1;
+        });
+
+    // ☆ Save chip: visible label, a pill, on the same row as the privacy badge
+    const save = page.getByRole("button", { name: "Save to favourites" });
+    await expect(save).toHaveText(/Save/);
+    await expect(save).toHaveAttribute("aria-pressed", "false");
+    const [saveBox, badgeBox] = await Promise.all([
+      save.boundingBox(),
+      page.getByText(/Runs on your device/).boundingBox(),
+    ]);
+    expect(Math.abs(saveBox!.y + saveBox!.height / 2 - (badgeBox!.y + badgeBox!.height / 2))).toBeLessThan(6);
+    expect(
+      await save.evaluate(
+        (e) => parseFloat(getComputedStyle(e).borderTopLeftRadius) >= e.getBoundingClientRect().height / 2 - 1,
+      ),
+    ).toBe(true);
+
+    await page.getByRole("button", { name: "Try a sample" }).click();
+    await expect(page.locator('[data-testid="download"]:visible')).toBeVisible();
+    // one primary: Download is ink, Copy beside it is a secondary pill
+    const bg = (id: string) =>
+      page.locator(`[data-testid="${id}"]:visible`).evaluate((e) => getComputedStyle(e).backgroundColor);
+    expect(await bg("copy")).not.toBe(await bg("download"));
+    expect(await radius('[data-testid="copy"]:visible')).toBe(true);
+
+    // Send to next tool is a pill like its neighbours (JSON has no live next tool; the compressor does)
+    await page.goto("/image-compressor");
+    await upload(page, fx("photo.jpg"));
+    await primary(page).click();
+    await expect(page.locator('[data-testid="send-next"]:visible')).toBeVisible();
+    expect(await radius('[data-testid="send-next"]:visible')).toBe(true);
   });
 });

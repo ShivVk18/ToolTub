@@ -118,13 +118,11 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
       {t.seo && <JsonLd data={toolGraph(t, hub, path, faqs)} />}
       <Breadcrumbs items={crumbs} />
       <header className="mb-6 mt-4 space-y-3">
-        <div className="flex items-start justify-between gap-4">
-          <PageTitle>{variant?.h1 ?? t.seo?.h1 ?? t.name}</PageTitle>
-          <FavouriteButton slug={t.slug} />
-        </div>
+        <PageTitle>{variant?.h1 ?? t.seo?.h1 ?? t.name}</PageTitle>
         <p className="text-lg text-fg-muted">{variant?.intro ?? t.tagline}</p>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <PrivacyBadge processing={t.processing} />
+          <FavouriteButton slug={t.slug} />
           {t.status === "beta" && (
             <span className="rounded-full border border-amber-500/30 bg-amber-500/5 px-3 py-1 text-xs text-amber-700 dark:text-amber-400">
               Beta

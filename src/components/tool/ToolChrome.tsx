@@ -28,17 +28,20 @@ export function VisitTracker({ slug }: { slug: string }) {
   return null;
 }
 
+/** "☆ Save" chip that sits with the badges. The visible label is part of the accessible name (WCAG 2.5.3). */
 export function FavouriteButton({ slug }: { slug: string }) {
   const fav = useKlip((s) => s.favourites.includes(slug));
   const toggle = useKlip((s) => s.toggleFavourite);
   return (
     <button
+      type="button"
       onClick={() => toggle(slug)}
       aria-pressed={fav}
-      aria-label={fav ? "Remove from favourites" : "Add to favourites"}
-      className="grid size-11 shrink-0 place-items-center rounded-lg hover:bg-soft sm:size-9"
+      className="inline-flex h-[28px] items-center gap-[6px] rounded-full border border-line bg-solid px-3 text-xs text-ink2 transition-colors hover:border-line2 hover:text-ink"
     >
-      <Star className={fav ? "size-4 fill-amber-400 text-amber-400" : "size-4"} aria-hidden />
+      <Star className={fav ? "size-3.5 fill-amber-400 text-amber-400" : "size-3.5"} aria-hidden />
+      {fav ? "Saved" : "Save"}
+      <span className="sr-only"> to favourites</span>
     </button>
   );
 }
@@ -92,7 +95,8 @@ export function ResultActions({
       {single?.text !== undefined && (
         <Button
           data-testid="copy"
-          variant="primary"
+          // One primary per row: Copy is secondary when Download is there too.
+          variant={items.some((i) => i.blob) ? "secondary" : "primary"}
           onClick={async () => {
             await navigator.clipboard.writeText(single.text!);
             setCopied(true);
@@ -107,15 +111,15 @@ export function ResultActions({
         <details className="relative">
           <summary
             data-testid="send-next"
-            className="flex h-11 sm:h-10 cursor-pointer list-none items-center gap-2 rounded-lg border border-border px-4 text-sm hover:bg-soft"
+            className="flex h-11 sm:h-10 cursor-pointer list-none items-center gap-2 rounded-full border border-line bg-solid px-4 text-sm text-ink hover:border-line2 hover:bg-soft"
           >
             Send to next tool <ArrowRight className="size-4" aria-hidden />
           </summary>
-          <ul className="absolute z-10 mt-1 min-w-56 rounded-lg border border-border bg-card p-1 shadow-lg">
+          <ul className="absolute z-10 mt-1 min-w-56 rounded-[16px] border border-line bg-solid p-1 shadow-lg">
             {next.map((n) => (
               <li key={n.slug}>
                 <button
-                  className="min-h-11 w-full rounded-md px-3 py-2 text-left text-sm hover:bg-soft sm:min-h-0"
+                  className="min-h-11 w-full rounded-[12px] px-3 py-2 text-left text-sm hover:bg-soft sm:min-h-0"
                   onClick={() => {
                     setHandoff({ from, items });
                     router.push(`/${n.slug}`);
