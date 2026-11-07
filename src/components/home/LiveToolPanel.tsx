@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useUIStore } from "@/lib/store/ui";
-import { PANELS } from "@/lib/toolCards";
+import { CARDS } from "@/lib/toolCards";
 import { CATS, TOOL_ICON_PATHS, tint } from "@/lib/designTools";
 
 interface LiveToolPanelProps {
@@ -27,7 +27,7 @@ export function LiveToolPanel({ onReturnToChat }: LiveToolPanelProps) {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const patRef = useRef<HTMLInputElement>(null);
 
-  const P = panelTool ? PANELS[panelTool.slug] : null;
+  const P = panelTool ? CARDS[panelTool.slug] : null;
 
   // Initialize tool state when panelTool changes
   useEffect(() => {

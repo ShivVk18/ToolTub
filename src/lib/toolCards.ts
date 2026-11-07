@@ -54,7 +54,7 @@ export interface CardConfig {
 }
 
 /** Live panel tools keyed by registry slug (see CARD_SLUGS in registry/tools.ts). */
-export const PANELS: Record<string, CardConfig> = {
+export const CARDS: Record<string, CardConfig> = {
   "json-formatter": {
     opts: [
       ["2 spaces", "2"],

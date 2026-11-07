@@ -7,16 +7,16 @@ import { ToolContent } from "@/components/seo/ToolContent";
 import { PrivacyBadge } from "@/components/tool/PrivacyBadge";
 import { FavouriteButton, VisitTracker } from "@/components/tool/ToolChrome";
 import { HubToolCard, RelatedTools } from "@/components/tool/RelatedTools";
-import { ToolUI } from "@/tools";
+import { HomeStage } from "@/components/home/HomeStage";
 import { getHub, hubs } from "@/registry/categories";
 import {
-  canChain,
   getTool,
   getVariant,
   isHubIndexable,
   isIndexable,
   relatedFor,
   routedTools,
+  tools,
   toolsInHub,
 } from "@/registry/tools";
 import type { LongTailVariant, ToolDefinition } from "@/registry/types";
@@ -32,9 +32,12 @@ type Resolved =
   | { kind: "variant"; tool: ToolDefinition; variant: LongTailVariant }
   | { kind: "hub"; hub: NonNullable<ReturnType<typeof getHub>> };
 
+/** Every working tool has a URL: tools with their own UI, and the chat's live card tools (Base64, Regex…). */
+const hasUrl = (t: ToolDefinition) => t.status !== "planned" || t.card;
+
 function resolve(slug: string): Resolved | undefined {
   const tool = getTool(slug);
-  if (tool && tool.status !== "planned") return { kind: "tool", tool };
+  if (tool && hasUrl(tool)) return { kind: "tool", tool };
   const v = getVariant(slug);
   if (v && v.tool.status !== "planned") return { kind: "variant", ...v };
   const hub = getHub(slug);
@@ -45,7 +48,7 @@ export const instant = false;
 
 export function generateStaticParams() {
   const variants = routedTools().flatMap((t) => t.seo?.longTailVariants?.map((v) => v.slug) ?? []);
-  return [...routedTools().map((t) => t.slug), ...variants, ...hubs.map((h) => h.id)].map((slug) => ({ slug }));
+  return [...tools.filter(hasUrl).map((t) => t.slug), ...variants, ...hubs.map((h) => h.id)].map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -100,10 +103,6 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const variant = r.kind === "variant" ? r.variant : undefined;
   const hub = getHub(t.hub)!;
   const path = variant ? `/${variant.slug}` : `/${t.slug}`;
-  const next = routedTools()
-    .filter((x) => x.slug !== t.slug && canChain(t, x))
-    .slice(0, 6)
-    .map((x) => ({ slug: x.slug, name: x.name }));
   const crumbs = [
     { name: "Home", path: "/" },
     { name: hub.name, path: `/${hub.id}` },
@@ -112,28 +111,31 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   ];
   const faqs = variant && t.seo ? [...variant.faqs, ...t.seo.faqs].slice(0, 8) : undefined;
 
+  // Chat-native: a tool's URL is the same chat app with that tool's card already in the thread. The
+  // server-rendered SEO content (H1, summary, how-to, FAQ, JSON-LD) follows below the chat.
   return (
-    <main className="mx-auto max-w-4xl px-4 py-8">
+    <>
       <VisitTracker slug={t.slug} />
       {t.seo && <JsonLd data={toolGraph(t, hub, path, faqs)} />}
-      <Breadcrumbs items={crumbs} />
-      <header className="mb-6 mt-4 space-y-3">
-        <PageTitle>{variant?.h1 ?? t.seo?.h1 ?? t.name}</PageTitle>
-        <p className="text-lg text-fg-muted">{variant?.intro ?? t.tagline}</p>
-        <div className="flex flex-wrap items-center gap-2">
-          <PrivacyBadge processing={t.processing} />
-          <FavouriteButton slug={t.slug} />
-          {t.status === "beta" && (
-            <span className="rounded-full border border-amber-500/30 bg-amber-500/5 px-3 py-1 text-xs text-amber-700 dark:text-amber-400">
-              Beta
-            </span>
-          )}
-        </div>
-      </header>
-      <ToolUI slug={t.slug} preset={variant?.preset} next={next} />
-      <RelatedTools tools={relatedFor(t)} />
-      {t.seo && <ToolContent tool={t} faqs={faqs} />}
-    </main>
+      <HomeStage initialSlug={t.slug} initialPreset={variant?.preset} toolPage />
+      <section
+        id="tool-seo"
+        aria-label={`About ${t.name}`}
+        className="relative z-[2] mx-auto w-full max-w-4xl px-4 py-12"
+      >
+        <Breadcrumbs items={crumbs} />
+        <header className="mb-6 mt-4 space-y-3">
+          <PageTitle>{variant?.h1 ?? t.seo?.h1 ?? t.name}</PageTitle>
+          <p className="text-lg text-fg-muted">{variant?.intro ?? t.tagline}</p>
+          <div className="flex flex-wrap items-center gap-2">
+            <PrivacyBadge processing={t.processing} />
+            <FavouriteButton slug={t.slug} />
+          </div>
+        </header>
+        <RelatedTools tools={relatedFor(t)} />
+        {t.seo && <ToolContent tool={t} faqs={faqs} />}
+      </section>
+    </>
   );
 }
 

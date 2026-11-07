@@ -56,8 +56,11 @@ export interface ActionResult {
   msg: string;
   html?: string;
   copy?: string;
-  /** Registry slug of the tool that can continue this result. */
+  /** Registry slug of the tool that can continue this result ("Edit live here"). */
   open?: string;
+  /** What that tool's card starts with: its input and option (e.g. the UUID count). */
+  openInput?: string;
+  openOpt?: string;
   bad?: number;
   go?: number;
 }
@@ -324,6 +327,7 @@ export async function runGen(p: GenParsed): Promise<ActionResult> {
       html: codeBlock(l.join("\n")),
       copy: l.join("\n"),
       open: "uuid-generator",
+      openOpt: String(n),
     };
   }
   if (g === "pass") {
@@ -334,6 +338,7 @@ export async function runGen(p: GenParsed): Promise<ActionResult> {
       html: `<pre class="code big">${esc(pw)}</pre>`,
       copy: pw,
       open: "password-generator",
+      openOpt: String(n),
     };
   }
   if (g === "lorem") {
@@ -344,6 +349,7 @@ export async function runGen(p: GenParsed): Promise<ActionResult> {
       html: codeBlock(s),
       copy: s,
       open: "lorem-ipsum",
+      openOpt: String(n),
     };
   }
   if (g === "hash") {
@@ -354,6 +360,7 @@ export async function runGen(p: GenParsed): Promise<ActionResult> {
       html: table(r),
       copy: r[1] ? r[1][1] : "",
       open: "hash-generator",
+      openInput: s,
     };
   }
   if (g === "b64e") {
@@ -364,6 +371,7 @@ export async function runGen(p: GenParsed): Promise<ActionResult> {
       html: codeBlock(o),
       copy: o,
       open: "base64",
+      openInput: s,
     };
   }
   if (g === "now") {

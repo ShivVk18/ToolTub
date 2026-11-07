@@ -17,13 +17,15 @@ import { genParse } from "@/lib/engines/generators";
 import { wordStats } from "@/lib/engines/text";
 import { parse, markHTML, esc as escHtml, type IntentStep } from "@/lib/engines/intent";
 import { tween, wait, ease } from "@/lib/motion/animation";
-import { useUIStore } from "@/lib/store/ui";
-import { LiveToolPanel } from "./LiveToolPanel";
+import { LiveToolCard } from "@/components/workspace/LiveToolCard";
+import { FileToolCard } from "@/components/workspace/FileToolCard";
+import { CARDS } from "@/lib/toolCards";
+import { useWorkspace, type ThreadMessage } from "@/lib/store/workspace";
 import { toolBySlug } from "@/lib/designTools";
+import { catalog } from "@/registry/catalog";
 import { planFor, stepTag, type StepPlan } from "@/lib/engines/plan";
 import { runStep, type PlanFile } from "@/lib/plan/run";
 import { useKlip } from "@/lib/store/klip";
-import { useRouter } from "next/navigation";
 
 export interface WorkspaceProps {
   file: FileInfo | null;
@@ -39,28 +41,7 @@ export interface WorkspaceProps {
   onSetStatus?: (status: { text: string; color?: string; busy?: boolean }) => void;
 }
 
-interface MessageItem {
-  id: string;
-  type: "bot" | "user" | "file" | "paste" | "chips" | "plan" | "results" | "resultCard" | "continue";
-  html?: string;
-  file?: FileInfo;
-  pasteItem?: PasteItem;
-  chips?: [string, string][];
-  onPickChip?: (cmd: string) => void;
-  planSteps?: IntentStep[];
-  /** Steps with their own tool page: continue there with the plan's latest output. */
-  continueIn?: { slug: string; name: string; file: PlanFile }[];
-  actionResult?: ActionResult;
-  results?: Array<{
-    name: string;
-    size: number;
-    url?: string;
-    gain: number;
-    m?: string;
-    blob?: Blob;
-    real?: boolean;
-  }>;
-}
+type MessageItem = ThreadMessage;
 
 export function Workspace({
   file,
@@ -74,15 +55,13 @@ export function Workspace({
   voiceTranscript = "",
   onSetStatus,
 }: WorkspaceProps) {
-  const [messages, setMessages] = useState<MessageItem[]>([]);
+  const messages = useWorkspace((st) => st.messages);
+  const setMessages = useWorkspace((st) => st.setMessages);
   const [inputText, setInputText] = useState("");
   const [isBusy, setIsBusy] = useState(false);
-  const router = useRouter();
   const setHandoff = useKlip((st) => st.setHandoff);
   const [statusText, setStatusText] = useState("Ready · runs on your device");
   const [statusColor, setStatusColor] = useState("var(--ok)");
-
-  const { panelTool, openPanel, closePanel } = useUIStore();
 
   const threadRef = useRef<HTMLDivElement>(null);
   const cmpRef = useRef<HTMLTextAreaElement>(null);
@@ -160,6 +139,58 @@ export function Workspace({
       ta.remove();
     }
   };
+
+  // ---- Tools come to the chat (reference: openPanel / toolWidget): a card appended to the thread ----
+  const addCard = useWorkspace((st) => st.addCard);
+  const openRequest = useWorkspace((st) => st.openRequest);
+  const clearOpenRequest = useWorkspace((st) => st.clearOpenRequest);
+  const openCard = useCallback(async (slug: string, input = "", option?: string | null) => {
+    const tool = toolBySlug(slug);
+    if (!tool) return;
+    const P = CARDS[slug];
+    // From the hero (or after "+ New"), the card starts a fresh thread, as in the reference.
+    if (!document.body.classList.contains("is-work")) useWorkspace.getState().reset();
+    updateStatus("Thinking…", "var(--accent)", true);
+    await wait(360);
+    updateStatus("Ready · runs on your device", "var(--ok)", false);
+    const core = catalog.find((t) => t.slug === slug);
+    const msg = P
+      ? P.gen
+        ? `Here's the <b>${escHtml(tool.n)}</b> — pick an option, or just tell me (“${escHtml((P.opts?.[2] ?? P.opts?.[0])?.[0] ?? "again")}”).`
+        : `Here's the <b>${escHtml(tool.n)}</b>, right here in the chat. ${input ? "I loaded your content — " : ""}Type or paste in it; it updates live.${
+            P.opts
+              ? `<span class="sub">You can keep talking to it too — try “${escHtml(P.opts[P.opts.length - 1][0])}”.</span>`
+              : ""
+          }`
+      : `Here's <b>${escHtml(tool.n)}</b>, right here in the chat. ${escHtml(tool.d)}.<span class="sub">${
+          core?.processing.where === "own-server"
+            ? "Your file goes to KlipKit's own server only and is deleted within an hour."
+            : "Everything stays on your device."
+        }</span>`;
+    let pattern = P?.pat ?? "";
+    let flags = P?.flags ?? "g";
+    let inp = input;
+    const rx = P?.regex ? /^\/(.+)\/([gimsuy]*)$/.exec(input.trim()) : null;
+    if (rx) [pattern, flags, inp] = [rx[1], rx[2] || "g", P!.sample ?? ""];
+    if (P && !P.gen && !inp) inp = P.sample ?? "";
+    const opt = P?.opts ? (option && P.opts.some((o) => o[1] === option) ? option : P.opts[0][1]) : (option ?? null);
+    const id = `card-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+    addCard({ id, toolId: slug, input: P?.gen ? "" : inp, option: opt, pattern, flags, expanded: false });
+    setMessages((prev) => [...prev, { id: "bot-" + id, type: "bot", html: msg }, { id, type: "toolCard", cardId: id }]);
+    // The URL stays on the chat: on the home page it only gains #slug (a /slug page keeps its path).
+    try {
+      if (location.pathname === "/") history.replaceState(null, "", "#" + slug);
+    } catch {
+      // ignore
+    }
+    setTimeout(scrollThreadToBottom, 80);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useEffect(() => {
+    if (!openRequest) return;
+    clearOpenRequest();
+    openCard(openRequest.slug, openRequest.input, openRequest.option);
+  }, [openRequest, clearOpenRequest, openCard]);
 
   // When voice transcript streams in
   useEffect(() => {
@@ -272,8 +303,7 @@ export function Workspace({
       updateStatus("Ready · runs on your device", "var(--ok)", false);
 
       if (r.go && r.open) {
-        const tool = toolBySlug(r.open);
-        if (tool) openPanel(tool, f.text);
+        openCard(r.open, r.openInput ?? f.text, r.openOpt);
         return;
       }
 
@@ -295,7 +325,7 @@ export function Workspace({
       setMessages((prev) => [...prev, ...newMsgs]);
       setTimeout(scrollThreadToBottom, 100);
     },
-    [openPanel],
+    [openCard],
   );
 
   // Main input handler from composer
@@ -320,10 +350,8 @@ export function Workspace({
       updateStatus("Ready · runs on your device", "var(--ok)", false);
 
       if (r.go && r.open) {
-        const tool = toolBySlug(r.open);
-        // Tools with their own page (QR) open there; openPanel had no panel for them, so nothing happened.
-        if (tool?.live) openPanel(tool, "");
-        else if (tool?.routed) router.push(`/${tool.slug}`);
+        // QR and every other tool open as a card right here in the chat.
+        openCard(r.open, r.openInput ?? "", r.openOpt);
         return;
       }
 
@@ -522,8 +550,9 @@ export function Workspace({
   };
 
   const continueIn = (slug: string, file: PlanFile) => {
+    // The file goes into the next tool's card, in this same thread.
     setHandoff({ from: "home", items: [{ name: file.name, type: file.type, blob: file.blob }] });
-    router.push(`/${slug}`);
+    openCard(slug);
   };
 
   // Hero ask bar → send it through the normal path (latest handleSend via a ref, once per request).
@@ -548,7 +577,7 @@ export function Workspace({
 
   return (
     <section id="work" aria-label="Workspace" className="select-text">
-      <div className={`col ${panelTool ? "w-[min(1600px,96vw)]" : "w-[min(880px,92vw)]"} flex flex-col h-full`}>
+      <div className="col w-[min(880px,92vw)] flex flex-col h-full">
         {/* Workspace Header */}
         <div className="wk-head flex items-center gap-[16px] py-[10px] pb-[14px] flex-none">
           <div id="orbDock" className="w-[58px] h-[58px] rounded-full flex-none" />
@@ -560,7 +589,7 @@ export function Workspace({
             </div>
           </div>
           <div className="wk-pill ml-auto flex items-center gap-[10px]">
-            {contextToolName && !panelTool && (
+            {contextToolName && (
               <span className="chip inline-flex items-center gap-[9px] h-[40px] px-[16px] rounded-full bg-solid border border-line text-[15px] font-medium cursor-default">
                 {contextToolIcon}
                 {contextToolName}
@@ -569,10 +598,7 @@ export function Workspace({
             <button
               id="newBtn"
               type="button"
-              onClick={() => {
-                closePanel();
-                onNew();
-              }}
+              onClick={() => onNew()}
               className="pill inline-flex items-center gap-[8px] h-[44px] px-[20px] rounded-full text-[15px] font-medium border border-line2 bg-panel text-ink transition-transform active:scale-[0.96]"
             >
               <svg
@@ -591,501 +617,510 @@ export function Workspace({
           </div>
         </div>
 
-        {/* Live Tool Panel */}
-        {panelTool ? (
-          <LiveToolPanel onReturnToChat={() => closePanel()} />
-        ) : (
-          <>
-            {/* Chat Thread */}
-            <div
-              ref={threadRef}
-              id="thread"
-              aria-live="polite"
-              className="flex-1 overflow-y-auto overflow-x-hidden py-[18px] px-[4px] pb-[40px] scrollbar-none [mask-image:linear-gradient(to_bottom,transparent_0,#000_34px,#000_calc(100%-34px),transparent)]"
-            >
-              {messages.map((m) => {
-                // File Card
-                if (m.type === "file" && m.file) {
-                  const f = m.file;
-                  const K = KINDS[f.kind];
-                  return (
+        {/* Chat thread and composer (tools appear inside the thread as cards; nothing replaces it) */}
+        <>
+          {/* Chat Thread */}
+          <div
+            ref={threadRef}
+            id="thread"
+            aria-live="polite"
+            className="flex-1 overflow-y-auto overflow-x-hidden py-[18px] px-[4px] pb-[40px] scrollbar-none [mask-image:linear-gradient(to_bottom,transparent_0,#000_34px,#000_calc(100%-34px),transparent)]"
+          >
+            {messages.map((m) => {
+              // Tool card: the tool itself, inside the conversation
+              if (m.type === "toolCard" && m.cardId) {
+                const tool = useWorkspace.getState().cards[m.cardId]?.toolId;
+                return tool && CARDS[tool] ? (
+                  <LiveToolCard
+                    key={m.id}
+                    id={m.cardId}
+                    onCopy={(t) => (t ? copyText(t) : toast("Nothing to copy yet"))}
+                  />
+                ) : (
+                  <FileToolCard key={m.id} id={m.cardId} />
+                );
+              }
+
+              // File Card
+              if (m.type === "file" && m.file) {
+                const f = m.file;
+                const K = KINDS[f.kind];
+                return (
+                  <div
+                    key={m.id}
+                    className="fcard ml-[48px] max-[640px]:ml-0 flex items-center gap-[16px] p-[14px_18px_14px_14px] rounded-[20px] bg-solid border border-line shadow-[var(--shadow)] w-max max-w-full my-[14px]"
+                  >
+                    {f.url ? (
+                      <div
+                        className="ftile w-[48px] h-[56px] rounded-[10px] grid place-items-center bg-cover bg-center flex-none"
+                        style={{ backgroundImage: `url(${f.url})` }}
+                      />
+                    ) : (
+                      <div
+                        className="ftile w-[48px] h-[56px] rounded-[10px] grid place-items-center text-white text-[12px] font-bold tracking-[0.4px] flex-none"
+                        style={{ background: K.c }}
+                      >
+                        {K.l}
+                      </div>
+                    )}
+                    <div>
+                      <div className="fname font-semibold text-[17px] text-ink">{f.name}</div>
+                      <div className="fmeta text-[14px] text-muted mt-[3px]">{metaFile(f)}</div>
+                    </div>
+                  </div>
+                );
+              }
+
+              // Paste Card
+              if (m.type === "paste" && m.pasteItem) {
+                const p = m.pasteItem;
+                return (
+                  <div
+                    key={m.id}
+                    className="fcard pcard ml-[48px] max-[640px]:ml-0 flex items-start gap-[16px] p-[16px_18px] rounded-[20px] bg-solid border border-line shadow-[var(--shadow)] my-[14px]"
+                  >
                     <div
-                      key={m.id}
-                      className="fcard ml-[48px] max-[640px]:ml-0 flex items-center gap-[16px] p-[14px_18px_14px_14px] rounded-[20px] bg-solid border border-line shadow-[var(--shadow)] w-max max-w-full my-[14px]"
+                      className="ftile flex-none grid place-items-center rounded-[10px] text-white font-bold"
+                      style={{
+                        background: PT_COLOR[p.pt],
+                        width: "46px",
+                        height: "46px",
+                        fontSize: PT_TILE[p.pt].length > 3 ? "10px" : "13px",
+                      }}
                     >
-                      {f.url ? (
-                        <div
-                          className="ftile w-[48px] h-[56px] rounded-[10px] grid place-items-center bg-cover bg-center flex-none"
-                          style={{ backgroundImage: `url(${f.url})` }}
-                        />
-                      ) : (
-                        <div
-                          className="ftile w-[48px] h-[56px] rounded-[10px] grid place-items-center text-white text-[12px] font-bold tracking-[0.4px] flex-none"
-                          style={{ background: K.c }}
+                      {PT_TILE[p.pt]}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="fname font-semibold text-[17px] text-ink">Pasted {p.label}</div>
+                      <div className="fmeta text-[14px] text-muted mt-[2px]">
+                        {p.lines.toLocaleString()} line{p.lines > 1 ? "s" : ""} · {fmtSize(p.size)}
+                      </div>
+                      <pre className="pprev mt-[8px] font-mono text-[13px] text-muted whitespace-pre-wrap break-all max-h-[84px] overflow-hidden">
+                        {m.html}
+                      </pre>
+                    </div>
+                  </div>
+                );
+              }
+
+              // Bot bubble
+              if (m.type === "bot" && m.html) {
+                return (
+                  <div
+                    key={m.id}
+                    className="msg flex gap-[14px] mb-[20px] animate-[msgIn_0.55s_cubic-bezier(.2,.8,.2,1)_both]"
+                  >
+                    <div
+                      className="av w-[34px] h-[34px] rounded-full flex-none overflow-hidden relative shadow-[inset_0_0_0_1px_rgba(255,255,255,0.4)]"
+                      style={{
+                        background:
+                          "conic-gradient(from 200deg, #7C6BFF, #B38BFF, #FF9C82, #FFD27A, #8FE0BE, #6FB7FF, #7C6BFF)",
+                      }}
+                    >
+                      <div
+                        className="absolute inset-0"
+                        style={{
+                          background: "radial-gradient(circle at 32% 28%, rgba(255,255,255,0.9), transparent 45%)",
+                        }}
+                      />
+                    </div>
+                    <div
+                      className="bub text-[19px] leading-[1.5] text-ink pt-[3px] max-w-[760px]"
+                      dangerouslySetInnerHTML={{ __html: m.html }}
+                    />
+                  </div>
+                );
+              }
+
+              // User bubble
+              if (m.type === "user" && m.html) {
+                return (
+                  <div
+                    key={m.id}
+                    className="msg user flex justify-end mb-[20px] animate-[msgIn_0.55s_cubic-bezier(.2,.8,.2,1)_both]"
+                  >
+                    <div
+                      className="ub bg-ink text-bg px-[20px] py-[14px] rounded-[22px_22px_6px_22px] text-[19px] leading-[1.45] max-w-[640px]"
+                      dangerouslySetInnerHTML={{ __html: m.html }}
+                    />
+                  </div>
+                );
+              }
+
+              // Chips
+              if (m.type === "chips" && m.chips) {
+                return (
+                  <div
+                    key={m.id}
+                    className="chips flex flex-wrap gap-[10px] my-[2px] mb-[22px] ml-[48px] max-[640px]:ml-0"
+                  >
+                    {m.chips.map(([label, cmd], idx) => (
+                      <button
+                        key={label}
+                        type="button"
+                        disabled={isBusy}
+                        onClick={() => {
+                          if (currentPasteRef.current) {
+                            doPasteAction(cmd, label);
+                          } else {
+                            handleSend(cmd);
+                          }
+                        }}
+                        style={{ animationDelay: `${idx * 70}ms` }}
+                        className="chip inline-flex items-center gap-[9px] h-[44px] px-[18px] rounded-full bg-solid border border-line text-[16px] font-medium shadow-[0_6px_18px_-12px_rgba(0,0,0,0.25)] transition-[transform,border-color,box-shadow,background] duration-250 hover:-translate-y-[2px] hover:border-line2 hover:shadow-[0_12px_26px_-14px_rgba(0,0,0,0.3)] active:scale-[0.96] animate-[chipIn_0.5s_cubic-bezier(.2,.9,.3,1.3)_forwards]"
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                );
+              }
+
+              // Action Result Card (for paste & generators)
+              if (m.type === "resultCard" && m.actionResult) {
+                const r = m.actionResult;
+                return (
+                  <div
+                    key={m.id}
+                    className="card rcard2 bg-solid border border-line rounded-[24px] shadow-[var(--shadow)] p-[20px] mb-[22px] ml-[48px] max-[640px]:ml-0"
+                  >
+                    {r.html && <div dangerouslySetInnerHTML={{ __html: r.html }} />}
+                    <div className="rfoot flex items-center gap-[8px] mt-[14px] flex-wrap">
+                      {r.copy && (
+                        <button
+                          type="button"
+                          className="pill sm inline-flex items-center gap-[6px] h-[38px] px-[15px] rounded-full text-[14px] font-medium border border-line bg-panel text-ink hover:-translate-y-[1px]"
+                          onClick={() => copyText(r.copy)}
                         >
-                          {K.l}
-                        </div>
+                          <svg
+                            width="15"
+                            height="15"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2.2"
+                            strokeLinecap="round"
+                          >
+                            <rect x="9" y="9" width="11" height="11" rx="2.5" />
+                            <path d="M5 15V6a2 2 0 0 1 2-2h9" />
+                          </svg>
+                          Copy
+                        </button>
                       )}
-                      <div>
-                        <div className="fname font-semibold text-[17px] text-ink">{f.name}</div>
-                        <div className="fmeta text-[14px] text-muted mt-[3px]">{metaFile(f)}</div>
-                      </div>
-                    </div>
-                  );
-                }
-
-                // Paste Card
-                if (m.type === "paste" && m.pasteItem) {
-                  const p = m.pasteItem;
-                  return (
-                    <div
-                      key={m.id}
-                      className="fcard pcard ml-[48px] max-[640px]:ml-0 flex items-start gap-[16px] p-[16px_18px] rounded-[20px] bg-solid border border-line shadow-[var(--shadow)] my-[14px]"
-                    >
-                      <div
-                        className="ftile flex-none grid place-items-center rounded-[10px] text-white font-bold"
-                        style={{
-                          background: PT_COLOR[p.pt],
-                          width: "46px",
-                          height: "46px",
-                          fontSize: PT_TILE[p.pt].length > 3 ? "10px" : "13px",
-                        }}
-                      >
-                        {PT_TILE[p.pt]}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="fname font-semibold text-[17px] text-ink">Pasted {p.label}</div>
-                        <div className="fmeta text-[14px] text-muted mt-[2px]">
-                          {p.lines.toLocaleString()} line{p.lines > 1 ? "s" : ""} · {fmtSize(p.size)}
-                        </div>
-                        <pre className="pprev mt-[8px] font-mono text-[13px] text-muted whitespace-pre-wrap break-all max-h-[84px] overflow-hidden">
-                          {m.html}
-                        </pre>
-                      </div>
-                    </div>
-                  );
-                }
-
-                // Bot bubble
-                if (m.type === "bot" && m.html) {
-                  return (
-                    <div
-                      key={m.id}
-                      className="msg flex gap-[14px] mb-[20px] animate-[msgIn_0.55s_cubic-bezier(.2,.8,.2,1)_both]"
-                    >
-                      <div
-                        className="av w-[34px] h-[34px] rounded-full flex-none overflow-hidden relative shadow-[inset_0_0_0_1px_rgba(255,255,255,0.4)]"
-                        style={{
-                          background:
-                            "conic-gradient(from 200deg, #7C6BFF, #B38BFF, #FF9C82, #FFD27A, #8FE0BE, #6FB7FF, #7C6BFF)",
-                        }}
-                      >
-                        <div
-                          className="absolute inset-0"
-                          style={{
-                            background: "radial-gradient(circle at 32% 28%, rgba(255,255,255,0.9), transparent 45%)",
-                          }}
-                        />
-                      </div>
-                      <div
-                        className="bub text-[19px] leading-[1.5] text-ink pt-[3px] max-w-[760px]"
-                        dangerouslySetInnerHTML={{ __html: m.html }}
-                      />
-                    </div>
-                  );
-                }
-
-                // User bubble
-                if (m.type === "user" && m.html) {
-                  return (
-                    <div
-                      key={m.id}
-                      className="msg user flex justify-end mb-[20px] animate-[msgIn_0.55s_cubic-bezier(.2,.8,.2,1)_both]"
-                    >
-                      <div
-                        className="ub bg-ink text-bg px-[20px] py-[14px] rounded-[22px_22px_6px_22px] text-[19px] leading-[1.45] max-w-[640px]"
-                        dangerouslySetInnerHTML={{ __html: m.html }}
-                      />
-                    </div>
-                  );
-                }
-
-                // Chips
-                if (m.type === "chips" && m.chips) {
-                  return (
-                    <div
-                      key={m.id}
-                      className="chips flex flex-wrap gap-[10px] my-[2px] mb-[22px] ml-[48px] max-[640px]:ml-0"
-                    >
-                      {m.chips.map(([label, cmd], idx) => (
+                      {r.open && (
                         <button
-                          key={label}
                           type="button"
-                          disabled={isBusy}
-                          onClick={() => {
-                            if (currentPasteRef.current) {
-                              doPasteAction(cmd, label);
-                            } else {
-                              handleSend(cmd);
-                            }
-                          }}
-                          style={{ animationDelay: `${idx * 70}ms` }}
-                          className="chip inline-flex items-center gap-[9px] h-[44px] px-[18px] rounded-full bg-solid border border-line text-[16px] font-medium shadow-[0_6px_18px_-12px_rgba(0,0,0,0.25)] transition-[transform,border-color,box-shadow,background] duration-250 hover:-translate-y-[2px] hover:border-line2 hover:shadow-[0_12px_26px_-14px_rgba(0,0,0,0.3)] active:scale-[0.96] animate-[chipIn_0.5s_cubic-bezier(.2,.9,.3,1.3)_forwards]"
+                          className="pill sm inline-flex items-center gap-[6px] h-[38px] px-[15px] rounded-full text-[14px] font-medium border border-line bg-panel text-ink hover:-translate-y-[1px]"
+                          onClick={() =>
+                            openCard(r.open!, r.openInput ?? currentPasteRef.current?.text ?? "", r.openOpt)
+                          }
                         >
-                          {label}
+                          Edit live here <span className="opacity-60">· {toolBySlug(r.open)?.n ?? r.open}</span>
                         </button>
-                      ))}
+                      )}
+                      <span className="rnote ml-auto text-[13px] text-faint">On your device · nothing uploaded</span>
                     </div>
-                  );
-                }
+                  </div>
+                );
+              }
 
-                // Action Result Card (for paste & generators)
-                if (m.type === "resultCard" && m.actionResult) {
-                  const r = m.actionResult;
-                  return (
-                    <div
-                      key={m.id}
-                      className="card rcard2 bg-solid border border-line rounded-[24px] shadow-[var(--shadow)] p-[20px] mb-[22px] ml-[48px] max-[640px]:ml-0"
-                    >
-                      {r.html && <div dangerouslySetInnerHTML={{ __html: r.html }} />}
-                      <div className="rfoot flex items-center gap-[8px] mt-[14px] flex-wrap">
-                        {r.copy && (
-                          <button
-                            type="button"
-                            className="pill sm inline-flex items-center gap-[6px] h-[38px] px-[15px] rounded-full text-[14px] font-medium border border-line bg-panel text-ink hover:-translate-y-[1px]"
-                            onClick={() => copyText(r.copy)}
+              // Plan Card
+              if (m.type === "plan" && m.planSteps) {
+                const steps = m.planSteps;
+                const kindNow = currentFileRef.current?.kind ?? "other";
+                const nameNow = currentFileRef.current?.name ?? "";
+                const stepPlans = steps.map((s) => planFor(s, { kind: kindNow, name: nameNow }));
+                const hasServer = stepPlans.some((p) => p.how === "open" && p.where === "server");
+                const canRun = stepPlans.some((p) => p.how !== "soon");
+                return (
+                  <div
+                    key={m.id}
+                    className="card bg-solid border border-line rounded-[24px] shadow-[var(--shadow)] p-[20px] mb-[22px] ml-[48px] max-[640px]:ml-0"
+                  >
+                    <div className="steps flex gap-[12px] items-stretch flex-wrap">
+                      {steps.map((s, idx) => (
+                        <React.Fragment key={s.id + idx}>
+                          {idx > 0 && <div className="arrow self-center text-faint text-[20px]">→</div>}
+                          <div
+                            className="step flex-1 min-w-[210px] relative p-[16px_16px_18px] rounded-[18px] bg-soft border border-line overflow-hidden"
+                            data-i={idx}
                           >
-                            <svg
-                              width="15"
-                              height="15"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2.2"
-                              strokeLinecap="round"
-                            >
-                              <rect x="9" y="9" width="11" height="11" rx="2.5" />
-                              <path d="M5 15V6a2 2 0 0 1 2-2h9" />
-                            </svg>
-                            Copy
-                          </button>
-                        )}
-                        {r.open && (
-                          <button
-                            type="button"
-                            className="pill sm inline-flex items-center gap-[6px] h-[38px] px-[15px] rounded-full text-[14px] font-medium border border-line bg-panel text-ink hover:-translate-y-[1px]"
-                            onClick={() => {
-                              const tool = toolBySlug(r.open!);
-                              if (tool) openPanel(tool, currentPasteRef.current?.text || "");
-                            }}
-                          >
-                            Open in {toolBySlug(r.open)?.n ?? r.open} <span className="opacity-60">⤢</span>
-                          </button>
-                        )}
-                        <span className="rnote ml-auto text-[13px] text-faint">On your device · nothing uploaded</span>
-                      </div>
-                    </div>
-                  );
-                }
-
-                // Plan Card
-                if (m.type === "plan" && m.planSteps) {
-                  const steps = m.planSteps;
-                  const kindNow = currentFileRef.current?.kind ?? "other";
-                  const nameNow = currentFileRef.current?.name ?? "";
-                  const stepPlans = steps.map((s) => planFor(s, { kind: kindNow, name: nameNow }));
-                  const hasServer = stepPlans.some((p) => p.how === "open" && p.where === "server");
-                  const canRun = stepPlans.some((p) => p.how !== "soon");
-                  return (
-                    <div
-                      key={m.id}
-                      className="card bg-solid border border-line rounded-[24px] shadow-[var(--shadow)] p-[20px] mb-[22px] ml-[48px] max-[640px]:ml-0"
-                    >
-                      <div className="steps flex gap-[12px] items-stretch flex-wrap">
-                        {steps.map((s, idx) => (
-                          <React.Fragment key={s.id + idx}>
-                            {idx > 0 && <div className="arrow self-center text-faint text-[20px]">→</div>}
-                            <div
-                              className="step flex-1 min-w-[210px] relative p-[16px_16px_18px] rounded-[18px] bg-soft border border-line overflow-hidden"
-                              data-i={idx}
-                            >
-                              <div className="n w-[28px] h-[28px] rounded-full bg-ink text-bg grid place-items-center text-[13px] font-semibold">
-                                {idx + 1}
-                              </div>
-                              <div className="t font-semibold text-[17px] mt-[10px]">{s.t}</div>
-                              <div className="d text-[14px] text-muted mt-[3px] tabular-nums">{s.d || "\u00A0"}</div>
-                              <div className="bar h-[5px] rounded-[5px] bg-line mt-[14px] overflow-hidden">
-                                <b
-                                  className="block h-full w-0 rounded-[5px]"
-                                  style={{ background: "linear-gradient(90deg, var(--accent), var(--peach))" }}
-                                />
-                              </div>
-                              <div className="ok absolute right-[14px] top-[14px] w-[28px] h-[28px] rounded-full bg-ok grid place-items-center scale-0 transition-transform duration-450 ease-[cubic-bezier(.2,.9,.3,1.5)]">
-                                <svg
-                                  width="15"
-                                  height="15"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="#fff"
-                                  strokeWidth="3.2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                >
-                                  <path d="M5 12l5 5L20 7" />
-                                </svg>
-                              </div>
-                              <div className="tag absolute right-[14px] top-[16px] text-[12px] font-semibold text-muted">
-                                {stepTag(planFor(s, { kind: kindNow, name: nameNow }))}
-                              </div>
+                            <div className="n w-[28px] h-[28px] rounded-full bg-ink text-bg grid place-items-center text-[13px] font-semibold">
+                              {idx + 1}
                             </div>
-                          </React.Fragment>
-                        ))}
-                      </div>
-
-                      <div className="cardfoot flex items-center gap-[10px] mt-[16px] text-[14px] text-muted">
-                        <svg
-                          width="17"
-                          height="17"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2.2"
-                          strokeLinecap="round"
-                        >
-                          <rect x="5" y="10" width="14" height="10" rx="3" />
-                          <path d="M8 10V7a4 4 0 0 1 8 0v3" />
-                        </svg>
-                        <span>
-                          {hasServer
-                            ? "Some steps use KlipKit’s own server · deleted after 1 hour"
-                            : "Runs on your device · nothing is uploaded"}
-                        </span>
-                        <button
-                          type="button"
-                          disabled={!canRun}
-                          title={canRun ? undefined : "These steps are coming soon"}
-                          className="run ml-auto disabled:opacity-40 disabled:cursor-not-allowed h-[46px] px-[22px] rounded-full bg-ink text-bg font-semibold text-[16px] inline-flex items-center gap-[10px] relative overflow-hidden transition-[transform,background] active:scale-[0.96]"
-                          onClick={(e) => {
-                            const card = e.currentTarget.closest(".card") as HTMLElement;
-                            if (card) executePlan(steps, card);
-                          }}
-                        >
-                          Run <span className="opacity-60 font-medium">↵</span>
-                        </button>
-                      </div>
-                    </div>
-                  );
-                }
-
-                // File Results Card
-                if (m.type === "continue" && m.continueIn) {
-                  return (
-                    <div key={m.id} className="flex flex-wrap gap-[10px] mb-[22px] ml-[48px] max-[640px]:ml-0">
-                      {m.continueIn.map((c) => (
-                        <button
-                          key={c.slug}
-                          type="button"
-                          onClick={() => continueIn(c.slug, c.file)}
-                          className="pill inline-flex items-center gap-[8px] h-[42px] px-[18px] rounded-full bg-ink text-bg text-[15px] font-semibold"
-                        >
-                          Continue in {c.name} →
-                        </button>
-                      ))}
-                    </div>
-                  );
-                }
-
-                if (m.type === "results" && m.results) {
-                  return (
-                    <div
-                      key={m.id}
-                      className="card bg-solid border border-line rounded-[24px] shadow-[var(--shadow)] p-[20px] mb-[22px] ml-[48px] max-[640px]:ml-0"
-                    >
-                      {m.results.map((res, i) => (
-                        <div
-                          key={res.name + i}
-                          className="rrow flex items-center gap-[14px] p-[12px_14px] rounded-[18px] bg-soft border border-line mt-[10px] first:mt-0"
-                        >
-                          {res.url ? (
-                            <div
-                              className="ftile w-[40px] h-[46px] rounded-[10px] grid place-items-center bg-cover bg-center flex-none"
-                              style={{ backgroundImage: `url(${res.url})` }}
-                            />
-                          ) : (
-                            <div
-                              className="ftile w-[40px] h-[46px] rounded-[10px] grid place-items-center text-white text-[11px] font-bold tracking-[0.4px] flex-none"
-                              style={{ background: KINDS[kindOf(res.name)].c }}
-                            >
-                              {KINDS[kindOf(res.name)].l}
+                            <div className="t font-semibold text-[17px] mt-[10px]">{s.t}</div>
+                            <div className="d text-[14px] text-muted mt-[3px] tabular-nums">{s.d || "\u00A0"}</div>
+                            <div className="bar h-[5px] rounded-[5px] bg-line mt-[14px] overflow-hidden">
+                              <b
+                                className="block h-full w-0 rounded-[5px]"
+                                style={{ background: "linear-gradient(90deg, var(--accent), var(--peach))" }}
+                              />
                             </div>
-                          )}
-                          <div>
-                            <div className="fname font-semibold text-[17px] text-ink">{res.name}</div>
-                            <div className="fmeta text-[14px] text-muted">
-                              {fmtSize(res.size)}
-                              {res.m ? ` · ${res.m}` : ""}
+                            <div className="ok absolute right-[14px] top-[14px] w-[28px] h-[28px] rounded-full bg-ok grid place-items-center scale-0 transition-transform duration-450 ease-[cubic-bezier(.2,.9,.3,1.5)]">
+                              <svg
+                                width="15"
+                                height="15"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#fff"
+                                strokeWidth="3.2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path d="M5 12l5 5L20 7" />
+                              </svg>
+                            </div>
+                            <div className="tag absolute right-[14px] top-[16px] text-[12px] font-semibold text-muted">
+                              {stepTag(planFor(s, { kind: kindNow, name: nameNow }))}
                             </div>
                           </div>
-                          {res.gain > 0 && (
-                            <span className="gain text-[13px] font-semibold text-ok bg-okSoft px-[10px] py-[4px] rounded-full">
-                              −{res.gain}%
-                            </span>
-                          )}
-                          <button
-                            type="button"
-                            aria-label="Download"
-                            onClick={() => handleDownload(res)}
-                            className="dl ml-auto w-[42px] h-[42px] rounded-full border border-line2 grid place-items-center bg-solid transition-transform hover:-translate-y-[2px]"
-                          >
-                            <svg
-                              width="19"
-                              height="19"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2.2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            >
-                              <path d="M12 4v12M6 11l6 6 6-6M5 20h14" />
-                            </svg>
-                          </button>
-                        </div>
+                        </React.Fragment>
                       ))}
                     </div>
-                  );
-                }
 
-                return null;
-              })}
+                    <div className="cardfoot flex items-center gap-[10px] mt-[16px] text-[14px] text-muted">
+                      <svg
+                        width="17"
+                        height="17"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.2"
+                        strokeLinecap="round"
+                      >
+                        <rect x="5" y="10" width="14" height="10" rx="3" />
+                        <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+                      </svg>
+                      <span>
+                        {hasServer
+                          ? "Some steps use KlipKit’s own server · deleted after 1 hour"
+                          : "Runs on your device · nothing is uploaded"}
+                      </span>
+                      <button
+                        type="button"
+                        disabled={!canRun}
+                        title={canRun ? undefined : "These steps are coming soon"}
+                        className="run ml-auto disabled:opacity-40 disabled:cursor-not-allowed h-[46px] px-[22px] rounded-full bg-ink text-bg font-semibold text-[16px] inline-flex items-center gap-[10px] relative overflow-hidden transition-[transform,background] active:scale-[0.96]"
+                        onClick={(e) => {
+                          const card = e.currentTarget.closest(".card") as HTMLElement;
+                          if (card) executePlan(steps, card);
+                        }}
+                      >
+                        Run <span className="opacity-60 font-medium">↵</span>
+                      </button>
+                    </div>
+                  </div>
+                );
+              }
+
+              // File Results Card
+              if (m.type === "continue" && m.continueIn) {
+                return (
+                  <div key={m.id} className="flex flex-wrap gap-[10px] mb-[22px] ml-[48px] max-[640px]:ml-0">
+                    {m.continueIn.map((c) => (
+                      <button
+                        key={c.slug}
+                        type="button"
+                        onClick={() => continueIn(c.slug, c.file)}
+                        className="pill inline-flex items-center gap-[8px] h-[42px] px-[18px] rounded-full bg-ink text-bg text-[15px] font-semibold"
+                      >
+                        Continue in {c.name} →
+                      </button>
+                    ))}
+                  </div>
+                );
+              }
+
+              if (m.type === "results" && m.results) {
+                return (
+                  <div
+                    key={m.id}
+                    className="card bg-solid border border-line rounded-[24px] shadow-[var(--shadow)] p-[20px] mb-[22px] ml-[48px] max-[640px]:ml-0"
+                  >
+                    {m.results.map((res, i) => (
+                      <div
+                        key={res.name + i}
+                        className="rrow flex items-center gap-[14px] p-[12px_14px] rounded-[18px] bg-soft border border-line mt-[10px] first:mt-0"
+                      >
+                        {res.url ? (
+                          <div
+                            className="ftile w-[40px] h-[46px] rounded-[10px] grid place-items-center bg-cover bg-center flex-none"
+                            style={{ backgroundImage: `url(${res.url})` }}
+                          />
+                        ) : (
+                          <div
+                            className="ftile w-[40px] h-[46px] rounded-[10px] grid place-items-center text-white text-[11px] font-bold tracking-[0.4px] flex-none"
+                            style={{ background: KINDS[kindOf(res.name)].c }}
+                          >
+                            {KINDS[kindOf(res.name)].l}
+                          </div>
+                        )}
+                        <div>
+                          <div className="fname font-semibold text-[17px] text-ink">{res.name}</div>
+                          <div className="fmeta text-[14px] text-muted">
+                            {fmtSize(res.size)}
+                            {res.m ? ` · ${res.m}` : ""}
+                          </div>
+                        </div>
+                        {res.gain > 0 && (
+                          <span className="gain text-[13px] font-semibold text-ok bg-okSoft px-[10px] py-[4px] rounded-full">
+                            −{res.gain}%
+                          </span>
+                        )}
+                        <button
+                          type="button"
+                          aria-label="Download"
+                          onClick={() => handleDownload(res)}
+                          className="dl ml-auto w-[42px] h-[42px] rounded-full border border-line2 grid place-items-center bg-solid transition-transform hover:-translate-y-[2px]"
+                        >
+                          <svg
+                            width="19"
+                            height="19"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2.2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M12 4v12M6 11l6 6 6-6M5 20h14" />
+                          </svg>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                );
+              }
+
+              return null;
+            })}
+          </div>
+
+          {/* Composer Dock */}
+          <div id="dock" className="flex-none py-[6px] pb-[26px] relative">
+            {/* Pro Listening Waveform pill */}
+            <div
+              id="listen"
+              className={`absolute left-1/2 -top-[38px] -translate-x-1/2 flex items-center gap-[12px] px-[18px] py-[10px] rounded-full bg-ink text-bg text-[14px] font-medium transition-[opacity,transform] duration-400 ease-[cubic-bezier(.2,.9,.3,1.3)] pointer-events-none ${
+                isListening ? "opacity-100 -translate-y-[8px]" : "opacity-0 translate-y-0"
+              }`}
+            >
+              <div className="rd w-[9px] h-[9px] rounded-full bg-[#FF5A5F]" />
+              Listening · Pro
+              <div id="wave" className="flex gap-[3px] items-center h-[24px]">
+                {Array.from({ length: 22 }).map((_, i) => (
+                  <i key={i} className="w-[3px] rounded-[3px] bg-bg h-[4px] block transition-[height] duration-75" />
+                ))}
+              </div>
             </div>
 
-            {/* Composer Dock */}
-            <div id="dock" className="flex-none py-[6px] pb-[26px] relative">
-              {/* Pro Listening Waveform pill */}
-              <div
-                id="listen"
-                className={`absolute left-1/2 -top-[38px] -translate-x-1/2 flex items-center gap-[12px] px-[18px] py-[10px] rounded-full bg-ink text-bg text-[14px] font-medium transition-[opacity,transform] duration-400 ease-[cubic-bezier(.2,.9,.3,1.3)] pointer-events-none ${
-                  isListening ? "opacity-100 -translate-y-[8px]" : "opacity-0 translate-y-0"
+            {/* Plan Preview Chips */}
+            <div id="preview" className="flex gap-[8px] items-center min-h-[38px] mb-[10px] ml-[6px] flex-wrap">
+              {previewSteps.length > 0 && (
+                <>
+                  <span className="pvl text-[13px] text-faint mr-[2px]">Plan</span>
+                  {previewSteps.map((s, idx) => (
+                    <React.Fragment key={s.id + idx}>
+                      {idx > 0 && <span className="text-faint">→</span>}
+                      <span
+                        className={`pv inline-flex items-center gap-[8px] h-[34px] px-[14px] rounded-full text-[14px] font-medium bg-solid border border-line ${
+                          s.ok ? "" : "opacity-50 line-through"
+                        }`}
+                      >
+                        <i
+                          className="w-[8px] h-[8px] rounded-full inline-block"
+                          style={{ background: `var(--u${s.i % 4})` }}
+                        />
+                        {s.t}
+                        {s.d && <span className="text-muted font-normal"> · {s.d}</span>}
+                      </span>
+                    </React.Fragment>
+                  ))}
+                </>
+              )}
+            </div>
+
+            {/* Composer Field */}
+            <div className="composer flex items-center gap-[8px] p-[10px_10px_10px_24px] rounded-[34px] bg-solid border border-line shadow-[var(--shadow2)] focus-within:border-[rgba(109,93,245,0.45)] focus-within:ring-6 focus-within:ring-accentSoft transition-[border-color,box-shadow]">
+              <div className="field relative flex-1 min-h-[30px]">
+                <div
+                  ref={mirrorRef}
+                  id="mirror"
+                  aria-hidden="true"
+                  className="font-sans text-[19px] leading-[30px] p-[8px_0] whitespace-pre-wrap break-words absolute inset-0 text-transparent pointer-events-none select-none"
+                  dangerouslySetInnerHTML={{
+                    __html: markHTML(inputText, mirrorSpans, true) + "&#8203;",
+                  }}
+                />
+                <textarea
+                  ref={cmpRef}
+                  id="cmp"
+                  rows={1}
+                  value={inputText}
+                  onChange={(e) => setInputText(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      if (inputText.trim()) handleSend(inputText);
+                    }
+                  }}
+                  placeholder="Ask, paste, or describe — e.g. “compress to under 2 MB” or “generate 5 UUIDs”"
+                  aria-label="Tell KlipKit what to do"
+                  className="font-sans text-[19px] leading-[30px] p-[8px_0] relative w-full border-0 outline-none resize-none bg-transparent text-ink h-[46px] overflow-hidden block placeholder:text-faint"
+                />
+              </div>
+
+              <button
+                id="mic"
+                type="button"
+                aria-label="Voice command (Pro)"
+                onClick={onOpenVoice}
+                className={`mic relative w-[52px] h-[52px] rounded-full border border-line grid place-items-center flex-none transition-colors active:scale-[0.96] ${
+                  isListening ? "rec bg-red border-red text-white" : "bg-soft text-ink"
                 }`}
               >
-                <div className="rd w-[9px] h-[9px] rounded-full bg-[#FF5A5F]" />
-                Listening · Pro
-                <div id="wave" className="flex gap-[3px] items-center h-[24px]">
-                  {Array.from({ length: 22 }).map((_, i) => (
-                    <i key={i} className="w-[3px] rounded-[3px] bg-bg h-[4px] block transition-[height] duration-75" />
-                  ))}
-                </div>
-              </div>
-
-              {/* Plan Preview Chips */}
-              <div id="preview" className="flex gap-[8px] items-center min-h-[38px] mb-[10px] ml-[6px] flex-wrap">
-                {previewSteps.length > 0 && (
-                  <>
-                    <span className="pvl text-[13px] text-faint mr-[2px]">Plan</span>
-                    {previewSteps.map((s, idx) => (
-                      <React.Fragment key={s.id + idx}>
-                        {idx > 0 && <span className="text-faint">→</span>}
-                        <span
-                          className={`pv inline-flex items-center gap-[8px] h-[34px] px-[14px] rounded-full text-[14px] font-medium bg-solid border border-line ${
-                            s.ok ? "" : "opacity-50 line-through"
-                          }`}
-                        >
-                          <i
-                            className="w-[8px] h-[8px] rounded-full inline-block"
-                            style={{ background: `var(--u${s.i % 4})` }}
-                          />
-                          {s.t}
-                          {s.d && <span className="text-muted font-normal"> · {s.d}</span>}
-                        </span>
-                      </React.Fragment>
-                    ))}
-                  </>
-                )}
-              </div>
-
-              {/* Composer Field */}
-              <div className="composer flex items-center gap-[8px] p-[10px_10px_10px_24px] rounded-[34px] bg-solid border border-line shadow-[var(--shadow2)] focus-within:border-[rgba(109,93,245,0.45)] focus-within:ring-6 focus-within:ring-accentSoft transition-[border-color,box-shadow]">
-                <div className="field relative flex-1 min-h-[30px]">
-                  <div
-                    ref={mirrorRef}
-                    id="mirror"
-                    aria-hidden="true"
-                    className="font-sans text-[19px] leading-[30px] p-[8px_0] whitespace-pre-wrap break-words absolute inset-0 text-transparent pointer-events-none select-none"
-                    dangerouslySetInnerHTML={{
-                      __html: markHTML(inputText, mirrorSpans, true) + "&#8203;",
-                    }}
-                  />
-                  <textarea
-                    ref={cmpRef}
-                    id="cmp"
-                    rows={1}
-                    value={inputText}
-                    onChange={(e) => setInputText(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && !e.shiftKey) {
-                        e.preventDefault();
-                        if (inputText.trim()) handleSend(inputText);
-                      }
-                    }}
-                    placeholder="Ask, paste, or describe — e.g. “compress to under 2 MB” or “generate 5 UUIDs”"
-                    aria-label="Tell KlipKit what to do"
-                    className="font-sans text-[19px] leading-[30px] p-[8px_0] relative w-full border-0 outline-none resize-none bg-transparent text-ink h-[46px] overflow-hidden block placeholder:text-faint"
-                  />
-                </div>
-
-                <button
-                  id="mic"
-                  type="button"
-                  aria-label="Voice command (Pro)"
-                  onClick={onOpenVoice}
-                  className={`mic relative w-[52px] h-[52px] rounded-full border border-line grid place-items-center flex-none transition-colors active:scale-[0.96] ${
-                    isListening ? "rec bg-red border-red text-white" : "bg-soft text-ink"
-                  }`}
+                <span className="pro absolute -top-[8px] -right-[10px] inline-flex items-center px-[8px] py-[3px] rounded-full text-white text-[11px] font-bold tracking-[0.8px] bg-gradient-to-br from-[#8C7DFF] to-[#FF9C82] shadow-sm">
+                  PRO
+                </span>
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.1"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 >
-                  <span className="pro absolute -top-[8px] -right-[10px] inline-flex items-center px-[8px] py-[3px] rounded-full text-white text-[11px] font-bold tracking-[0.8px] bg-gradient-to-br from-[#8C7DFF] to-[#FF9C82] shadow-sm">
-                    PRO
-                  </span>
-                  <svg
-                    width="22"
-                    height="22"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.1"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <rect x="9" y="3" width="6" height="11" rx="3" />
-                    <path d="M5 11a7 7 0 0 0 14 0M12 18v3" />
-                  </svg>
-                </button>
+                  <rect x="9" y="3" width="6" height="11" rx="3" />
+                  <path d="M5 11a7 7 0 0 0 14 0M12 18v3" />
+                </svg>
+              </button>
 
-                <button
-                  id="send"
-                  type="button"
-                  aria-label="Send"
-                  disabled={!inputText.trim() || isBusy}
-                  onClick={() => handleSend(inputText)}
-                  className="send w-[52px] h-[52px] rounded-full bg-ink text-bg grid place-items-center flex-none transition-[transform,opacity] disabled:opacity-35 active:scale-[0.96]"
+              <button
+                id="send"
+                type="button"
+                aria-label="Send"
+                disabled={!inputText.trim() || isBusy}
+                onClick={() => handleSend(inputText)}
+                className="send w-[52px] h-[52px] rounded-full bg-ink text-bg grid place-items-center flex-none transition-[transform,opacity] disabled:opacity-35 active:scale-[0.96]"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 >
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.4"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M12 19V5M5 12l7-7 7 7" />
-                  </svg>
-                </button>
-              </div>
+                  <path d="M12 19V5M5 12l7-7 7 7" />
+                </svg>
+              </button>
             </div>
-          </>
-        )}
+          </div>
+        </>
       </div>
     </section>
   );

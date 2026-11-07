@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { PANELS } from "@/lib/toolCards";
+import { CARDS } from "@/lib/toolCards";
 import { hashAll } from "@/lib/engines/hash";
 import { genParse } from "@/lib/engines/generators";
 import { runGen } from "@/lib/actions";
@@ -30,7 +30,7 @@ describe("Task 2 Section 4: Expected Test Vectors", () => {
 
   // 3. Base64 encode: KlipKit ✨
   it("Base64: KlipKit ✨ encodes and decodes losslessly", async () => {
-    const p = PANELS["base64"];
+    const p = CARDS["base64"];
     const encoded = await p.run("KlipKit ✨", "e");
     expect(encoded.copy).toBe("S2xpcEtpdCDinKg=");
     const decoded = await p.run("S2xpcEtpdCDinKg=", "d");
@@ -47,14 +47,14 @@ describe("Task 2 Section 4: Expected Test Vectors", () => {
 
   // 5. URL encode: compress pdf & split?
   it("URL encode: compress pdf & split?", async () => {
-    const p = PANELS["url-encoder"];
+    const p = CARDS["url-encoder"];
     const res = await p.run("compress pdf & split?", "e");
     expect(res.copy).toBe("compress%20pdf%20%26%20split%3F");
   });
 
   // 6. Timestamp: 1730592000
   it("Timestamp: 1730592000 produces ISO 2024-11-03T00:00:00.000Z and IST date", async () => {
-    const p = PANELS["timestamp-converter"];
+    const p = CARDS["timestamp-converter"];
     const res = await p.run("1730592000");
     expect(res.html).toContain("2024-11-03T00:00:00.000Z");
     expect(res.html).toContain("November");
@@ -69,7 +69,7 @@ describe("Task 2 Section 4: Expected Test Vectors", () => {
   it("JWT Decoder: decodes token with expected claims and valid status", async () => {
     const token =
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyXzQyIiwibmFtZSI6IkFzaGEgUmFvIiwiaWF0IjoxNzMwNTAwMDAwLCJleHAiOjE5MDAwMDAwMDB9.c2lnbmF0dXJl";
-    const p = PANELS["jwt-decoder"];
+    const p = CARDS["jwt-decoder"];
     const res = await p.run(token);
     expect(res.html).toContain("HS256");
     expect(res.html).toContain("user_42");
@@ -82,7 +82,7 @@ describe("Task 2 Section 4: Expected Test Vectors", () => {
   it("JWT expired: correctly detects expired status", async () => {
     const expiredToken =
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyXzQyIiwibmFtZSI6IkFzaGEgUmFvIiwiaWF0IjoxNzMwNTAwMDAwLCJleHAiOjE3MzA1MDM2MDB9.c2lnbmF0dXJl";
-    const p = PANELS["jwt-decoder"];
+    const p = CARDS["jwt-decoder"];
     const res = await p.run(expiredToken);
     expect(res.status).toContain("Expired");
   });
@@ -90,7 +90,7 @@ describe("Task 2 Section 4: Expected Test Vectors", () => {
   // 9. JSON Formatter: {"a":1,"b":[1,2]}
   it("JSON Formatter: 2-space pretty output with 8 lines, and minify", async () => {
     const input = '{"a":1,"b":[1,2]}';
-    const p = PANELS["json-formatter"];
+    const p = CARDS["json-formatter"];
     const pretty = await p.run(input, "2");
     expect(pretty.copy?.split("\n").length).toBe(7);
     const min = await p.run(pretty.copy!, "m");
@@ -121,7 +121,7 @@ describe("Task 2 Section 4: Expected Test Vectors", () => {
   // 11. CSV ↔ JSON: name,city\nRohan,"Delhi, NCR"
   it("CSV ↔ JSON: round-trips with quoted commas", async () => {
     const csvInput = 'name,city\nRohan,"Delhi, NCR"';
-    const p = PANELS["json-to-csv"];
+    const p = CARDS["json-to-csv"];
     const toJson = await p.run(csvInput, "j");
     expect(toJson.copy).toBe(JSON.stringify([{ name: "Rohan", city: "Delhi, NCR" }], null, 2));
 
@@ -131,7 +131,7 @@ describe("Task 2 Section 4: Expected Test Vectors", () => {
 
   // 12. JSON to TS: {"id":1,"tags":["a"],"addr":{"pin":411001}}
   it("JSON to TS: produces valid typescript interfaces", async () => {
-    const p = PANELS["json-to-typescript"];
+    const p = CARDS["json-to-typescript"];
     const res = await p.run('{"id":1,"tags":["a"],"addr":{"pin":411001}}');
     expect(res.copy).toContain("interface Addr");
     expect(res.copy).toContain("pin: number");
@@ -155,7 +155,7 @@ describe("Task 2 Section 4: Expected Test Vectors", () => {
 
   // 13. Cron: */15 9-18 * * 1-5
   it("Cron: */15 9-18 * * 1-5 explanation and schedule", async () => {
-    const p = PANELS["cron-generator"];
+    const p = CARDS["cron-generator"];
     const res = await p.run("*/15 9-18 * * 1-5");
     expect(res.html).toContain("Every 15 minutes");
     expect(res.html).toContain("09:00");
@@ -165,7 +165,7 @@ describe("Task 2 Section 4: Expected Test Vectors", () => {
 
   // 14. Color Converter: #6D5DF5
   it("Color Converter: rgb, hsl and contrast for #6D5DF5", async () => {
-    const p = PANELS["color-converter"];
+    const p = CARDS["color-converter"];
     const res = await p.run("#6D5DF5");
     expect(res.copy).toContain("rgb(109, 93, 245)");
     expect(res.copy).toContain("hsl(246, 88%, 66%)");
@@ -176,7 +176,7 @@ describe("Task 2 Section 4: Expected Test Vectors", () => {
   it("Regex Tester: finds exactly 2 email matches", async () => {
     const pattern = "[\\w.+-]+@[\\w-]+\\.[\\w.]+";
     const text = "asha@klipkit.com or rohan.dev@example.in — not @x";
-    const p = PANELS["regex-tester"];
+    const p = CARDS["regex-tester"];
     const res = await p.run(text, undefined, pattern, "g");
     expect(res.status).toBe("2 matches");
     expect(res.html).toContain("asha@klipkit.com");
@@ -185,7 +185,7 @@ describe("Task 2 Section 4: Expected Test Vectors", () => {
 
   // 16. UUID Generator: 10 000 UUIDs v4, 0 duplicates
   it("UUID Generator: 10,000 UUIDs match v4 and have 0 duplicates", async () => {
-    const p = PANELS["uuid-generator"];
+    const p = CARDS["uuid-generator"];
     const res = await p.run("", "10000");
     const list = res.copy!.split("\n");
     expect(list.length).toBe(10000);
@@ -199,7 +199,7 @@ describe("Task 2 Section 4: Expected Test Vectors", () => {
 
   // 17. Password Generator: length 24, 0 duplicates across 1 000 runs
   it("Password Generator: length 24, 0 duplicates across 1,000 runs", async () => {
-    const p = PANELS["password-generator"];
+    const p = CARDS["password-generator"];
     const passwords = new Set<string>();
     for (let i = 0; i < 1000; i++) {
       const res = await p.run("", "24");
@@ -211,7 +211,7 @@ describe("Task 2 Section 4: Expected Test Vectors", () => {
 
   // 18. Word Counter: Hello world. This is KlipKit.
   it("Word Counter: 5 words, 2 sentences", async () => {
-    const p = PANELS["word-counter"];
+    const p = CARDS["word-counter"];
     const res = await p.run("Hello world. This is KlipKit.");
     expect(res.status).toContain("5 words");
     expect(res.copy).toMatch(/Sentences\s+2/);
@@ -219,7 +219,7 @@ describe("Task 2 Section 4: Expected Test Vectors", () => {
 
   // 19. Case Converter: drop it paste it
   it("Case Converter: camel, snake, kebab, title, upper", async () => {
-    const p = PANELS["case-converter"];
+    const p = CARDS["case-converter"];
     const input = "drop it paste it";
     expect((await p.run(input, "c")).copy).toBe("dropItPasteIt");
     expect((await p.run(input, "s")).copy).toBe("drop_it_paste_it");
@@ -230,7 +230,7 @@ describe("Task 2 Section 4: Expected Test Vectors", () => {
 
   // 20. SQL Formatter: select a from t where x=1 and y=2
   it("SQL Formatter: uppercase keywords and structured newlines", async () => {
-    const p = PANELS["sql-formatter"];
+    const p = CARDS["sql-formatter"];
     const res = await p.run("select a from t where x=1 and y=2");
     expect(res.copy).toContain("SELECT");
     expect(res.copy).toContain("\nFROM");

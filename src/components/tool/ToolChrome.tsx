@@ -1,9 +1,9 @@
 "use client";
 import { ArrowRight, Copy, Download, Star } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useKlip, type Artifact } from "@/lib/store/klip";
+import { useWorkspace } from "@/lib/store/workspace";
 import { download } from "@/lib/utils";
 
 /** Bundles several outputs into one ZIP (fflate, MIT; images are already compressed, so store only). */
@@ -67,7 +67,6 @@ export function ResultActions({
   /** Download each file on its own (e.g. QR PNG + SVG) instead of zipping. */
   separate?: boolean;
 }) {
-  const router = useRouter();
   const setHandoff = useKlip((s) => s.setHandoff);
   const [copied, setCopied] = useState(false);
   const single = items.length === 1 ? items[0] : null;
@@ -121,8 +120,9 @@ export function ResultActions({
                 <button
                   className="min-h-11 w-full rounded-[12px] px-3 py-2 text-left text-sm hover:bg-soft sm:min-h-0"
                   onClick={() => {
+                    // Chat-native: the next tool opens as another card in the same thread, with this output in it.
                     setHandoff({ from, items });
-                    router.push(`/${n.slug}`);
+                    useWorkspace.getState().requestOpen(n.slug);
                   }}
                 >
                   {n.name}

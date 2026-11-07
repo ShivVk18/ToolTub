@@ -7,7 +7,7 @@ import { deps, platformDeps } from "@/registry/dependencies";
 import { catalog, CARD_SLUGS } from "@/registry/catalog";
 import { HOME } from "@/registry/home";
 import { TOOLS, toolBySlug } from "@/lib/designTools";
-import { PANELS } from "@/lib/toolCards";
+import { CARDS } from "@/lib/toolCards";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
@@ -147,7 +147,7 @@ describe("single source of truth (ADR 0002)", () => {
     expect(TOOLS.map((t) => t.slug)).toEqual(Object.keys(HOME));
   });
   it("live panels and the registry agree exactly", () => {
-    expect(new Set(Object.keys(PANELS))).toEqual(new Set(CARD_SLUGS));
+    expect(new Set(Object.keys(CARDS))).toEqual(new Set(CARD_SLUGS));
     for (const slug of CARD_SLUGS) expect(getTool(slug)?.card, slug).toBe(true);
   });
   it("every action and generator target is a registry slug", () => {

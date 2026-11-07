@@ -4,6 +4,7 @@ Every change landed as its own branch, squash-merged into `integration/ui-restor
 
 | # | Title | Branch | PR notes |
 |---|---|---|---|
+| 87 | feat: tools open as Live Tool Cards inside the chat; /slug renders the chat with the card + SEO below; paste into the active card | `feat/workspace-live-tool-card` | [reports/prs/feat-workspace-live-tool-card.md](reports/prs/feat-workspace-live-tool-card.md) |
 | 86 | refactor: registry `panel` → `card` (CardConfig); latest reference with chat-native tools | `refactor/registry-card-config` | [reports/prs/refactor-registry-card-config.md](reports/prs/refactor-registry-card-config.md) |
 | 85 | fix: per-platform resize sizes; AA contrast for the Explore "● Live" tag | `feat/decisions-mp3-cleanup` | [reports/prs/feat-decisions-mp3-cleanup.md](reports/prs/feat-decisions-mp3-cleanup.md) |
 | 84 | feat: Diff Checker, Code Minifier, HTML Playground, Text to Speech, Résumé Builder; home plans open the new tools; early paste kept | `feat/dev-text-tools` | [reports/prs/feat-dev-text-tools.md](reports/prs/feat-dev-text-tools.md) |

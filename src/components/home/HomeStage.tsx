@@ -2,7 +2,6 @@
 
 import { setTheme } from "@/lib/theme";
 import React, { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Orb, type OrbController } from "./Orb";
 import { Hero } from "./Hero";
 import { DropVeil } from "./DropVeil";
@@ -21,9 +20,19 @@ import { useKlip } from "@/lib/store/klip";
 import { pasteItem, type PasteItem, looksLikeContent } from "@/lib/engines/detect";
 import { PT_TILE, PT_COLOR } from "@/lib/actions";
 import { esc } from "@/lib/engines/text";
-import { PANELS } from "@/lib/toolCards";
+import { CARDS } from "@/lib/toolCards";
+import { useWorkspace, liveCard } from "@/lib/store/workspace";
 
-export function HomeStage() {
+export interface HomeStageProps {
+  /** A tool's own URL (/json-formatter): the chat opens with that tool's card already in the thread. */
+  initialSlug?: string;
+  /** A long-tail landing page's preset (e.g. {"targetKB":50}) for that tool's card. */
+  initialPreset?: Record<string, string | number | boolean>;
+  /** On a tool's URL the marketing sections are left out (the SEO content follows the chat instead). */
+  toolPage?: boolean;
+}
+
+export function HomeStage({ initialSlug, initialPreset, toolPage = false }: HomeStageProps = {}) {
   const [mode, setMode] = useState<"hero" | "work">("hero");
   const [currentFile, setCurrentFile] = useState<FileInfo | null>(null);
   const [currentPaste, setCurrentPaste] = useState<PasteItem | null>(null);
@@ -32,7 +41,6 @@ export function HomeStage() {
   // Dragging state
   const [isDragging, setIsDragging] = useState(false);
   const dragDepthRef = useRef(0);
-  const router = useRouter();
 
   // Voice state
   const [isListening, setIsListening] = useState(false);
@@ -44,30 +52,38 @@ export function HomeStage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const orbControllerRef = useRef<OrbController | null>(null);
 
-  const { openPalette, openVoiceSheet, activeTool, setActiveTool, openPanel, closePanel, panelTool } = useUIStore();
+  const { openPalette, openVoiceSheet, activeTool, setActiveTool } = useUIStore();
+  const requestOpen = useWorkspace((st) => st.requestOpen);
+  const openRequest = useWorkspace((st) => st.openRequest);
 
-  // As in the reference's openPanel (state.mode = 'work'): a live panel is a workspace view, so the orb
-  // docks and the satellites leave. Closing the panel keeps the workspace.
+  // Every tool opens in the chat (reference: openPanel): the workspace takes over and the orb docks.
+  // The Workspace appends the card itself; a file or paste that was loaded stays in its own context.
   useEffect(() => {
-    if (panelTool) setMode("work");
-  }, [panelTool]);
-
-  // Watch activeTool from store
-  useEffect(() => {
-    if (activeTool) {
-      if (PANELS[activeTool.slug]) {
-        openPanel(activeTool, "");
-      } else {
-        setContextTool(activeTool);
-        setCurrentFile(null);
-        setCurrentPaste(null);
-        setMode("work");
-        document.body.classList.add("is-work");
-        orbControllerRef.current?.triggerGulp(0.8);
-      }
-      setActiveTool(null);
+    if (!openRequest) return;
+    if (mode !== "work") {
+      setCurrentFile(null);
+      setCurrentPaste(null);
+      setContextTool(null);
     }
-  }, [activeTool, setActiveTool, openPanel]);
+    setMode("work");
+    document.body.classList.add("is-work");
+    orbControllerRef.current?.triggerGulp(0.7);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openRequest]);
+
+  // ⌘K picks (from any component) open as a card too.
+  useEffect(() => {
+    if (!activeTool) return;
+    requestOpen(activeTool.slug);
+    setActiveTool(null);
+  }, [activeTool, setActiveTool, requestOpen]);
+
+  // A tool's own URL opens the chat with its card (preset from a landing page travels as the card's option).
+  useEffect(() => {
+    if (!initialSlug) return;
+    requestOpen(initialSlug, "", initialPreset ? JSON.stringify(initialPreset) : null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialSlug]);
 
   // Toast helper
   const showToast = (text: string) => {
@@ -201,7 +217,6 @@ export function HomeStage() {
 
     await animateFlyChip(f, pt || undefined);
 
-    closePanel();
     setCurrentFile(f);
     setCurrentPaste(null);
     setContextTool(null);
@@ -210,10 +225,17 @@ export function HomeStage() {
   };
 
   const handlePasteIn = async (text: string) => {
+    // Paste into the live card when it's the latest message (reference: wLive), instead of a new paste flow.
+    const card = document.body.classList.contains("is-work") ? liveCard() : null;
+    if (card && CARDS[card.toolId] && !CARDS[card.toolId].gen) {
+      const rx = CARDS[card.toolId].regex ? /^\/(.+)\/([gimsuy]*)$/.exec(text.trim()) : null;
+      useWorkspace.getState().updateCard(card.id, rx ? { pattern: rx[1], flags: rx[2] || "g" } : { input: text });
+      showToast(`Pasted into ${toolBySlug(card.toolId)?.n ?? "the tool"}`);
+      return;
+    }
     const item = pasteItem(text);
     await animateFlyPaste(item);
 
-    closePanel();
     setCurrentPaste(item);
     setCurrentFile(null);
     setContextTool(null);
@@ -259,6 +281,14 @@ export function HomeStage() {
     const handleDrop = async (e: DragEvent) => {
       if (!hasFiles(e)) return;
       e.preventDefault();
+      // A drop onto a file tool's card goes to that tool (its dropzone handles it), not a new conversation.
+      if ((e.target as HTMLElement | null)?.closest?.(".tw-file")) {
+        dragDepthRef.current = 0;
+        setIsDragging(false);
+        document.body.classList.remove("dragging");
+        orbControllerRef.current?.setLabel("Drop here");
+        return;
+      }
       dragDepthRef.current = 0;
       setIsDragging(false);
       document.body.classList.remove("dragging");
@@ -288,9 +318,12 @@ export function HomeStage() {
   useEffect(() => {
     const handleGlobalPaste = async (e: ClipboardEvent) => {
       const tg = e.target as HTMLElement | null;
-      if (tg?.closest?.("#panel") || tg?.closest?.("#pal")) return;
+      if (tg?.closest?.("#pal") || tg?.closest?.("[data-testid=tool-card] :is(input, textarea)")) return;
 
       const files = Array.from(e.clipboardData?.files || []);
+      // A file tool's card is the latest message: its own dropzone takes the pasted file (paste into the card).
+      const card = liveCard();
+      if (files.length > 0 && card && !CARDS[card.toolId]) return;
       if (files.length > 0) {
         e.preventDefault();
         const fileInfos = await Promise.all(files.map(fromFile));
@@ -327,16 +360,15 @@ export function HomeStage() {
   }, []);
 
   const handleSelectTool = async (t: ToolItem) => {
-    // Tools with their own page open it; unbuilt tools say so instead of faking a workspace.
-    if (!PANELS[t.slug]) {
-      if (t.routed) router.push(`/${t.slug}`);
-      else showToast(`${t.n} is coming soon.`);
+    // Every working tool opens as a card in the chat; unbuilt tools say so instead of faking a workspace.
+    if (!CARDS[t.slug] && !t.routed) {
+      showToast(`${t.n} is coming soon.`);
       return;
     }
     if (window.scrollY > 10) {
-      await goto(0);
+      await goto(0, 900);
     }
-    openPanel(t, "");
+    requestOpen(t.slug);
   };
 
   // Hash deep links: klipkit.com/#json-formatter opens the live tool
@@ -353,13 +385,7 @@ export function HomeStage() {
               .replace(/[^a-z0-9]+/g, "-")
               .replace(/^-|-$/g, "") === h,
         );
-      if (t) {
-        if (PANELS[t.slug]) {
-          openPanel(t, "");
-        } else {
-          handleSelectTool(t);
-        }
-      }
+      if (t) handleSelectTool(t);
     };
 
     window.addEventListener("hashchange", routeHash);
@@ -368,7 +394,8 @@ export function HomeStage() {
       window.removeEventListener("hashchange", routeHash);
       clearTimeout(tm);
     };
-  }, [openPanel]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Initialize magnetic buttons effect
   useEffect(() => {
@@ -379,7 +406,14 @@ export function HomeStage() {
   }, []);
 
   const handleNew = () => {
-    closePanel();
+    // "+ New": an empty thread and back to the hero (cards and their state go too).
+    useWorkspace.getState().reset();
+    document.body.classList.remove("wide");
+    try {
+      if (window.location.hash) history.replaceState(null, "", window.location.pathname + window.location.search);
+    } catch {
+      // ignore
+    }
     setMode("hero");
     setCurrentFile(null);
     setCurrentPaste(null);
@@ -464,11 +498,9 @@ export function HomeStage() {
       pasteIn: (t: string) => handlePasteIn(t),
       openPanel: (slugOrName: string, i?: string) => {
         const t = toolBySlug(slugOrName) ?? TOOLS.find((x) => x.n === slugOrName);
-        if (t && PANELS[t.slug]) openPanel(t, i || "");
-        else if (t) handleSelectTool(t);
+        if (t) requestOpen(t.slug, i || "");
       },
       startWork: () => {
-        closePanel();
         setMode("work");
         document.body.classList.add("is-work");
       },
@@ -492,7 +524,7 @@ export function HomeStage() {
       setTheme: (t: "light" | "dark") => setTheme(t),
       state: { mode, file: currentFile, paste: currentPaste },
     };
-  }, [mode, currentFile, currentPaste, voiceDemoText, openPanel, closePanel]);
+  }, [mode, currentFile, currentPaste, voiceDemoText, requestOpen]);
 
   return (
     <>
@@ -503,7 +535,6 @@ export function HomeStage() {
           onOrbSlotClick={() => fileInputRef.current?.click()}
           onPasteText={handlePasteIn}
           onSubmitAsk={(text) => {
-            closePanel();
             setMode("work");
             document.body.classList.add("is-work");
             orbControllerRef.current?.triggerGulp(0.8);
@@ -512,6 +543,7 @@ export function HomeStage() {
             setTimeout(() => setPendingAsk({ text, n: Date.now() }), 300);
           }}
           hintText={isDragging ? "Release to let KlipKit read it ✨" : undefined}
+          noHeading={toolPage}
         />
 
         {/* Workspace Section */}
@@ -561,18 +593,16 @@ export function HomeStage() {
         />
       </div>
 
-      {/* Editorial Marquee Band */}
-      <MarqueeBand />
-
-      {/* Sections below stage */}
-      <FeelSection />
-
-      <ExploreSection onSelectTool={handleSelectTool} />
-
-      <PricingSection onOpenPro={() => openVoiceSheet()} />
-
-      {/* Giant Spotlight Wordmark */}
-      <SpotlightWordmark />
+      {/* Sections below the stage: the home page only (a tool's URL shows its SEO content there instead) */}
+      {!toolPage && (
+        <>
+          <MarqueeBand />
+          <FeelSection />
+          <ExploreSection onSelectTool={handleSelectTool} />
+          <PricingSection onOpenPro={() => openVoiceSheet()} />
+          <SpotlightWordmark />
+        </>
+      )}
 
       {/* Drop Veil */}
       <DropVeil isDragging={isDragging} />

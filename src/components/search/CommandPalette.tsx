@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { SearchEntry } from "@/registry/search-index";
 import { useKlip } from "@/lib/store/klip";
 import { useUIStore } from "@/lib/store/ui";
+import { useWorkspace } from "@/lib/store/workspace";
 import { cn } from "@/lib/utils";
 import { createToolSearch } from "@/lib/search";
 import { CATS, tint, TOOL_ICON_PATHS } from "@/lib/designTools";
@@ -79,9 +80,10 @@ export function CommandPalette({ index }: { index: SearchEntry[] }) {
   const go = (e?: SearchEntry) => {
     if (!e?.available) return;
     setOpen(false);
-    // On the home page, drop any loaded file before navigating to the tool page.
-    useUIStore.getState().homeActions?.clearInput();
-    router.push(`/${e.slug}`);
+    // Chat-native: where the chat is on screen (home page or a tool's URL), the tool opens as a card in it.
+    // Elsewhere (hubs, Privacy…) its URL is that same chat with the card already open.
+    if (useUIStore.getState().homeActions) useWorkspace.getState().requestOpen(e.slug);
+    else router.push(`/${e.slug}`);
   };
 
   if (!open) return null;

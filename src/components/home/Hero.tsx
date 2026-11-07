@@ -15,6 +15,8 @@ interface HeroProps {
   onPasteText?: (text: string) => void;
   onSubmitAsk?: (text: string) => void;
   hintText?: string;
+  /** On a tool's own URL the page's one H1 is the tool's name, so the hero's headline is not a heading there. */
+  noHeading?: boolean;
 }
 
 const TYPEWRITER_EXAMPLES = [
@@ -28,7 +30,14 @@ const TYPEWRITER_EXAMPLES = [
   "lorem ipsum, 3 paragraphs",
 ];
 
-export function Hero({ onPickSample, onOrbSlotClick, onPasteText, onSubmitAsk, hintText }: HeroProps) {
+export function Hero({
+  onPickSample,
+  onOrbSlotClick,
+  onPasteText,
+  onSubmitAsk,
+  hintText,
+  noHeading = false,
+}: HeroProps) {
   const [askValue, setAskValue] = useState("");
   const [placeholder, setPlaceholder] = useState("Try “generate 10 UUIDs” — or paste anything");
   const [mirrorHtml, setMirrorHtml] = useState("");
@@ -36,6 +45,8 @@ export function Hero({ onPickSample, onOrbSlotClick, onPasteText, onSubmitAsk, h
 
   const askInputRef = useRef<HTMLInputElement>(null);
   const h1Ref = useRef<HTMLHeadingElement>(null);
+  // Styled by #h1, so the same look whether it's the page's heading or not.
+  const Headline = (noHeading ? "div" : "h1") as "h1";
   const squigRef = useRef<SVGSVGElement>(null);
   const squigPathRef = useRef<SVGPathElement>(null);
 
@@ -147,7 +158,7 @@ export function Hero({ onPickSample, onOrbSlotClick, onPasteText, onSubmitAsk, h
         <b>✦</b> {TOOL_COUNTS.live} tools live · {TOOL_COUNTS.total - TOOL_COUNTS.live} on the way · Free forever
       </div>
 
-      <h1 ref={h1Ref} id="h1">
+      <Headline ref={h1Ref} id="h1">
         <span className="l1">
           {line1Words.map((w, i) => (
             <React.Fragment key={w + i}>
@@ -176,7 +187,7 @@ export function Hero({ onPickSample, onOrbSlotClick, onPasteText, onSubmitAsk, h
           </defs>
           <path id="squigP" ref={squigPathRef} />
         </svg>
-      </h1>
+      </Headline>
 
       <div
         id="orbSlot"
