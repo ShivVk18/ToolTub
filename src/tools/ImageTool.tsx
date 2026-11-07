@@ -1,6 +1,8 @@
 "use client";
 import { useState, type CSSProperties } from "react";
 import { Dropzone } from "@/components/tool/Dropzone";
+import { FileChip } from "@/components/tool/FileChip";
+import { ResultRow } from "@/components/tool/ResultRow";
 import { ResultActions, useHandoff } from "@/components/tool/ToolChrome";
 import { Field, ToolWorkspace, inputClass, useToolRun } from "@/components/tool/ToolWorkspace";
 import type { Artifact } from "@/lib/store/klip";
@@ -72,27 +74,19 @@ export function ImageTool({ slug, preset, next, mode }: ToolProps & { mode: Mode
       status={job.status}
       progress={job.progress}
       error={job.error}
+      onRetry={() => (setFiles([]), job.reset())}
       input={
         files.length === 0 ? (
           <Dropzone
-            accept="image/png,image/jpeg,image/webp,image/avif,image/gif,image/bmp"
+            accept="image/png,image/jpeg,image/webp,image/avif,image/gif,image/bmp,.png,.jpg,.jpeg,.webp,.avif,.gif,.bmp"
             multiple
+            typeLabel="a JPG, PNG, WebP, AVIF, GIF or BMP image"
             maxFileMb={50}
             onFiles={(f) => (setFiles(f.slice(0, 50)), job.reset())}
             hint="JPG, PNG, WebP or AVIF · up to 50 images, 50 MB each"
           />
         ) : (
-          <div className="flex items-center justify-between rounded-lg bg-soft px-4 py-3 text-sm">
-            <span>
-              {files.length} image{files.length > 1 && "s"} · {formatBytes(files.reduce((s, f) => s + f.size, 0))}
-            </span>
-            <button
-              className="inline-flex min-h-11 items-center text-fg-muted underline sm:min-h-0"
-              onClick={() => (setFiles([]), job.reset())}
-            >
-              Change
-            </button>
-          </div>
+          <FileChip files={files} noun="image" onChange={() => (setFiles([]), job.reset())} />
         )
       }
       settings={
@@ -188,21 +182,6 @@ export function ImageTool({ slug, preset, next, mode }: ToolProps & { mode: Mode
         job.status === "done" &&
         job.result && (
           <div className="space-y-4">
-            <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-4">
-              <p className="text-lg font-semibold">
-                {formatBytes(before)} → {formatBytes(after)}
-                {after < before && (
-                  <span className="ml-2 text-emerald-600 dark:text-emerald-400">
-                    −{Math.round((1 - after / before) * 100)}%
-                  </span>
-                )}
-              </p>
-              {[...new Set(job.result.map((r) => r.out.note).filter(Boolean))].map((n) => (
-                <p key={n} className="mt-1 text-sm text-fg-muted">
-                  {n}
-                </p>
-              ))}
-            </div>
             <ul className="divide-y divide-border text-sm">
               {job.result.map((r, i) => (
                 <li key={i} className="flex justify-between gap-4 py-2">
@@ -213,7 +192,14 @@ export function ImageTool({ slug, preset, next, mode }: ToolProps & { mode: Mode
                 </li>
               ))}
             </ul>
-            <ResultActions items={artifacts} next={next} from={slug} zipName="klipkit-images.zip" />
+            <ResultRow before={before} after={after}>
+              <ResultActions items={artifacts} next={next} from={slug} zipName="klipkit-images.zip" />
+            </ResultRow>
+            {[...new Set(job.result.map((r) => r.out.note).filter(Boolean))].map((n) => (
+              <p key={n} className="text-sm text-fg-muted">
+                {n}
+              </p>
+            ))}
           </div>
         )
       }

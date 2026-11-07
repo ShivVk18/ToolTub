@@ -56,6 +56,8 @@ export interface ToolWorkspaceProps {
   status: RunStatus;
   progress?: { ratio?: number; label?: string } | null;
   error?: RunError | null;
+  /** File tools: clears the file so the error offers "Choose another file" (Hallmark F7). */
+  onRetry?: () => void;
   /** 6–7. Success state: preview, before/after, Download / Copy / Send to next tool. */
   result?: ReactNode;
 }
@@ -82,6 +84,7 @@ export function ToolWorkspace({
   status,
   progress,
   error,
+  onRetry,
   result,
 }: ToolWorkspaceProps) {
   // The tool is server-rendered, so on a slow connection it is visible before JavaScript runs. A file
@@ -141,6 +144,11 @@ export function ToolWorkspace({
               <div>
                 <p className="font-medium">{error.cause}</p>
                 {error.fix && <p className="mt-1 text-fg-muted">{error.fix}</p>}
+                {onRetry && (
+                  <Button size="sm" className="mt-3" onClick={onRetry}>
+                    Choose another file
+                  </Button>
+                )}
               </div>
             </div>
           )}

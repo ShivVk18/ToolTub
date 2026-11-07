@@ -77,7 +77,8 @@ export function BackgroundRemover({ slug, next }: ToolProps) {
       error={job.error}
       input={
         <Dropzone
-          accept="image/png,image/jpeg,image/webp"
+          accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp"
+          typeLabel="a PNG, JPG or WebP image"
           maxFileMb={25}
           onFiles={([f]) => (setFile(f), setItems([]), job.reset())}
           hint={file ? file.name : "JPG, PNG or WebP up to 25 MB · first use downloads a 44 MB AI model once"}

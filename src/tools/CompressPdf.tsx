@@ -3,7 +3,8 @@ import { useState } from "react";
 import { Dropzone } from "@/components/tool/Dropzone";
 import { ResultActions, useHandoff } from "@/components/tool/ToolChrome";
 import { Field, ToolWorkspace, inputClass, useToolRun } from "@/components/tool/ToolWorkspace";
-import { formatBytes } from "@/lib/utils";
+import { FileChip } from "@/components/tool/FileChip";
+import { ResultRow } from "@/components/tool/ResultRow";
 import { pdfWorker } from "@/workers/clients";
 import type { ToolProps } from "./types";
 
@@ -31,13 +32,19 @@ export function CompressPdf({ slug, preset, next }: ToolProps) {
       status={job.status}
       progress={job.progress}
       error={job.error}
+      onRetry={() => (setFile(null), job.reset())}
       input={
-        <Dropzone
-          accept="application/pdf,.pdf"
-          maxFileMb={200}
-          onFiles={([f]) => (setFile(f), job.reset())}
-          hint={file ? `${file.name} · ${formatBytes(file.size)}` : "PDF up to 200 MB"}
-        />
+        file ? (
+          <FileChip files={[file]} noun="PDF" onChange={() => (setFile(null), job.reset())} />
+        ) : (
+          <Dropzone
+            accept="application/pdf,.pdf"
+            typeLabel="a PDF"
+            maxFileMb={200}
+            onFiles={([f]) => (setFile(f), job.reset())}
+            hint="PDF up to 200 MB"
+          />
+        )
       }
       settings={
         <>
@@ -69,30 +76,24 @@ export function CompressPdf({ slug, preset, next }: ToolProps) {
         job.status === "done" &&
         job.result && (
           <div className="space-y-3">
-            <p className="text-lg font-semibold">
-              {formatBytes(job.result.originalSize)} → {formatBytes(job.result.blob.size)}
-              {!job.result.keptOriginal && (
-                <span className="ml-2 text-emerald-600 dark:text-emerald-400">
-                  −{Math.round((1 - job.result.blob.size / job.result.originalSize) * 100)}%
-                </span>
-              )}
-            </p>
+            <ResultRow before={job.result.originalSize} after={job.result.blob.size}>
+              <ResultActions
+                items={[
+                  {
+                    name: file!.name.replace(/\.pdf$/i, "") + "-compressed.pdf",
+                    type: "application/pdf",
+                    blob: job.result.blob,
+                  },
+                ]}
+                next={next}
+                from={slug}
+              />
+            </ResultRow>
             {(job.result.note || job.result.keptOriginal) && (
               <p className="text-sm text-fg-muted">
                 {job.result.note ?? "This PDF is already as small as we can make it without losing quality."}
               </p>
             )}
-            <ResultActions
-              items={[
-                {
-                  name: file!.name.replace(/\.pdf$/i, "") + "-compressed.pdf",
-                  type: "application/pdf",
-                  blob: job.result.blob,
-                },
-              ]}
-              next={next}
-              from={slug}
-            />
           </div>
         )
       }

@@ -65,6 +65,7 @@ export function PdfToWord({ slug, next }: ToolProps) {
       input={
         <Dropzone
           accept="application/pdf,.pdf"
+          typeLabel="a PDF"
           maxFileMb={50}
           onFiles={([f]) => (setFile(f), job.reset())}
           hint={

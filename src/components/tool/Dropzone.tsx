@@ -2,6 +2,7 @@
 import { AlertTriangle, Upload } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
+import { acceptsFile } from "@/lib/engines/format";
 
 interface DropzoneProps {
   accept: string; // e.g. "image/*" or ".heic,.heif"
@@ -10,12 +11,23 @@ interface DropzoneProps {
   onFiles: (files: File[]) => void;
   onReject?: (message: string) => void;
   hint?: string;
+  /** What the tool takes, for the wrong-type message: "x.txt isn't a PDF." Defaults to "a supported file". */
+  typeLabel?: string;
   /** Loads a sample file so people can try the tool instantly. */
   onSample?: () => void;
 }
 
 /** Drag-and-drop, paste (Ctrl/Cmd+V anywhere on the page) and the native file picker (mobile camera roll). */
-export function Dropzone({ accept, multiple, maxFileMb, onFiles, onReject, hint, onSample }: DropzoneProps) {
+export function Dropzone({
+  accept,
+  multiple,
+  maxFileMb,
+  onFiles,
+  onReject,
+  hint,
+  typeLabel = "a supported file",
+  onSample,
+}: DropzoneProps) {
   const [over, setOver] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -23,14 +35,21 @@ export function Dropzone({ accept, multiple, maxFileMb, onFiles, onReject, hint,
   const take = (list: FileList | File[] | null) => {
     if (!list) return;
     const files = Array.from(list);
-    const tooBig = maxFileMb ? files.filter((f) => f.size > maxFileMb * 1024 * 1024) : [];
-    const ok = files.filter((f) => !tooBig.includes(f));
-    if (tooBig.length) {
-      // Always tell the user; previously this was silent unless the tool passed onReject.
-      const msg = `${tooBig[0].name} is larger than the ${maxFileMb} MB limit${tooBig.length > 1 ? ` (${tooBig.length} files skipped)` : ""}.`;
-      setError(msg);
-      onReject?.(msg);
-    } else setError(null);
+    // Check the type on selection: drag-and-drop and paste skip the input's accept filter, and a wrong
+    // file used to fail only after the user pressed the primary action (Hallmark F7).
+    const wrongType = files.filter((f) => !acceptsFile(accept, f));
+    const tooBig = maxFileMb ? files.filter((f) => !wrongType.includes(f) && f.size > maxFileMb * 1024 * 1024) : [];
+    const ok = files.filter((f) => !tooBig.includes(f) && !wrongType.includes(f));
+    const skipped = wrongType.length + tooBig.length;
+    const more = skipped > 1 ? ` (${skipped} files skipped)` : "";
+    const msg = wrongType.length
+      ? `${wrongType[0].name} isn't ${typeLabel}.${more}`
+      : tooBig.length
+        ? `${tooBig[0].name} is larger than the ${maxFileMb} MB limit${more}.`
+        : null;
+    // Always tell the user; previously this was silent unless the tool passed onReject.
+    setError(msg);
+    if (msg) onReject?.(msg);
     if (ok.length) onFiles(multiple ? ok : ok.slice(0, 1));
     // Reset so choosing the same file again still fires "change".
     if (inputRef.current) inputRef.current.value = "";
@@ -76,10 +95,19 @@ export function Dropzone({ accept, multiple, maxFileMb, onFiles, onReject, hint,
       </div>
       {hint && <p className="text-xs text-fg-muted">{hint}</p>}
       {error && (
-        <p role="alert" className="flex items-center gap-2 text-sm text-red-700 dark:text-red-400">
-          <AlertTriangle className="size-4" aria-hidden />
-          {error}
-        </p>
+        <div role="alert" className="flex flex-col items-center gap-2">
+          <p className="flex items-center gap-2 text-sm text-red-700 dark:text-red-400">
+            <AlertTriangle className="size-4" aria-hidden />
+            {error}
+          </p>
+          <button
+            type="button"
+            onClick={() => inputRef.current?.click()}
+            className="inline-flex h-9 items-center rounded-full border border-line bg-solid px-4 text-xs font-medium text-ink hover:border-line2 hover:bg-soft"
+          >
+            Choose another file
+          </button>
+        </div>
       )}
       {onSample && (
         <button

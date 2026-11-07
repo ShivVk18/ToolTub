@@ -39,6 +39,7 @@ export function HeicToJpg({ slug, preset, next }: ToolProps) {
       input={
         <Dropzone
           accept=".heic,.heif,image/heic,image/heif"
+          typeLabel="a HEIC or HEIF photo"
           multiple
           maxFileMb={50}
           onFiles={(f) => (setFiles(f.slice(0, 100)), job.reset())}

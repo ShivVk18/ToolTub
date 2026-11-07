@@ -7,7 +7,7 @@ import { genPassword } from "@/lib/engines/generators";
 import { rel, tsConv } from "@/lib/engines/time";
 import { cronNext } from "@/lib/engines/cron";
 import { utf8b64, utf8b64Decode } from "@/lib/engines/text";
-import { byteLength } from "@/lib/engines/format";
+import { acceptsFile, byteLength } from "@/lib/engines/format";
 
 const ENGINES = join(__dirname, "../../src/lib/engines");
 
@@ -94,5 +94,20 @@ describe("text and format helpers", () => {
   });
   it("byteLength counts UTF-8 bytes", () => {
     expect(byteLength("✨")).toBe(3);
+  });
+});
+
+describe("acceptsFile (Hallmark F7: validate on selection)", () => {
+  const f = (name: string, type: string) => ({ name, type });
+  it("matches MIME types, wildcards and extensions, case-insensitively", () => {
+    expect(acceptsFile("application/pdf,.pdf", f("a.pdf", "application/pdf"))).toBe(true);
+    expect(acceptsFile("application/pdf,.pdf", f("A.PDF", ""))).toBe(true); // drag-drop can lose the type
+    expect(acceptsFile("application/pdf,.pdf", f("photo.jpg", "image/jpeg"))).toBe(false);
+    expect(acceptsFile("image/*", f("x.webp", "image/webp"))).toBe(true);
+    expect(acceptsFile("image/png,image/jpeg", f("notes.txt", "text/plain"))).toBe(false);
+    expect(acceptsFile(".heic,.heif", f("IMG_1.HEIC", ""))).toBe(true);
+  });
+  it("accepts anything when accept is empty", () => {
+    expect(acceptsFile("", f("x.bin", ""))).toBe(true);
   });
 });
