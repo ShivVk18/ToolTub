@@ -4,6 +4,7 @@ Every change landed as its own branch, squash-merged into `integration/ui-restor
 
 | # | Title | Branch | PR notes |
 |---|---|---|---|
+| 89 | chore: remove the full-screen tool panel (component, store state, CSS) | `chore/remove-tool-panel` | [reports/prs/chore-remove-tool-panel.md](reports/prs/chore-remove-tool-panel.md) |
 | 88 | feat: chat router — talk to the active card, paste into it, "open <tool>"; ⌘K card tools were "Coming soon" | `feat/chat-router-card-commands` | [reports/prs/feat-chat-router-card-commands.md](reports/prs/feat-chat-router-card-commands.md) |
 | 87 | feat: tools open as Live Tool Cards inside the chat; /slug renders the chat with the card + SEO below; paste into the active card | `feat/workspace-live-tool-card` | [reports/prs/feat-workspace-live-tool-card.md](reports/prs/feat-workspace-live-tool-card.md) |
 | 86 | refactor: registry `panel` → `card` (CardConfig); latest reference with chat-native tools | `refactor/registry-card-config` | [reports/prs/refactor-registry-card-config.md](reports/prs/refactor-registry-card-config.md) |
