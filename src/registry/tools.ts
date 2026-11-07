@@ -2,7 +2,7 @@ import type { HubId, ToolDefinition } from "./types";
 import { seoBySlug } from "./seo";
 import { catalog } from "./catalog";
 
-export { PANEL_SLUGS, homeTools } from "./catalog";
+export { CARD_SLUGS, homeTools } from "./catalog";
 
 const META: Record<string, string> = {
   "diff-checker":

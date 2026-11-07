@@ -1260,8 +1260,8 @@ const rows: Row[] = [
 ];
 
 /** Meta descriptions for routed (beta) tools that don't have a full ToolSEO object yet. */
-/** Tools that run as a live split-view panel on the home page (see lib/livePanels.ts, keyed by these slugs). */
-export const PANEL_SLUGS: ReadonlySet<string> = new Set([
+/** Tools that run as a Live Tool Card in the chat (config in lib/toolCards.ts, keyed by these slugs). */
+export const CARD_SLUGS: ReadonlySet<string> = new Set([
   "json-formatter",
   "jwt-decoder",
   "base64",
@@ -1330,7 +1330,7 @@ export const catalog: ToolCore[] = rows.map(
     synonyms,
     relatedTools: related,
     home: HOME[slug],
-    panel: PANEL_SLUGS.has(slug),
+    card: CARD_SLUGS.has(slug),
   }),
 );
 

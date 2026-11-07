@@ -141,8 +141,8 @@ function HubPage({ hub }: { hub: NonNullable<ReturnType<typeof getHub>> }) {
   const all = toolsInHub(hub.id);
   const available = all.filter((t) => t.status !== "planned");
   // Live = has its own page, or runs as a live panel on the home page (opened by its #slug deep link).
-  const live = all.filter((t) => t.status !== "planned" || t.panel);
-  const soon = all.filter((t) => t.status === "planned" && !t.panel);
+  const live = all.filter((t) => t.status !== "planned" || t.card);
+  const soon = all.filter((t) => t.status === "planned" && !t.card);
   return (
     <main className="mx-auto max-w-6xl px-4 py-8">
       <JsonLd data={hubGraph(hub, available)} />

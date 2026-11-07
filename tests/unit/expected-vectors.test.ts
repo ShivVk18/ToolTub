@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { PANELS } from "@/lib/livePanels";
+import { PANELS } from "@/lib/toolCards";
 import { hashAll } from "@/lib/engines/hash";
 import { genParse } from "@/lib/engines/generators";
 import { runGen } from "@/lib/actions";

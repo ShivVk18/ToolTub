@@ -36,25 +36,25 @@ import { code128, ean13, upcA, barcodeSvg } from "./engines/barcode";
 
 export { fmtSize };
 
-export interface PanelRunResult {
+export interface CardRunResult {
   html?: string;
   copy?: string;
   status?: string;
   bad?: boolean | number;
 }
 
-export interface PanelConfig {
+export interface CardConfig {
   opts?: [string, string][];
   sample?: string;
   gen?: boolean | number;
   regex?: boolean | number;
   pat?: string;
   flags?: string;
-  run: (v: string, o?: string | null, pat?: string, fl?: string) => PanelRunResult | Promise<PanelRunResult>;
+  run: (v: string, o?: string | null, pat?: string, fl?: string) => CardRunResult | Promise<CardRunResult>;
 }
 
-/** Live panel tools keyed by registry slug (see PANEL_SLUGS in registry/tools.ts). */
-export const PANELS: Record<string, PanelConfig> = {
+/** Live panel tools keyed by registry slug (see CARD_SLUGS in registry/tools.ts). */
+export const PANELS: Record<string, CardConfig> = {
   "json-formatter": {
     opts: [
       ["2 spaces", "2"],

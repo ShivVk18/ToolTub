@@ -142,8 +142,8 @@ export interface ToolDefinition {
   seo?: ToolSEO;
   /** Card on the home page (Explore grid, palette icons). */
   home?: HomeCard;
-  /** True when the tool runs as a live panel on the home page. */
-  panel: boolean;
+  /** True when the tool runs as a Live Tool Card in the chat (text in, live output). */
+  card: boolean;
 }
 
 /** Tool facts without SEO copy (registry/catalog.ts); light enough for client bundles. */

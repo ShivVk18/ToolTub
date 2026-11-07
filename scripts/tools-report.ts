@@ -49,8 +49,8 @@ const walk = (s: PwSuite, trail: string[]) => {
 };
 for (const s of res.suites) walk(s, [s.title]);
 
-const live = catalog.filter((t) => t.status !== "planned" || t.panel);
-const soon = catalog.filter((t) => t.status === "planned" && !t.panel);
+const live = catalog.filter((t) => t.status !== "planned" || t.card);
+const soon = catalog.filter((t) => t.status === "planned" && !t.card);
 
 /** Which tests prove each entry point (route/⌘K/Explore/chat/paste). "—" = no test (not claimed). */
 const ENTRY: Record<string, Partial<Record<"route" | "palette" | "explore" | "chat" | "paste", string>>> = {
@@ -97,7 +97,7 @@ const has = (rs: Row[], re: RegExp) => {
 const tools = live.map((t) => {
   const rs = match(t);
   const s = summarise(rs);
-  const e = ENTRY[t.slug] ?? (t.panel ? { route: "live-panels" } : {});
+  const e = ENTRY[t.slug] ?? (t.card ? { route: "live-panels" } : {});
   return {
     slug: t.slug,
     name: t.home?.name ?? t.name,

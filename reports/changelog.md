@@ -4,6 +4,7 @@ Every change landed as its own branch, squash-merged into `integration/ui-restor
 
 | # | Title | Branch | PR notes |
 |---|---|---|---|
+| 86 | refactor: registry `panel` → `card` (CardConfig); latest reference with chat-native tools | `refactor/registry-card-config` | [reports/prs/refactor-registry-card-config.md](reports/prs/refactor-registry-card-config.md) |
 | 85 | fix: per-platform resize sizes; AA contrast for the Explore "● Live" tag | `feat/decisions-mp3-cleanup` | [reports/prs/feat-decisions-mp3-cleanup.md](reports/prs/feat-decisions-mp3-cleanup.md) |
 | 84 | feat: Diff Checker, Code Minifier, HTML Playground, Text to Speech, Résumé Builder; home plans open the new tools; early paste kept | `feat/dev-text-tools` | [reports/prs/feat-dev-text-tools.md](reports/prs/feat-dev-text-tools.md) |
 | 83 | feat: 9 video, audio and speech tools (compress, convert, trim, GIF, extract audio, audio converter, screen recorder, transcription, subtitles) | `feat/video-audio-tools` | [reports/prs/feat-video-audio-tools.md](reports/prs/feat-video-audio-tools.md) |

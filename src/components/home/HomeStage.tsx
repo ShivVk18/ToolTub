@@ -21,7 +21,7 @@ import { useKlip } from "@/lib/store/klip";
 import { pasteItem, type PasteItem, looksLikeContent } from "@/lib/engines/detect";
 import { PT_TILE, PT_COLOR } from "@/lib/actions";
 import { esc } from "@/lib/engines/text";
-import { PANELS } from "@/lib/livePanels";
+import { PANELS } from "@/lib/toolCards";
 
 export function HomeStage() {
   const [mode, setMode] = useState<"hero" | "work">("hero");

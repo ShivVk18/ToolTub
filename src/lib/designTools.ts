@@ -10,7 +10,7 @@ export interface ToolItem {
   d: string; // one-line blurb
   s?: string; // 'server' if processed on KlipKit's own server
   slug: string; // registry slug
-  live: boolean; // runs as a live panel on the home page
+  live: boolean; // runs as a Live Tool Card in the chat
   routed: boolean; // has its own page at /slug
 }
 
@@ -43,7 +43,7 @@ export const TOOLS: ToolItem[] = homeTools().map((t) => ({
   d: t.home!.blurb,
   s: t.processing.where === "own-server" ? "server" : undefined,
   slug: t.slug,
-  live: t.panel,
+  live: t.card,
   routed: t.status !== "planned",
 }));
 
@@ -54,11 +54,11 @@ export const TOOL_COUNTS = {
 };
 
 /** Look up a home card by registry slug. */
-/** Home card by slug; a live panel without a home card (e.g. Time Zone Converter) gets one built from the registry. */
+/** Home card by slug; a live card without a home card (e.g. Time Zone Converter) gets one built from the registry. */
 export const toolBySlug = (slug: string): ToolItem | undefined => {
   const home = TOOLS.find((t) => t.slug === slug);
   if (home) return home;
-  const t = catalog.find((x) => x.slug === slug && x.panel);
+  const t = catalog.find((x) => x.slug === slug && x.card);
   return t
     ? { n: t.name, c: CAT_KEY[t.category], i: "code", d: t.tagline, slug: t.slug, live: true, routed: false }
     : undefined;

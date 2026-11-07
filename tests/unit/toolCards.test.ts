@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { PANELS } from "@/lib/livePanels";
+import { PANELS } from "@/lib/toolCards";
 
 describe("PANELS - 34 Live Tools", () => {
   it("has all 34 live panel tools defined", () => {

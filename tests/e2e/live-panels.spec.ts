@@ -1,11 +1,11 @@
 import { test, expect, type Page } from "@playwright/test";
-import { PANEL_SLUGS } from "../../src/registry/catalog";
+import { CARD_SLUGS } from "../../src/registry/catalog";
 
 /** Flow 5.7 — every live panel: deep link, Sample, every option, Clear, Copy, full screen + Esc, ⌘/Ctrl+Enter. */
 const out = (page: Page) => page.locator("#pnOut");
 const text = async (page: Page) => (await out(page).innerText()).trim();
 
-for (const slug of [...PANEL_SLUGS]) {
+for (const slug of [...CARD_SLUGS]) {
   test(`live panel: ${slug}`, async ({ page, context, browserName }) => {
     await page.goto(`/#${slug}`);
     const panel = page.locator("#panel");

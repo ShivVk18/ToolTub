@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useUIStore } from "@/lib/store/ui";
-import { PANELS } from "@/lib/livePanels";
+import { PANELS } from "@/lib/toolCards";
 import { CATS, TOOL_ICON_PATHS, tint } from "@/lib/designTools";
 
 interface LiveToolPanelProps {

@@ -389,6 +389,26 @@ h1{position:relative}
 .tcard{transform-style:preserve-3d}
 @media(max-width:1100px){.b-big,.b-paste,.b-priv,.b-keys,.bento .fc{grid-column:span 12}.giant{font-size:26vw}}
 
+
+.card.tw{padding:18px 18px 14px}
+.tw-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.tw-head>.ti{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;flex:none}
+.tw-t{font-family:var(--serif);font-size:24px;font-weight:500;letter-spacing:-.02em;line-height:1.1}
+.tw-body{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tw .pn-box{box-shadow:none;border-radius:18px}
+.tw-in{display:block;width:100%;border:0;outline:0;resize:vertical;background:transparent;color:var(--ink);font:400 14.5px/1.6 var(--mono);padding:14px 16px;height:230px}
+.tw-out{overflow:auto;white-space:pre-wrap;word-break:break-word;font:400 14.5px/1.6 var(--mono);padding:14px 16px;color:var(--ink2);height:230px}
+.tw.big .tw-in,.tw.big .tw-out,.tw.big .tw-gen{height:480px}
+.tw-out.flash{animation:flash .6s ease}
+.tw-rx{display:flex;gap:6px;padding:10px 12px;border-bottom:1px solid var(--line);align-items:center;font:500 18px var(--mono);color:var(--faint)}
+.tw-rx input{border:1px solid var(--line);background:var(--soft);border-radius:12px;height:40px;padding:0 12px;font:400 14.5px var(--mono);color:var(--ink);outline:0;min-width:0}
+.tw-rx input:focus{border-color:rgba(109,93,245,.45)}
+.tw-pat{flex:1}.tw-fl{width:64px}
+.tw-gen{display:flex;align-items:center;justify-content:center;height:230px;color:var(--muted);font-size:14px;padding:16px;text-align:center;line-height:1.6}
+.tw .pn-status{margin-top:10px}
+body.wide .col{width:min(1400px,94vw)}
+@media(max-width:900px){.tw-body{grid-template-columns:1fr}.tw .pn-r{margin-left:0}}
+
 @media (max-width:1100px){.grid{grid-template-columns:repeat(2,1fr)}.feel{grid-template-columns:1fr}.links{display:none}.kbtn{min-width:0}.kbtn span{display:none}.plans{grid-template-columns:1fr}}
 @media (max-width:640px){.grid{grid-template-columns:1fr}.navr .pill:not(.ink){display:none}.card,.chips{margin-left:0}}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
@@ -435,17 +455,6 @@ h1{position:relative}
           <button class="send" id="send" aria-label="Send" disabled><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
         </div>
       </div>
-      <div id="panel">
-        <div class="pn-head"><div class="ti" id="pnIcon"></div><div><div class="pn-t" id="pnT"></div><div class="pn-d"><span id="pnD"></span> · <span style="color:var(--ok);font-weight:500">Live · on your device</span></div></div>
-          <div class="pn-r"><div class="segs" id="pnOpts"></div><button class="pill sm" id="pnFull">⤢ Full screen</button><button class="pill sm" id="pnChat">Chat</button></div></div>
-        <div class="pn-body">
-          <div class="pn-box"><div class="pn-lab"><span id="pnInLab">Input</span><span class="sp"><button class="mini" id="pnSample">Sample</button><button class="mini" id="pnClear">Clear</button></span></div>
-            <div id="pnRx">/<input id="pnPat" spellcheck="false" placeholder="pattern" aria-label="Regex pattern">/<input id="pnFl" spellcheck="false" placeholder="flags" aria-label="Regex flags"></div>
-            <textarea id="pnIn" spellcheck="false" placeholder="Paste or type here — the output updates as you type" aria-label="Tool input"></textarea>
-            <div id="pnGen"><div>Choose an option above — or</div><button class="pill ink" id="pnRegen">↻ Generate again</button></div></div>
-          <div class="pn-box"><div class="pn-lab">Output<span class="sp"><button class="mini" id="pnCopy">Copy</button></span></div><div id="pnOut" aria-live="polite"></div></div>
-        </div>
-        <div class="pn-status" id="pnStatus"></div>
       </div>
     </div>
   </section>
@@ -698,6 +707,7 @@ cmp.addEventListener('input',live);
 cmp.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();if(cmp.value.trim())submit(cmp.value)}});
 $('#send').onclick=()=>cmp.value.trim()&&submit(cmp.value);
 async function submit(text){if(state.busy)return;
+ if(!state.file&&!looksLikeContent(text)&&await talkToWidget(text))return;
  if(state.file?.kind==='paste'){if(looksLikeContent(text)){cmp.value='';live();return pasteIn(text)}const pa=pasteAct(text,state.file.pt);add(`<div class="ub">${pa?markHTML(text,[[pa.span[0],pa.span[1],{i:0}]],false):esc(text)}</div>`,'msg user');cmp.value='';live();
   if(pa)return doPaste(pa.act,text);await think(450);bot(`Here's what I can do with this ${state.file.label}:`);chips(PSUG[state.file.pt],a=>doPaste(a,null));return}
  if(!state.file){if(looksLikeContent(text)){cmp.value='';live();return pasteIn(text)}const g=genParse(text);add(`<div class="ub">${markHTML(text,g?g.spans:[],false)}</div>`,'msg user');cmp.value='';live();
@@ -910,13 +920,13 @@ async function runGen(p){const g=p.g.id;
  if(g==='now'){const ms=Date.now();const r=tsConv(String(ms));return{msg:`Right now it's <b>${Math.floor(ms/1000)}</b>.`,html:table(r),copy:String(Math.floor(ms/1000)),open:'Timestamp'}}
  if(g==='qr')return{msg:'Opening the QR Code tool…',open:'QR Code',go:1}}
 function resultCard(r){if(!r.html&&!r.copy&&!r.open)return;const d=add('','card rcard2');
- d.innerHTML=`${r.html||''}<div class="rfoot">${r.copy?`<button class="pill sm" data-a="copy"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>Copy</button>`:''}${r.open?`<button class="pill sm" data-a="open">Open in ${esc(r.open)} <span style="opacity:.6">⤢</span></button>`:''}<span class="rnote">On your device · nothing uploaded</span></div>`;
+ d.innerHTML=`${r.html||''}<div class="rfoot">${r.copy?`<button class="pill sm" data-a="copy"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>Copy</button>`:''}${r.open?`<button class="pill sm" data-a="open">Edit live here <span style="opacity:.6">· ${esc(r.open)}</span></button>`:''}<span class="rnote">On your device · nothing uploaded</span></div>`;
  d.querySelector('[data-a=copy]')?.addEventListener('click',()=>copyText(r.copy));
  d.querySelector('[data-a=open]')?.addEventListener('click',()=>openPanelByName(r.open,state.file?.text||''));return d}
 async function copyText(s){try{await navigator.clipboard.writeText(s);toast('Copied ✓')}catch(e){const ta=document.createElement('textarea');ta.value=s;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('Copied ✓')}catch(_){toast('Select and copy manually')}ta.remove()}}
 // ---------- paste into the conversation ----------
-async function startWork(){if(state.mode==='work'&&!document.body.classList.contains('panel-open'))return;closePanel(true);thread.innerHTML='';$('#ctx').innerHTML='';state.mode='work';document.body.classList.add('is-work');O.gulp=.8;await wait(520)}
-async function pasteIn(text,pt){const f=pasteItem(text);if(state.mode==='hero'){const sr=stage.getBoundingClientRect();const fc=document.createElement('div');fc.className='flychip';fc.innerHTML=`<div class="ftile" style="background:${PT_COLOR[f.pt]};font-size:${PT_TILE[f.pt].length>3?10:13}px">${PT_TILE[f.pt]}</div><div style="font-family:${MONO};font-weight:500;font-size:14px;max-width:340px;overflow:hidden;text-overflow:ellipsis">${esc(text.trim().slice(0,46))}</div>`;stage.appendChild(fc);const w=fc.offsetWidth,h=fc.offsetHeight;const s0={x:O.x,y:O.y+260};
+async function startWork(){activeW=null;if(state.mode==='work'&&!document.body.classList.contains('panel-open'))return;closePanel(true);thread.innerHTML='';$('#ctx').innerHTML='';state.mode='work';document.body.classList.add('is-work');O.gulp=.8;await wait(520)}
+async function pasteIn(text,pt){const LW=state.mode==='work'?wLive():null;if(LW&&LW.inp){LW.inp.value=text;runW(LW);toast('Pasted into '+LW.t.n);return}const f=pasteItem(text);if(state.mode==='hero'){const sr=stage.getBoundingClientRect();const fc=document.createElement('div');fc.className='flychip';fc.innerHTML=`<div class="ftile" style="background:${PT_COLOR[f.pt]};font-size:${PT_TILE[f.pt].length>3?10:13}px">${PT_TILE[f.pt]}</div><div style="font-family:${MONO};font-weight:500;font-size:14px;max-width:340px;overflow:hidden;text-overflow:ellipsis">${esc(text.trim().slice(0,46))}</div>`;stage.appendChild(fc);const w=fc.offsetWidth,h=fc.offsetHeight;const s0={x:O.x,y:O.y+260};
   await tween(560,p=>{const x=s0.x+(O.x-s0.x)*p,y=s0.y+(O.y-s0.y)*p-Math.sin(p*Math.PI)*50;fc.style.transform=`translate(${x-w/2}px,${y-h/2}px) scale(${1-.75*p})`;fc.style.opacity=p>.8?(1-p)*5:1},ease.io);fc.remove();ripple(O.x,O.y,O.s*BASE*1.05)}
  await startWork();state.file=f;
  const prev=esc(text.trim().split('\n').slice(0,4).join('\n').slice(0,260))+(text.trim().split('\n').length>4||text.length>260?'\n…':'');
@@ -968,34 +978,45 @@ const PANELS={
    let out='',last=0,n=0;const list=[];for(const m of v.matchAll(re)){if(n++>500)break;if(m[0]===''){continue}out+=esc(v.slice(last,m.index))+`<mark class="rm">${esc(m[0])}</mark>`;last=m.index+m[0].length;list.push(m)}out+=esc(v.slice(last));
    return{html:out+(list.length?`\n\n<span class="pc">// ${list.length} match${list.length>1?'es':''}</span>\n`+list.slice(0,30).map((m,i)=>`${String(i+1).padStart(2)}  ${esc(m[0])}${m.length>1?'  '+m.slice(1).map((g,j)=>`<span class="pc">$${j+1}</span>=${esc(g??'')}`).join(' '):''}`).join('\n'):''),copy:list.map(m=>m[0]).join('\n'),status:`${list.length} match${list.length===1?'':'es'}`}}},
 };
-let panelTool=null,panelOpt=null,prevMode=null;
-function openPanelByName(n,input){const t=T.find(x=>x.n===n);if(t&&PANELS[n])openPanel(t,input);else if(t)openTool(t)}
-async function openPanel(t,input){closePal();if(scrollY>10)await goto(0,900);const P=PANELS[t.n];panelTool=t;panelOpt=P.opts?P.opts[0][1]:null;state.mode='work';document.body.classList.add('is-work','panel-open');O.gulp=.7;
- $('#pnIcon').style.background=tint(CATS[t.c].c);$('#pnIcon').innerHTML=svgI(t.i,CATS[t.c].c,20);$('#pnT').textContent=t.n;$('#pnD').textContent=t.d;
- $('#pnOpts').innerHTML=(P.opts||[]).map(([l,v],i)=>`<button class="seg${i?'':' on'}" data-v="${v}">${esc(l)}</button>`).join('');
- $$('#pnOpts .seg').forEach(b=>b.onclick=()=>{panelOpt=b.dataset.v;$$('#pnOpts .seg').forEach(x=>x.classList.toggle('on',x===b));runPanel()});
- $('#pnRx').style.display=P.regex?'flex':'none';$('#pnIn').style.display=P.gen?'none':'block';$('#pnGen').style.display=P.gen?'flex':'none';
- $('#pnInLab').textContent=P.regex?'Test text':'Input';
- if(P.regex){$('#pnPat').value=P.pat;$('#pnFl').value=P.flags}
- $('#pnIn').value=input&&!P.gen?(P.regex&&/^\/.+\/[gimsuy]*$/.test(input.trim())?P.sample:input):(P.sample||'');
- if(P.regex&&input&&/^\/(.+)\/([gimsuy]*)$/.test(input.trim())){const m=/^\/(.+)\/([gimsuy]*)$/.exec(input.trim());$('#pnPat').value=m[1];$('#pnFl').value=m[2]||'g'}
- try{history.replaceState(null,'','#'+slug(t.n))}catch(e){}
- $('#ctx').innerHTML='';runPanel();setTimeout(()=>{(P.regex?$('#pnPat'):P.gen?null:$('#pnIn'))?.focus({preventScroll:true})},450)}
-let runSeq=0;async function runPanel(){if(!panelTool)return;const P=PANELS[panelTool.n];const my=++runSeq;const t0=now();
- const r=await P.run($('#pnIn').value,panelOpt,$('#pnPat').value,$('#pnFl').value);if(my!==runSeq)return;
- $('#pnOut').innerHTML=r.html||'<span class="pc">Output appears here as you type…</span>';$('#pnOut').dataset.copy=r.copy||'';
- $('#pnStatus').innerHTML=`<i style="background:${r.bad?'var(--red)':'var(--ok)'}"></i>${r.status?esc(r.status):'Ready'}<span style="margin-left:auto">${(now()-t0).toFixed(1)} ms · on your device · nothing uploaded</span>`;
- const o=$('#pnOut');o.classList.remove('flash');void o.offsetWidth;o.classList.add('flash')}
-['input'].forEach(ev=>{$('#pnIn').addEventListener(ev,runPanel);$('#pnPat').addEventListener(ev,runPanel);$('#pnFl').addEventListener(ev,runPanel)});
-$('#pnCopy').onclick=()=>{const s=$('#pnOut').dataset.copy;if(s)copyText(s);else toast('Nothing to copy yet')};
-$('#pnSample').onclick=()=>{const P=PANELS[panelTool.n];if(P.regex){$('#pnPat').value=P.pat;$('#pnFl').value=P.flags}$('#pnIn').value=P.sample||'';runPanel()};
-$('#pnClear').onclick=()=>{$('#pnIn').value='';runPanel();$('#pnIn').focus()};
-$('#pnRegen').onclick=()=>runPanel();
-$('#pnFull').onclick=()=>document.body.classList.toggle('panel-full');
-$('#pnChat').onclick=()=>{closePanel();if(!thread.children.length){bot('What would you like to do? Drop a file, paste something, or just ask.')}};
-function closePanel(silent){document.body.classList.remove('panel-open','panel-full');panelTool=null;try{if(location.hash)history.replaceState(null,'',location.pathname+location.search)}catch(e){}}
-addEventListener('keydown',e=>{if(!document.body.classList.contains('panel-open'))return;if((e.metaKey||e.ctrlKey)&&e.key==='Enter'){e.preventDefault();runPanel()}if(e.key==='Escape'&&document.body.classList.contains('panel-full'))document.body.classList.remove('panel-full')});
-// deep links: klipkit.com/#json-formatter opens the live tool
+// ---- tools run INSIDE the chat as live cards (no separate page) ----
+let activeW=null;
+function closePanel(){}
+function openPanelByName(n,input){const t=T.find(x=>x.n===n);if(t&&PANELS[t.n])openPanel(t,input);else if(t)openTool(t)}
+async function openPanel(t,input){closePal();if(scrollY>10)await goto(0,900);
+ if(state.mode!=='work'){thread.innerHTML='';$('#ctx').innerHTML='';state.file=null;state.mode='work';document.body.classList.add('is-work');O.gulp=.7;await wait(520)}
+ await think(360);const P=PANELS[t.n];
+ bot(P.gen?`Here's the <b>${t.n}</b> — pick an option, or just tell me (“${P.opts[2]?P.opts[2][0]:P.opts[0][0]}”).`:`Here's the <b>${t.n}</b>, right here in the chat. ${input?'I loaded your content — ':''}Type or paste in it; it updates live.${P.opts?`<span class="sub">You can keep talking to it too — try “${P.opts[P.opts.length-1][0]}”.</span>`:''}`);
+ const w=toolWidget(t,input);try{history.replaceState(null,'','#'+slug(t.n))}catch(e){}return w}
+function toolWidget(t,input){const P=PANELS[t.n];const c=CATS[t.c].c;const d=add('','card tw');
+ d.innerHTML=`<div class="tw-head"><div class="ti" style="background:${tint(c)}">${svgI(t.i,c,19)}</div><div class="tw-meta"><div class="tw-t">${t.n}</div><div class="pn-d">${t.d} · <span style="color:var(--ok);font-weight:500">● Live · on your device</span></div></div>
+ <div class="pn-r"><div class="segs">${(P.opts||[]).map(([l,v],i)=>`<button class="seg${i?'':' on'}" data-v="${v}">${esc(l)}</button>`).join('')}</div><button class="mini tw-exp" aria-label="Expand">⤢ Expand</button></div></div>
+ <div class="tw-body"><div class="pn-box"><div class="pn-lab"><span>${P.regex?'Test text':P.gen?'Generate':'Input'}</span><span class="sp">${P.gen?'<button class="mini tw-regen">↻ Again</button>':'<button class="mini tw-sample">Sample</button><button class="mini tw-clear">Clear</button>'}</span></div>
+ ${P.regex?'<div class="tw-rx">/<input class="tw-pat" spellcheck="false" aria-label="Pattern">/<input class="tw-fl" spellcheck="false" aria-label="Flags"></div>':''}
+ ${P.gen?'<div class="tw-gen">Fresh values every time — made on your device.<br>Pick an option above, or say it in the chat.</div>':'<textarea class="tw-in" spellcheck="false" placeholder="Paste or type — the output updates as you type" aria-label="Tool input"></textarea>'}</div>
+ <div class="pn-box"><div class="pn-lab">Output<span class="sp"><button class="mini tw-copy">Copy</button></span></div><div class="tw-out" aria-live="polite"></div></div></div><div class="pn-status"></div>`;
+ const q=s=>d.querySelector(s);const W={t,P,el:d,opt:P.opts?P.opts[0][1]:null,inp:q('.tw-in'),out:q('.tw-out'),pat:q('.tw-pat'),fl:q('.tw-fl'),st:q('.pn-status'),seq:0};
+ if(W.inp)W.inp.value=input&&!(P.regex&&/^\/.+\/[gimsuy]*$/.test(input.trim()))?input:(P.sample||'');
+ if(P.regex){W.pat.value=P.pat;W.fl.value=P.flags;const m=input&&/^\/(.+)\/([gimsuy]*)$/.exec(input.trim());if(m){W.pat.value=m[1];W.fl.value=m[2]||'g'}}
+ [W.inp,W.pat,W.fl].forEach(e=>e&&e.addEventListener('input',()=>runW(W)));
+ d.querySelectorAll('.seg').forEach(b=>b.onclick=()=>setOpt(W,b.dataset.v));
+ q('.tw-copy').onclick=()=>{const s=W.out.dataset.copy;s?copyText(s):toast('Nothing to copy yet')};
+ q('.tw-sample')?.addEventListener('click',()=>{W.inp.value=P.sample||'';if(P.regex){W.pat.value=P.pat;W.fl.value=P.flags}runW(W)});
+ q('.tw-clear')?.addEventListener('click',()=>{W.inp.value='';runW(W);W.inp.focus()});
+ q('.tw-regen')?.addEventListener('click',()=>runW(W));
+ q('.tw-exp').onclick=()=>{const big=!d.classList.contains('big');d.classList.toggle('big',big);document.body.classList.toggle('wide',big);q('.tw-exp').textContent=big?'⤡ Collapse':'⤢ Expand';setTimeout(scrollThread,60)};
+ W.inp?.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key==='Enter'){e.preventDefault();runW(W)}});
+ activeW=W;runW(W);setTimeout(()=>{(W.pat||W.inp)?.focus({preventScroll:true})},450);return W}
+function setOpt(W,v){W.opt=v;W.el.querySelectorAll('.seg').forEach(x=>x.classList.toggle('on',x.dataset.v===v));runW(W)}
+async function runW(W){const my=++W.seq;const t0=now();const r=await W.P.run(W.inp?.value||'',W.opt,W.pat?.value||'',W.fl?.value||'');if(my!==W.seq)return;
+ W.out.innerHTML=r.html||'<span class="pc">Output appears here as you type…</span>';W.out.dataset.copy=r.copy||'';
+ W.st.innerHTML=`<i style="background:${r.bad?'var(--red)':'var(--ok)'}"></i>${r.status?esc(r.status):'Ready'}<span style="margin-left:auto">${(now()-t0).toFixed(1)} ms · nothing uploaded</span>`;
+ W.out.classList.remove('flash');void W.out.offsetWidth;W.out.classList.add('flash')}
+const wLive=()=>activeW&&document.body.contains(activeW.el)&&thread.lastElementChild===activeW.el?activeW:null;
+// talk to the live card from the chat composer ("minify it", "decode", "10")
+async function talkToWidget(text){const W=activeW&&document.body.contains(activeW.el)?activeW:null;if(!W||!W.P.opts)return false;const low=text.toLowerCase();
+ const o=W.P.opts.find(([l])=>{const k=l.toLowerCase().replace('¶','').trim();return k.length>2?low.includes(k):new RegExp('(^|\\s)'+k+'(\\s|$)').test(low)});
+ if(!o)return false;add(`<div class="ub">${esc(text)}</div>`,'msg user');cmp.value='';live();await think(280);setOpt(W,o[1]);bot(`Done — switched to <b>${esc(o[0])}</b>.`);thread.appendChild(W.el);scrollThread();return true}
+// deep links: klipkit.com/#json-formatter opens the chat with that tool already running
 function routeHash(){const h=location.hash.slice(1);if(!h)return;const t=T.find(x=>slug(x.n)===h);if(t)(PANELS[t.n]?openPanel(t,''):openTool(t))}
 addEventListener('hashchange',routeHash);setTimeout(routeHash,120);
 

@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
-import { PANEL_SLUGS } from "../../src/registry/catalog";
+import { CARD_SLUGS } from "../../src/registry/catalog";
 import { gen, guard, output } from "./helpers";
 
 /**
@@ -13,9 +13,9 @@ const results: Record<string, number> = {};
 test.describe.configure({ mode: "serial" });
 
 test("every live panel: runs in under 50 ms, nothing uploaded, nothing third-party", async ({ page }) => {
-  test.setTimeout(PANEL_SLUGS.size * 6_000); // one page visits every panel in turn: ~3 s each, so scale with the count
+  test.setTimeout(CARD_SLUGS.size * 6_000); // one page visits every panel in turn: ~3 s each, so scale with the count
   const g = guard(page);
-  for (const slug of [...PANEL_SLUGS]) {
+  for (const slug of [...CARD_SLUGS]) {
     await page.goto(`/#${slug}`);
     await expect(page.locator("#panel")).toBeVisible();
     const sample = page.locator("#pnSample");
