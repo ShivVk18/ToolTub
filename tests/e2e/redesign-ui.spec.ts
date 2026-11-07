@@ -252,6 +252,26 @@ test.describe("KlipKit Redesign UI & Visual Layer", () => {
       const measure = async (url: string) => {
         const page = await browser.newPage({ viewport: { width, height: 900 } });
         await page.goto(url, { waitUntil: "load" });
+        await page.evaluate(() => document.fonts.ready);
+        if (url.startsWith("file:"))
+          // The reference places its squiggle when fonts are ready, measuring words that start 0.35 em low
+          // and animate up (wordIn). Normally that callback runs at the start of the animation; under load it
+          // ran after it and the squiggle sat 15 px higher. Re-place it at the animation's start, every run.
+          await page.evaluate(() => {
+            const anims = document
+              .getAnimations()
+              .filter(
+                (a) =>
+                  (a.effect as KeyframeEffect)?.target instanceof Element &&
+                  ((a.effect as KeyframeEffect).target as Element).matches("#h1 .w"),
+              );
+            anims.forEach((a) => {
+              a.pause();
+              a.currentTime = 0;
+            });
+            (window as unknown as { placeSquiggle: () => void }).placeSquiggle();
+            anims.forEach((a) => a.finish());
+          });
         await page.waitForTimeout(3200);
         const d = await page.evaluate(() => {
           const just = document.querySelectorAll("#h1 .l2 .w")[1].getBoundingClientRect();
