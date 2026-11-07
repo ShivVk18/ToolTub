@@ -5,6 +5,30 @@ import { catalog } from "./catalog";
 export { PANEL_SLUGS, homeTools } from "./catalog";
 
 const META: Record<string, string> = {
+  "crop-image":
+    "Crop, rotate and flip images with aspect presets like 1:1, 4:5 and 16:9, or exact pixel sizes. Runs in your browser; nothing is uploaded. Free, no sign-up.",
+  "exif-remover":
+    "Remove EXIF metadata such as GPS location and camera details from photos without re-encoding them. Runs in your browser; nothing is uploaded. Free.",
+  "bulk-rename":
+    "Rename many files at once with patterns like {name}, {n} and {date}, and optionally shrink large photos. Runs in your browser; nothing is uploaded. Free.",
+  "social-image-resizer":
+    "Resize one image for Instagram, Stories, YouTube, X, LinkedIn and Pinterest in one go: crop or fit with a blurred background. Runs in your browser. Free.",
+  "thumbnail-preview":
+    "Preview a YouTube thumbnail in the home feed, sidebar and search, light or dark, and check its size and ratio. Runs in your browser; nothing is uploaded.",
+  "meme-generator":
+    "Make a meme from your own picture with classic top and bottom text that wraps and resizes to fit. Runs in your browser; nothing is uploaded. Free, no sign-up.",
+  "image-watermark":
+    "Add a text or logo watermark to many photos at once, in a corner, centred or tiled across. Runs in your browser; nothing is uploaded. Free, no sign-up.",
+  "color-palette-from-image":
+    "Extract the main colours from any photo with their share and hex codes, then copy them as CSS variables. Runs in your browser; nothing is uploaded. Free.",
+  "image-color-picker":
+    "Click any pixel of an image to get its HEX, RGB and HSL values plus contrast against white and black. Runs in your browser; nothing is uploaded. Free.",
+  "collage-maker":
+    "Combine 2 to 9 photos into a collage grid for posts, stories or wide banners, with spacing and background colour. Runs in your browser. Free, no sign-up.",
+  "passport-photo-maker":
+    "Make a passport or visa photo at the right size for India, US, UK, Schengen and more, with a white background and print sheet. Runs on your device.",
+  "image-to-text":
+    "Copy text from photos, screenshots and scanned PDFs with OCR that runs on your device. English supported; nothing is uploaded. Free and no sign-up needed.",
   "merge-pdf":
     "Merge several PDFs into one file in the order you choose. Runs in your browser, so documents are never uploaded. Free, no sign-up, no watermark.",
   "split-pdf":

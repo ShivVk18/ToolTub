@@ -21,6 +21,12 @@ export function acceptsFile(accept: string, file: { name: string; type: string }
   const name = file.name.toLowerCase();
   const type = file.type.toLowerCase();
   return rules.some((r) =>
-    r.startsWith(".") ? name.endsWith(r) : r.endsWith("/*") ? type.startsWith(r.slice(0, -1)) : type === r,
+    r === "*/*" || r === "*"
+      ? true
+      : r.startsWith(".")
+        ? name.endsWith(r)
+        : r.endsWith("/*")
+          ? type.startsWith(r.slice(0, -1))
+          : type === r,
   );
 }

@@ -30,6 +30,18 @@ const components: Record<string, ComponentType<ToolProps>> = {
   "organize-pdf": lazy(() => import("./PdfPages").then((m) => m.OrganizePdf)),
   "sign-pdf": lazy(() => import("./PdfPages").then((m) => m.SignPdf)),
   "pdf-to-jpg": lazy(() => import("./PdfPages").then((m) => m.PdfToJpg)),
+  "crop-image": lazy(() => import("./ImageCreator").then((m) => m.CropImage)),
+  "exif-remover": lazy(() => import("./ImageCreator").then((m) => m.ExifRemover)),
+  "bulk-rename": lazy(() => import("./ImageCreator").then((m) => m.BulkRename)),
+  "social-image-resizer": lazy(() => import("./ImageCreator").then((m) => m.SocialImageResizer)),
+  "thumbnail-preview": lazy(() => import("./ImageCreator").then((m) => m.ThumbnailPreview)),
+  "meme-generator": lazy(() => import("./ImageCreator").then((m) => m.MemeGenerator)),
+  "image-watermark": lazy(() => import("./ImageCreator").then((m) => m.ImageWatermark)),
+  "color-palette-from-image": lazy(() => import("./ImageCreator").then((m) => m.ColorPalette)),
+  "image-color-picker": lazy(() => import("./ImageCreator").then((m) => m.ImageColorPicker)),
+  "collage-maker": lazy(() => import("./ImageCreator").then((m) => m.CollageMaker)),
+  "passport-photo-maker": lazy(() => import("./ImageAI").then((m) => m.PassportPhotoMaker)),
+  "image-to-text": lazy(() => import("./ImageAI").then((m) => m.ImageToText)),
 };
 
 export function ToolUI(props: ToolProps) {

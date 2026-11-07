@@ -43,6 +43,18 @@ const TOOLS = [
   { slug: "sign-pdf", h1: "Fill & Sign PDF", device: true, action: true },
   { slug: "pdf-to-jpg", h1: "PDF to JPG", device: true, action: true },
   { slug: "word-to-pdf", h1: "Word, Excel & PowerPoint to PDF", device: false, action: true },
+  { slug: "crop-image", h1: "Crop, Rotate & Flip Image", device: true, action: true },
+  { slug: "exif-remover", h1: "Photo Metadata (EXIF) Remover", device: true, action: true },
+  { slug: "bulk-rename", h1: "Bulk Rename Files", device: true, action: true },
+  { slug: "social-image-resizer", h1: "Social Media Image Resizer", device: true, action: true },
+  { slug: "thumbnail-preview", h1: "YouTube Thumbnail Preview", device: true, action: true },
+  { slug: "meme-generator", h1: "Meme Generator", device: true, action: true },
+  { slug: "image-watermark", h1: "Image Watermark", device: true, action: true },
+  { slug: "color-palette-from-image", h1: "Color Palette from Image", device: true, action: true },
+  { slug: "image-color-picker", h1: "Image Color Picker", device: true, action: false },
+  { slug: "collage-maker", h1: "Collage & Grid Maker", device: true, action: true },
+  { slug: "passport-photo-maker", h1: "Passport & ID Photo Maker", device: true, action: true },
+  { slug: "image-to-text", h1: "Image to Text (OCR)", device: true, action: true },
 ];
 
 const DEVICE_BADGE = "Runs on your device — nothing uploaded";

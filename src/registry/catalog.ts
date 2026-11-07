@@ -285,7 +285,7 @@ const rows: Row[] = [
     [[IMG], [IMG]],
     ["crop photo", "rotate image", "flip image"],
     ["image-resizer", "image-compressor"],
-    "planned",
+    "beta",
   ],
   [
     "passport-photo-maker",
@@ -300,7 +300,7 @@ const rows: Row[] = [
     [[IMG], [IMG]],
     ["passport size photo", "visa photo", "id photo"],
     ["background-remover", "image-resizer", "image-compressor"],
-    "planned",
+    "beta",
   ],
   [
     "image-to-text",
@@ -315,7 +315,7 @@ const rows: Row[] = [
     [[IMG], [TXT]],
     ["ocr", "extract text from image", "picture to text"],
     ["word-counter", "clean-text", "jpg-to-pdf"],
-    "planned",
+    "beta",
   ],
   [
     "exif-remover",
@@ -330,7 +330,7 @@ const rows: Row[] = [
     [[IMG], [IMG]],
     ["remove exif", "remove location from photo", "metadata remover"],
     ["image-compressor", "heic-to-jpg"],
-    "planned",
+    "beta",
   ],
   [
     "bulk-rename",
@@ -348,7 +348,7 @@ const rows: Row[] = [
     ],
     ["batch rename", "rename files", "file renamer"],
     ["image-converter", "image-compressor"],
-    "planned",
+    "beta",
   ],
 
   // ───────────── Productivity · Text ─────────────
@@ -1075,7 +1075,7 @@ const rows: Row[] = [
     [[IMG], [IMG]],
     ["instagram size", "resize for instagram", "youtube banner size"],
     ["image-resizer", "image-compressor", "thumbnail-preview"],
-    "planned",
+    "beta",
   ],
   [
     "thumbnail-preview",
@@ -1090,7 +1090,7 @@ const rows: Row[] = [
     [[IMG], []],
     ["thumbnail tester", "youtube thumbnail checker"],
     ["title-builder", "social-image-resizer"],
-    "planned",
+    "beta",
   ],
   [
     "social-post-formatter",
@@ -1195,7 +1195,7 @@ const rows: Row[] = [
     [[IMG], [IMG]],
     ["meme maker", "add text to image"],
     ["image-watermark", "image-compressor"],
-    "planned",
+    "beta",
   ],
   [
     "image-watermark",
@@ -1210,7 +1210,7 @@ const rows: Row[] = [
     [[IMG], [IMG]],
     ["watermark photo", "add logo to image"],
     ["image-compressor", "social-image-resizer"],
-    "planned",
+    "beta",
   ],
   [
     "color-palette-from-image",
@@ -1225,7 +1225,7 @@ const rows: Row[] = [
     [[IMG], [TXT]],
     ["color picker from image", "palette generator"],
     ["color-converter", "css-generator"],
-    "planned",
+    "beta",
   ],
   [
     "image-color-picker",
@@ -1240,7 +1240,7 @@ const rows: Row[] = [
     [[IMG], [TXT]],
     ["eyedropper", "get color from image"],
     ["color-palette-from-image", "color-converter"],
-    "planned",
+    "beta",
   ],
   [
     "collage-maker",
@@ -1255,7 +1255,7 @@ const rows: Row[] = [
     [[IMG], [IMG]],
     ["photo collage", "photo grid"],
     ["social-image-resizer", "image-compressor"],
-    "planned",
+    "beta",
   ],
 ];
 

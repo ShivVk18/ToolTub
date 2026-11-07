@@ -4,6 +4,7 @@ Every change landed as its own branch, squash-merged into `integration/ui-restor
 
 | # | Title | Branch | PR notes |
 |---|---|---|---|
+| 82 | feat: 12 image and creator tools (crop, EXIF remover, bulk rename, social resizer, thumbnail preview, meme, watermark, palette, colour picker, collage, passport photo, OCR) | `feat/image-creator-tools` | [reports/prs/feat-image-creator-tools.md](reports/prs/feat-image-creator-tools.md) |
 | 81 | feat: 9 PDF tools (merge, split, JPG to PDF, watermark & page numbers, protect/unlock, organize, fill & sign, PDF to JPG, Office to PDF) | `feat/pdf-tools` | [reports/prs/feat-pdf-tools.md](reports/prs/feat-pdf-tools.md) |
 | 80 | feat: 15 new live tools (unit/time zone, YAML, .env, meta, schema, chmod, entities, bases, CSS, post/caption/bio, Markdown, barcode) | `feat/panels-text-dev-tools` | [reports/prs/feat-panels-text-dev-tools.md](reports/prs/feat-panels-text-dev-tools.md) |
 | 79 | docs: release PR description (integration/ui-restore → main, v1.0.0-rc1) | `docs/release-pr-body` | [reports/prs/integration-ui-restore-to-main.md](reports/prs/integration-ui-restore-to-main.md) |

@@ -25,6 +25,18 @@ const copies = [
   ["pdfjs-dist/LICENSE", "pdfjs/LICENSE"],
   // qpdf (Apache-2.0) as WebAssembly, for Protect PDF.
   ["@neslinesli93/qpdf-wasm/dist/qpdf.wasm", "qpdf/qpdf.wasm"],
+  // Tesseract.js (Apache-2.0) for Image to Text: API, its worker, the LSTM WebAssembly cores (SIMD and plain),
+  // and the English model (tessdata best_int, Apache-2.0). Other languages aren't bundled.
+  ["tesseract.js/dist/tesseract.esm.min.js", "tesseract/tesseract.esm.min.js"],
+  ["tesseract.js/dist/worker.min.js", "tesseract/worker.min.js"],
+  ...["", "simd-", "relaxedsimd-"].flatMap((v) =>
+    ["js", "wasm", "wasm.js"].map((ext) => [
+      `tesseract.js-core/tesseract-core-${v}lstm.${ext}`,
+      `tesseract/core/tesseract-core-${v}lstm.${ext}`,
+    ]),
+  ),
+  ["tesseract.js-core/LICENSE", "tesseract/LICENSE"],
+  ["@tesseract.js-data/eng/4.0.0_best_int/eng.traineddata.gz", "tesseract/lang/eng.traineddata.gz"],
 ];
 
 for (const [from, to] of copies) {

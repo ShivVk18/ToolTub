@@ -107,7 +107,10 @@ describe("acceptsFile (Hallmark F7: validate on selection)", () => {
     expect(acceptsFile("image/png,image/jpeg", f("notes.txt", "text/plain"))).toBe(false);
     expect(acceptsFile(".heic,.heif", f("IMG_1.HEIC", ""))).toBe(true);
   });
-  it("accepts anything when accept is empty", () => {
+  it("accepts anything when accept is empty or */*", () => {
     expect(acceptsFile("", f("x.bin", ""))).toBe(true);
+    // Bulk Rename takes any file: "*/*" used to be read as a type prefix ("*/") and rejected everything.
+    expect(acceptsFile("*/*", f("notes.txt", "text/plain"))).toBe(true);
+    expect(acceptsFile("*/*", f("mystery", ""))).toBe(true);
   });
 });
