@@ -59,7 +59,10 @@ test.describe("KlipKit Redesign UI & Visual Layer", () => {
     // b-big: typing demo
     await expect(bento.locator(".b-big")).toBeVisible();
     await expect(bento.locator(".bstat")).toContainText("tools live today");
-    await expect(bento.locator(".bstat")).toContainText("0.8 ms");
+    // Hallmark F12: the speed stat is measured (60 panel runs: median 0.1 ms, p90 2.5 ms), not invented.
+    await expect(bento.locator(".bstat")).toContainText("<3 ms");
+    await expect(bento.locator(".bstat")).toContainText("9 in 10 dev-tool runs");
+    await expect(bento.locator(".bstat")).not.toContainText("0.8 ms");
 
     // b-paste: detector cycle
     await expect(bento.locator(".b-paste")).toBeVisible();

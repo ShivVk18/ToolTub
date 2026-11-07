@@ -249,8 +249,9 @@ export function FeelSection() {
               <span>tools live today</span>
             </div>
             <div>
-              <b>0.8 ms</b>
-              <span>typical dev-tool run</span>
+              {/* Measured: 60 live-panel runs, median 0.1 ms, p90 2.5 ms (Hallmark F12). */}
+              <b>&lt;3 ms</b>
+              <span>9 in 10 dev-tool runs</span>
             </div>
             <div>
               <b>0</b>
