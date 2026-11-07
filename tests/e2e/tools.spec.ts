@@ -120,6 +120,22 @@ test.describe("Image Compressor", () => {
     g.assertClean();
   });
 
+  test("PNG with a target size works in every browser (Safari can't write WebP, so it gets JPG)", async ({
+    page,
+    browserName,
+  }) => {
+    await page.goto("/image-compressor");
+    await upload(page, gen("photo-1600x1200.png"));
+    await page.getByLabel("Target size (KB, optional)").fill("150");
+    await primary(page).click();
+    await expect(output(page)).toContainText("→", { timeout: 60_000 });
+    await expect(output(page)).toContainText(browserName === "webkit" ? "Saved as JPG" : "Saved as WebP");
+    const { bytes } = await downloadFrom(page, () => byTestId(page, "download").click());
+    expect(bytes.length).toBeLessThanOrEqual(150 * 1024);
+    const img = await inspectImage(page, bytes);
+    expect(img).toMatchObject({ width: 1600, height: 1200 });
+  });
+
   test("quality slider changes the output size", async ({ page }) => {
     await page.goto("/image-compressor");
     const sizeAt = async (q: string) => {

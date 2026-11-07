@@ -95,6 +95,22 @@ test.describe("Plan → Run → Results is real", () => {
     );
   }
 
+  test("§4 Image Compressor (real): 1600×1200 PNG + 'compress to under 200 kb' → ≤ 200 KB, valid, same size", async ({
+    page,
+  }) => {
+    await dropOnHome(page, gen("photo-1600x1200.png"));
+    await runPlan(page, "compress to under 200 kb");
+    const row = work(page).locator(".rrow").last();
+    await expect(row).toContainText("photo-1600x1200-compressed", { timeout: 60_000 });
+    const [dl] = await Promise.all([
+      page.waitForEvent("download"),
+      row.getByRole("button", { name: "Download" }).click(),
+    ]);
+    const bytes = readFileSync((await dl.path())!);
+    expect(bytes.length).toBeLessThanOrEqual(200 * 1000);
+    expect(await decode(page, bytes, "image/jpeg")).toEqual({ w: 1600, h: 1200 });
+  });
+
   test("§4 Resize: 'resize for instagram' fits within 1080×1350 and keeps the aspect ratio", async ({ page }) => {
     await dropOnHome(page, gen("photo-1600x1200.png"));
     await runPlan(page, "resize for instagram");

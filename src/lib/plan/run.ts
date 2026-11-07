@@ -29,7 +29,7 @@ export async function runStep(step: IntentStep, input: PlanFile): Promise<PlanFi
     const bytes = await input.blob.arrayBuffer();
     const r = await pdfWorker.call(
       "compress",
-      { bytes, level: "recommended", targetKB: step.target ? Math.floor(step.target / 1000) : undefined },
+      { bytes, level: "recommended", targetKB: step.target ? Math.floor(step.target / 1024) : undefined },
       { transfer: [bytes] },
     );
     return { ...input, blob: r.blob, name: `${base(input.name)}-compressed.pdf`, note: r.note };
@@ -55,7 +55,8 @@ export async function runStep(step: IntentStep, input: PlanFile): Promise<PlanFi
       mime,
       maxWidth: w,
       maxHeight: h,
-      targetKB: step.id === "compress" && step.target ? Math.floor(step.target / 1000) : undefined,
+      // step.target is in bytes ("200 kb" = 200 000, as the home page shows sizes); the worker counts KiB.
+      targetKB: step.id === "compress" && step.target ? Math.floor(step.target / 1024) : undefined,
     });
     const ext = EXT[r.blob.type] ?? "img";
     const suffix = step.id === "compress" ? "-compressed" : step.id === "resize" ? "-resized" : "";

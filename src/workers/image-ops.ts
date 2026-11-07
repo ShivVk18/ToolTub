@@ -43,6 +43,14 @@ async function draw(src: ImageBitmap, width: number, height: number, mime: strin
   return out;
 }
 
+/** Whether this browser's canvas can write `mime` (Safari silently writes PNG for WebP). */
+async function canEncode(mime: string) {
+  const c = new OffscreenCanvas(1, 1);
+  c.getContext("2d"); // Chromium can't encode a canvas that has no rendering context
+  const out = await c.convertToBlob({ type: mime });
+  return out.type === mime;
+}
+
 export async function processImage(job: ImageJob): Promise<ImageResult> {
   const src = await createImageBitmap(job.blob, { imageOrientation: "from-image" });
   let { width, height } = fit(src.width, src.height, job.maxWidth, job.maxHeight);
@@ -66,10 +74,11 @@ export async function processImage(job: ImageJob): Promise<ImageResult> {
     return { blob: out, width, height, keptOriginal: false };
   }
 
-  // Target size: PNG cannot hit a byte budget, so switch to WebP and say so.
+  // Target size: PNG cannot hit a byte budget, so switch to a lossy format and say so. WebP keeps
+  // transparency, but Safari can't encode it ("cannot save WEBP" failed every PNG + target there), so JPG.
   if (mime === "image/png") {
-    mime = "image/webp";
-    note = "Saved as WebP, because PNG can't be compressed to a target size.";
+    mime = (await canEncode("image/webp")) ? "image/webp" : "image/jpeg";
+    note = `Saved as ${mime === "image/webp" ? "WebP" : "JPG"}, because PNG can't be compressed to a target size.`;
   }
   const target = job.targetKB * 1024;
   let best: Blob | null = null;
