@@ -161,4 +161,4 @@ export function Field({ label, children }: { label: string; children: ReactNode 
 }
 
 export const inputClass =
-  "h-11 sm:h-10 rounded-lg border border-border bg-bg px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring";
+  "kk-field h-11 sm:h-10 rounded-full border border-line2 bg-solid px-4 text-sm text-ink outline-none transition-colors hover:border-ink2/40 focus-visible:ring-2 focus-visible:ring-accent";

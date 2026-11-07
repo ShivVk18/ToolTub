@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { PNG } from "pngjs";
 import { assertAccessible, fx, primary, upload } from "./helpers";
 
 /** Design-system checks for tool pages (Phase 3 audit). */
@@ -189,5 +190,45 @@ test.describe("tool pages use the design system", () => {
     // the deep link really opens the live panel
     await live.filter({ hasText: "Base64" }).click();
     await expect(page.getByLabel("Base64 workspace")).toBeVisible();
+  });
+
+  test("F8: form controls use the accent and home-style pills, and go dark in dark mode", async ({ page }) => {
+    const accent = () =>
+      page.evaluate(() => {
+        const d = document.createElement("i");
+        d.style.color = "var(--accent)";
+        document.body.append(d);
+        const c = getComputedStyle(d).color;
+        d.remove();
+        return c;
+      });
+    await page.goto("/json-formatter");
+    const box = page.getByLabel("Sort keys");
+    expect(await box.evaluate((e) => getComputedStyle(e).accentColor)).toBe(await accent());
+    const sel = page.locator('section[aria-label="Tool"] select').first();
+    const s = await sel.evaluate((e) => {
+      const cs = getComputedStyle(e);
+      return {
+        pill: parseFloat(cs.borderTopLeftRadius) >= e.getBoundingClientRect().height / 2 - 1,
+        appearance: cs.appearance,
+        chevronRoom: parseFloat(cs.paddingRight) >= 30 && cs.backgroundImage.startsWith("url("),
+      };
+    });
+    expect(s).toEqual({ pill: true, appearance: "none", chevronRoom: true });
+
+    await page.goto("/image-compressor");
+    const range = page.locator('input[type="range"]');
+    expect(await range.evaluate((e) => getComputedStyle(e).accentColor)).toBe(await accent());
+
+    await page.evaluate(() => localStorage.setItem("theme", "dark"));
+    await page.reload();
+    expect(await range.evaluate((e) => getComputedStyle(e).colorScheme)).toBe("dark");
+    // the unfilled end of the track must not be a light bar on the dark card
+    const png = PNG.sync.read(await range.screenshot());
+    const y = Math.floor(png.height / 2);
+    const x = png.width - 6;
+    const o = (y * png.width + x) * 4;
+    const lum = (0.2126 * png.data[o] + 0.7152 * png.data[o + 1] + 0.0722 * png.data[o + 2]) / 255;
+    expect(lum).toBeLessThan(0.35);
   });
 });

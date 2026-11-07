@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { Dropzone } from "@/components/tool/Dropzone";
 import { ResultActions, useHandoff } from "@/components/tool/ToolChrome";
 import { Field, ToolWorkspace, inputClass, useToolRun } from "@/components/tool/ToolWorkspace";
@@ -106,7 +106,8 @@ export function ImageTool({ slug, preset, next, mode }: ToolProps & { mode: Mode
                 step={0.05}
                 value={quality}
                 onChange={(e) => setQuality(Number(e.target.value))}
-                className="w-48 h-6 min-h-[24px] cursor-pointer"
+                className="kk-range w-48 h-6 min-h-[24px] cursor-pointer"
+                style={{ "--fill": `${((quality - 0.4) / 0.55) * 100}%` } as CSSProperties}
                 disabled={!!targetKB}
               />
             </Field>

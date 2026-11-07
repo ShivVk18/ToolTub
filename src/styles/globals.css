@@ -214,6 +214,71 @@ footer,
     border: 0;
     cursor: pointer;
   }
+  /* Native controls take the accent instead of browser blue, and render dark in dark mode (Hallmark F8). */
+  input,
+  select,
+  textarea,
+  progress {
+    accent-color: var(--accent);
+  }
+  [data-theme="dark"] :is(input, select, textarea, progress) {
+    color-scheme: dark;
+  }
+}
+/* Tool-page select: home-style pill with its own chevron (the native arrow ignores the pill padding).
+   Unlayered on purpose: it must beat the field's px-4 utility for the chevron's room. Touches nothing else. */
+select.kk-field {
+  appearance: none;
+  padding-right: 38px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a8578' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+}
+@layer components {
+  /* Range: accent fill (--fill set inline) on a token track. Chrome's native track stays white in dark mode. */
+  input[type="range"].kk-range {
+    appearance: none;
+    background: transparent;
+  }
+  .kk-range::-webkit-slider-runnable-track {
+    height: 6px;
+    border-radius: 999px;
+    background:
+      linear-gradient(var(--accent), var(--accent)) 0 / var(--fill, 0%) 100% no-repeat,
+      var(--line2);
+  }
+  .kk-range::-moz-range-track {
+    height: 6px;
+    border-radius: 999px;
+    background:
+      linear-gradient(var(--accent), var(--accent)) 0 / var(--fill, 0%) 100% no-repeat,
+      var(--line2);
+  }
+  .kk-range::-webkit-slider-thumb {
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    margin-top: -6px;
+    border-radius: 50%;
+    background: var(--solid);
+    border: 2px solid var(--accent);
+    box-shadow: 0 2px 6px -2px rgba(0, 0, 0, 0.35);
+  }
+  .kk-range::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--solid);
+    border: 2px solid var(--accent);
+  }
+  .kk-range:disabled {
+    opacity: 0.5;
+  }
+  .kk-range:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+    border-radius: 999px;
+  }
 }
 ::selection {
   background: var(--h0);
