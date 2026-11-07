@@ -162,4 +162,32 @@ test.describe("tool pages use the design system", () => {
     expect(await left(related)).toBe(h1);
     expect(await left(page.locator("article.prose-klip"))).toBe(h1);
   });
+
+  test("F9: hubs lead with every live tool as a large card; the backlog is a compact chip list", async ({ page }) => {
+    await page.goto("/developer-tools");
+    const live = page.locator("[data-hub-live] a");
+    // routed tools open their page; live home panels open via the home deep link
+    await expect(live.filter({ hasText: "JSON Formatter" })).toHaveAttribute("href", "/json-formatter");
+    await expect(live.filter({ hasText: "Base64" })).toHaveAttribute("href", "/#base64");
+    await expect(live.filter({ hasText: "Regex Tester" })).toHaveAttribute("href", "/#regex-tester");
+
+    const soon = page.locator("[data-hub-soon] li");
+    expect(await soon.count()).toBeGreaterThan(0);
+    await expect(soon.filter({ hasText: /^Base64$/ })).toHaveCount(0);
+    await expect(page.locator("[data-hub-soon] a")).toHaveCount(0);
+    const chipH = await soon.first().evaluate((e) => e.getBoundingClientRect().height);
+    const cardH = await live.first().evaluate((e) => e.getBoundingClientRect().height);
+    expect(chipH).toBeLessThanOrEqual(36);
+    expect(cardH).toBeGreaterThan(chipH * 3);
+    // glyphs keep the category hue but meet AA on their tinted tile, in both themes
+    await assertAccessible(page, "/developer-tools light");
+    await page.evaluate(() => localStorage.setItem("theme", "dark"));
+    await page.goto("/pdf-tools");
+    await assertAccessible(page, "/pdf-tools dark");
+    await page.goto("/developer-tools");
+
+    // the deep link really opens the live panel
+    await live.filter({ hasText: "Base64" }).click();
+    await expect(page.getByLabel("Base64 workspace")).toBeVisible();
+  });
 });

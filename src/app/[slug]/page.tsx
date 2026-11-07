@@ -6,7 +6,7 @@ import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { ToolContent } from "@/components/seo/ToolContent";
 import { PrivacyBadge } from "@/components/tool/PrivacyBadge";
 import { FavouriteButton, VisitTracker } from "@/components/tool/ToolChrome";
-import { RelatedTools, ToolCard } from "@/components/tool/RelatedTools";
+import { HubToolCard, RelatedTools } from "@/components/tool/RelatedTools";
 import { ToolUI } from "@/tools";
 import { getHub, hubs } from "@/registry/categories";
 import {
@@ -140,7 +140,9 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 function HubPage({ hub }: { hub: NonNullable<ReturnType<typeof getHub>> }) {
   const all = toolsInHub(hub.id);
   const available = all.filter((t) => t.status !== "planned");
-  const soon = all.filter((t) => t.status === "planned");
+  // Live = has its own page, or runs as a live panel on the home page (opened by its #slug deep link).
+  const live = all.filter((t) => t.status !== "planned" || t.panel);
+  const soon = all.filter((t) => t.status === "planned" && !t.panel);
   return (
     <main className="mx-auto max-w-6xl px-4 py-8">
       <JsonLd data={hubGraph(hub, available)} />
@@ -152,22 +154,25 @@ function HubPage({ hub }: { hub: NonNullable<ReturnType<typeof getHub>> }) {
       />
       <PageTitle className="mt-4">{hub.h1}</PageTitle>
       <p className="mt-3 max-w-2xl text-lg text-fg-muted">{hub.description}</p>
-      {available.length > 0 && (
-        <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {available.map((t) => (
+      {live.length > 0 && (
+        <ul data-hub-live className="mt-8 grid list-none gap-[18px] p-0 sm:grid-cols-2 lg:grid-cols-3">
+          {live.map((t) => (
             <li key={t.slug}>
-              <ToolCard tool={t} />
+              <HubToolCard tool={t} />
             </li>
           ))}
         </ul>
       )}
       {soon.length > 0 && (
         <>
-          <h2 className="mt-10 text-sm font-medium text-fg-muted">Coming soon</h2>
-          <ul className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <h2 className="mt-12 text-sm font-medium text-ink2">Coming soon</h2>
+          <ul data-hub-soon className="mt-3 flex list-none flex-wrap gap-2 p-0">
             {soon.map((t) => (
-              <li key={t.slug}>
-                <ToolCard tool={t} />
+              <li
+                key={t.slug}
+                className="inline-flex h-8 items-center rounded-full border border-dashed border-line2 px-3 text-[13px] text-ink2"
+              >
+                {t.home?.name ?? t.name}
               </li>
             ))}
           </ul>

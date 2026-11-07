@@ -27,8 +27,12 @@ export const CATS: Record<"p" | "d" | "c", CategoryInfo> = {
   c: { n: "Creator", c: "#1F9D63" },
 };
 
+/** Text colour for a category's mono glyph (AA on its tint in both themes; see --g-* in globals.css). */
+export const glyphColor = (c: "p" | "d" | "c") => `var(--g-${c})`;
+
 /** Category colour for a registry category id. */
 export const catColor = (c: CategoryId) => CATS[CAT_KEY[c]].c;
+export const catKey = (c: CategoryId) => CAT_KEY[c];
 
 /** Home-page cards, derived from the tool registry (the single source of truth) in Explore grid order. */
 export const TOOLS: ToolItem[] = homeTools().map((t) => ({

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ToolDefinition } from "@/registry/types";
 import { catColor } from "@/lib/designTools";
+import { ToolMark } from "./ToolMark";
 
 /** Related tools as home-style chips (a pill with the category's colour mark), in the page's one column. */
 export function RelatedTools({ tools }: { tools: ToolDefinition[] }) {
@@ -44,6 +45,31 @@ export function ToolCard({ tool }: { tool: Pick<ToolDefinition, "slug" | "name" 
       className="block h-full rounded-xl border border-border bg-card p-4 transition-colors hover:border-fg/30"
     >
       {inner}
+    </Link>
+  );
+}
+
+/** Large hub card for a live tool, in the Explore grid's style. Panel tools open on the home page. */
+export function HubToolCard({ tool }: { tool: ToolDefinition }) {
+  const routed = tool.status !== "planned";
+  return (
+    <Link
+      href={routed ? `/${tool.slug}` : `/#${tool.slug}`}
+      className="relative block h-full min-h-[168px] rounded-[24px] border border-line bg-solid p-[22px] no-underline transition-shadow hover:shadow-[var(--shadow)]"
+    >
+      <ToolMark category={tool.category} home={tool.home} />
+      <span className="absolute right-[22px] top-[22px] text-[12px] font-medium text-ink2">
+        {!routed ? (
+          // --g-c: the AA-safe green (--ok is 3.4:1 on white at 12 px)
+          <b style={{ color: "var(--g-c)", fontWeight: 600 }}>● Live</b>
+        ) : tool.processing.where === "own-server" ? (
+          "Private server"
+        ) : (
+          "On device"
+        )}
+      </span>
+      <span className="mt-[16px] block text-[18px] font-semibold text-ink">{tool.name}</span>
+      <span className="mt-[4px] block text-[14px] leading-[1.45] text-ink2">{tool.tagline}</span>
     </Link>
   );
 }

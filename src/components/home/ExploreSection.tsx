@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { TOOLS, CATS, tint, TOOL_ICON_PATHS, TOOL_COUNTS, type ToolItem } from "@/lib/designTools";
+import { TOOLS, CATS, glyphColor, tint, TOOL_ICON_PATHS, TOOL_COUNTS, type ToolItem } from "@/lib/designTools";
 import { addLoop, tween, ease } from "@/lib/motion/animation";
 
 interface ExploreSectionProps {
@@ -171,7 +171,7 @@ export function ExploreSection({ onSelectTool }: ExploreSectionProps) {
                       data-glyph
                       aria-hidden
                       className="font-mono font-semibold leading-none tracking-[-0.02em]"
-                      style={{ color: cat.c, fontSize: t.g.length > 3 ? 12 : t.g.length > 2 ? 14 : 17 }}
+                      style={{ color: glyphColor(t.c), fontSize: t.g.length > 3 ? 12 : t.g.length > 2 ? 14 : 17 }}
                     >
                       {t.g}
                     </span>

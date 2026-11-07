@@ -91,6 +91,10 @@
 
 /* ================= REFERENCE STYLES (verbatim from KlipKit_UI.html) ================= */
 :root {
+  /* Category glyph text: the category hue, shaded to reach AA (4.5:1) on its tinted tile (Hallmark F9/F11). */
+  --g-p: #b73a3e;
+  --g-d: #6052d8;
+  --g-c: #18774b;
   --bg: #f3f0e8;
   --bg2: #ece7dc;
   --panel: rgba(255, 255, 255, 0.66);
@@ -126,6 +130,9 @@
   --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 [data-theme="dark"] {
+  --g-p: #e96266;
+  --g-d: #8a7df7;
+  --g-c: #2ca36c;
   --bg: #0e0d12;
   --bg2: #15141b;
   --panel: rgba(28, 27, 35, 0.66);
