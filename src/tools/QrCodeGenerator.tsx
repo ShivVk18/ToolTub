@@ -30,7 +30,6 @@ export function QrCodeGenerator({ slug, preset, next }: ToolProps) {
   const [bg, setBg] = useState("#ffffff");
   const [ecl, setEcl] = useState<"L" | "M" | "Q" | "H">("M");
   const [lastPng, setPng] = useState<Blob | null>(null);
-  const [lastSvg, setSvg] = useState("");
 
   const payload = useMemo(() => {
     if (kind === "url") return f.url.trim();
@@ -39,15 +38,29 @@ export function QrCodeGenerator({ slug, preset, next }: ToolProps) {
     return vcardPayload(f.name, f.phone, f.email);
   }, [kind, f]);
 
+  // The SVG is made during render: qrcode's SVG renderer calls back synchronously, so the code is in the
+  // server HTML. Made in an effect, it painted only after the chunk loaded and was the LCP element (4.2 s).
+  const svg = useMemo(() => {
+    if (!payload) return "";
+    let out = "";
+    QRCode.toString(
+      payload,
+      { type: "svg", errorCorrectionLevel: ecl, margin: 4, color: { dark: fg, light: bg } },
+      (err, s) => {
+        if (!err) out = s;
+      },
+    );
+    return out;
+  }, [payload, fg, bg, ecl]);
+
+  // The 1024 px PNG is only needed for the download, so it can arrive after the first paint.
   useEffect(() => {
     if (!payload) return;
     const opts = { errorCorrectionLevel: ecl, margin: 4, color: { dark: fg, light: bg } };
-    QRCode.toString(payload, { ...opts, type: "svg" }).then(setSvg);
     QRCode.toDataURL(payload, { ...opts, width: 1024 }).then((u) => setPng(dataUrlToBlob(u)));
   }, [payload, fg, bg, ecl]);
 
   const png = payload ? lastPng : null;
-  const svg = payload ? lastSvg : "";
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setF({ ...f, [k]: e.target.value });
   const items: Artifact[] = png

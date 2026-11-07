@@ -419,6 +419,13 @@ test.describe("JWT Decoder", () => {
 });
 
 test.describe("QR Code Generator", () => {
+  test("the default code is in the server HTML (it was the LCP element, painted only after JS: 4.2 s)", async ({
+    request,
+  }) => {
+    const html = await (await request.get("/qr-code-generator")).text();
+    expect(html).toMatch(/<img[^>]*alt="Your QR code"/);
+    expect(html).toContain("data:image/svg+xml");
+  });
   test("renders a QR for a link and downloads PNG + SVG", async ({ page }) => {
     const g = guard(page);
     await page.goto("/qr-code-generator");
