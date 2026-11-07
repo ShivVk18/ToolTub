@@ -89,26 +89,21 @@ export function ToolContent({ tool, faqs }: { tool: ToolDefinition; faqs?: FAQ[]
 
       {/* 6. Explainer */}
       <section>
-        <h2>About {s.primaryKeyword}</h2>
+        <h2>About {tool.name}</h2>
         {s.explainer.split("\n\n").map((p) => (
           <p key={p.slice(0, 32)}>{p}</p>
         ))}
       </section>
 
-      {/* 7. Related chains + guides (related tools render above, next to the tool) */}
-      {(relatedChains.length > 0 || s.relatedGuides.length > 0) && (
+      {/* 7. Related chains (related tools render above, next to the tool).
+          relatedGuides stay in the registry for planning; list them once /guides pages exist. */}
+      {relatedChains.length > 0 && (
         <section>
           <h2>Keep going</h2>
           <ul>
             {relatedChains.map((c) => (
               <li key={c.slug}>
                 <Link href={`/chain/${c.slug}`}>Tool Chain: {c.name}</Link>
-              </li>
-            ))}
-            {/* Guides are listed for planning; link them once /guides pages exist. */}
-            {s.relatedGuides.map((g) => (
-              <li key={g} className="text-fg-muted">
-                Guide (coming soon): {g.replace(/-/g, " ")}
               </li>
             ))}
           </ul>

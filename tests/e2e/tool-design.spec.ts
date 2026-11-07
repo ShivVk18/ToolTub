@@ -53,4 +53,11 @@ test.describe("tool pages use the design system", () => {
     });
     expect(m.bg).toBe(m.soft);
   });
+
+  test("F15: the explainer uses the tool's display name and lists no guides that don't exist", async ({ page }) => {
+    await page.goto("/json-formatter");
+    await expect(page.getByRole("heading", { name: "About JSON Formatter & Validator", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /about json formatter/ })).toHaveCount(0);
+    await expect(page.getByText(/Guide \(coming soon\)/)).toHaveCount(0);
+  });
 });
