@@ -1,418 +1,86 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="light">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KlipKit — Tools E2E Test & Verification Report</title>
-  <style>
-    :root {
-      --bg: #F3F0E8;
-      --bg2: #ECE7DC;
-      --panel: rgba(255,255,255,0.7);
-      --solid: #FFFFFF;
-      --ink: #17161B;
-      --ink2: #3B3943;
-      --muted: #7C7870;
-      --line: rgba(23,22,27,0.08);
-      --line2: rgba(23,22,27,0.14);
-      --accent: #6D5DF5;
-      --accentSoft: rgba(109,93,245,0.12);
-      --ok: #1F9D63;
-      --okSoft: rgba(31,157,99,0.12);
-      --red: #E5484D;
-      --redSoft: rgba(229,72,77,0.12);
-      --shadow: 0 20px 40px -15px rgba(40,30,10,0.15);
-      --sans: system-ui, -apple-system, sans-serif;
-      --serif: Georgia, serif;
-      --mono: ui-monospace, Menlo, Consolas, monospace;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #0E0D12;
-        --bg2: #15141B;
-        --panel: rgba(28,27,35,0.7);
-        --solid: #1A1921;
-        --ink: #F3F1EC;
-        --ink2: #D2CEC6;
-        --muted: #8F8B94;
-        --line: rgba(255,255,255,0.07);
-        --line2: rgba(255,255,255,0.13);
-        --accentSoft: rgba(140,125,255,0.16);
-        --okSoft: rgba(31,157,99,0.18);
-        --redSoft: rgba(229,72,77,0.18);
-        --shadow: 0 20px 40px -15px rgba(0,0,0,0.6);
-      }
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background: var(--bg);
-      color: var(--ink);
-      font-family: var(--sans);
-      line-height: 1.5;
-      padding: 40px 20px;
-    }
-    .wrap {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    header.head {
-      margin-bottom: 36px;
-      padding-bottom: 24px;
-      border-bottom: 1px solid var(--line2);
-    }
-    .eyebrow {
-      display: inline-block;
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 8px;
-    }
-    h1 {
-      font-family: var(--serif);
-      font-size: clamp(32px, 4vw, 44px);
-      font-weight: 500;
-      letter-spacing: -0.5px;
-      margin-bottom: 8px;
-    }
-    .sub {
-      color: var(--ink2);
-      font-size: 16px;
-    }
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-      margin-bottom: 36px;
-    }
-    .card {
-      background: var(--solid);
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 20px;
-      box-shadow: var(--shadow);
-    }
-    .num {
-      font-size: 32px;
-      font-weight: 700;
-      color: var(--ink);
-      font-family: var(--serif);
-    }
-    .lbl {
-      font-size: 13px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      margin-top: 4px;
-    }
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 13px;
-      font-weight: 600;
-    }
-    .pill.ok {
-      background: var(--okSoft);
-      color: var(--ok);
-    }
-    .pill.bad {
-      background: var(--redSoft);
-      color: var(--red);
-    }
-    .pill.accent {
-      background: var(--accentSoft);
-      color: var(--accent);
-    }
-    section.sec {
-      margin-bottom: 40px;
-    }
-    h2 {
-      font-family: var(--serif);
-      font-size: 24px;
-      font-weight: 500;
-      margin-bottom: 16px;
-    }
-    .search-box {
-      margin-bottom: 16px;
-      display: flex;
-      gap: 12px;
-    }
-    .search-box input {
-      flex: 1;
-      max-width: 360px;
-      padding: 10px 16px;
-      border-radius: 12px;
-      border: 1px solid var(--line2);
-      background: var(--solid);
-      color: var(--ink);
-      font-size: 14px;
-      outline: none;
-    }
-    .table-wrap {
-      overflow-x: auto;
-      background: var(--solid);
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      box-shadow: var(--shadow);
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
-      text-align: left;
-    }
-    th, td {
-      padding: 14px 18px;
-      border-bottom: 1px solid var(--line);
-    }
-    th {
-      background: var(--bg2);
-      font-weight: 600;
-      color: var(--ink2);
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-    }
-    tr:last-child td {
-      border-bottom: 0;
-    }
-    code {
-      font-family: var(--mono);
-      font-size: 12px;
-      background: var(--accentSoft);
-      padding: 2px 6px;
-      border-radius: 4px;
-      color: var(--ink);
-    }
-    .bug-desc {
-      max-width: 260px;
-    }
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <header class="head">
-      <span class="eyebrow">Task 2 Complete · Verified E2E</span>
-      <h1>KlipKit Tools Quality & Verification Report</h1>
-      <p class="sub">Comprehensive end-to-end audit of all 76 tools, multi-step chains, mobile viewports, accessibility, and zero third-party privacy leaks.</p>
-    </header>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KlipKit — tools end-to-end report</title>
+<style>
+:root{--bg:#f3f0e8;--solid:#fff;--soft:#faf8f3;--ink:#17161b;--ink2:#55524c;--line:rgba(23,22,27,.08);--accent:#6d5df5;--ok:#18774b;--okSoft:rgba(31,157,99,.12);--bad:#b42318;--badSoft:rgba(229,72,77,.12)}
+*{box-sizing:border-box}body{margin:0;font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}
+main{max-width:1200px;margin:0 auto;padding:48px 24px}h1{font:500 44px/1.1 Georgia,serif;letter-spacing:-.02em;margin:0}
+.sub{color:var(--ink2);margin:8px 0 28px}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:32px}
+.card{background:var(--solid);border:1px solid var(--line);border-radius:20px;padding:18px}.card b{display:block;font:500 34px Georgia,serif}.card span{color:var(--ink2);font-size:13px}
+h2{font:500 26px Georgia,serif;margin:36px 0 12px}input{width:100%;max-width:360px;height:44px;border-radius:999px;border:1px solid var(--line);padding:0 18px;font:inherit;background:var(--solid);margin-bottom:14px}
+table{width:100%;border-collapse:collapse;background:var(--solid);border:1px solid var(--line);border-radius:20px;overflow:hidden;font-size:14px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}th{background:var(--soft);font-weight:600}
+.pill{display:inline-block;padding:2px 10px;border-radius:999px;font-weight:600;font-size:12px}.pill.pass{color:var(--ok);background:var(--okSoft)}.pill.fail{color:var(--bad);background:var(--badSoft)}.pill.untested{color:var(--ink2);background:var(--soft)}
+code{font:12px ui-monospace,Menlo,monospace}table.md{margin:8px 0 20px}p,li{max-width:80ch}a{color:var(--accent)}
+</style></head><body><main>
+<h1>Tools end-to-end report</h1><p class="sub">Generated 2026-11-07T13:26:14.712Z from Playwright results and panel timings · see reports/tools-e2e-report.md for the narrative, bug table and how to re-run.</p>
+<div class="cards">
+<div class="card"><b>26</b><span>live tools (of 79)</span></div>
+<div class="card"><b>26</b><span>live tools passing</span></div>
+<div class="card"><b>0</b><span>live tools failing</span></div>
+<div class="card"><b>586</b><span>e2e tests passed (0 flaky)</span></div>
+<div class="card"><b>0</b><span>e2e tests failed</span></div>
+<div class="card"><b>53</b><span>Coming soon (not built)</span></div>
+</div>
+<h2>Tool matrix</h2><input id="q" placeholder="Filter tools…" aria-label="Filter tools">
+<table id="m"><thead><tr><th>Tool</th><th>Type</th><th>Entry points</th><th>Output verified</th><th>Privacy</th><th>a11y</th><th>Mobile</th><th>Dark</th><th>Median ms</th><th>Status</th></tr></thead><tbody>
+<tr><td><b>Compress PDF</b><br><code>compress-pdf</code></td><td>page</td><td>4/5 <br><small>route: tools universal</small><br><small>palette: search: shrink</small><br><small>explore: redesign A1/F5</small><br><small>chat: plan.spec</small></td><td>✓ 36</td><td>✓ 8</td><td>✓ 4</td><td>✓ 18</td><td>✓ 4</td><td>—</td><td><span class="pill pass">Pass</span></td></tr>
+<tr><td><b>PDF to Word</b><br><code>pdf-to-word</code></td><td>page · server</td><td>3/5 <br><small>route: tools universal</small><br><small>palette: search: pdf to docx</small><br><small>chat: plan.spec continue</small></td><td>✓ 1</td><td>✓ 4</td><td>✓ 4</td><td>✓ 8</td><td>✓ 4</td><td>—</td><td><span class="pill pass">Pass</span></td></tr>
+<tr><td><b>Image Compressor</b><br><code>image-compressor</code></td><td>page</td><td>3/5 <br><small>route: tools universal</small><br><small>palette: search: reduce image size</small><br><small>chat: plan.spec §4</small></td><td>✓ 62</td><td>✓ 8</td><td>✓ 4</td><td>✓ 30</td><td>✓ 4</td><td>—</td><td><span class="pill pass">Pass</span></td></tr>
+<tr><td><b>Resize Image</b><br><code>image-resizer</code></td><td>page</td><td>2/5 <br><small>route: tools universal</small><br><small>chat: plan.spec §4 resize</small></td><td>✓ 24</td><td>✓ 4</td><td>✓ 4</td><td>✓ 12</td><td>✓ 4</td><td>—</td><td><span class="pill pass">Pass</span></td></tr>
+<tr><td><b>Convert Image</b><br><code>image-converter</code></td><td>page</td><td>1/5 <br><small>route: tools universal</small></td><td>✓ 28</td><td>✓ 4</td><td>✓ 4</td><td>✓ 14</td><td>✓ 4</td><td>—</td><td><span class="pill pass">Pass</span></td></tr>
+<tr><td><b>HEIC to JPG</b><br><code>heic-to-jpg</code></td><td>page</td><td>2/5 <br><small>route: tools universal</small><br><small>palette: platform ⌘K + search: iphone</small></td><td>✓ 24</td><td>✓ 4</td><td>✓ 4</td><td>✓ 12</td><td>✓ 4</td><td>—</td><td><span class="pill pass">Pass</span></td></tr>
+<tr><td><b>Word Counter</b><br><code>word-counter</code></td><td>live panel</td><td>1/5 <br><small>route: live-panels</small></td><td>✓ 2</td><td>✓ 2</td><td>—</td><td>—</td><td>—</td><td>0.1</td><td><span class="pill pass">Pass</span></td></tr>
+<tr><td><b>Case Converter</b><br><code>case-converter</code></td><td>live panel</td><td>1/5 <br><small>route: live-panels</small></td><td>✓ 2</td><td>✓ 2</td><td>—</td><td>—</td><td>—</td><td>0.1</td><td><span class="pill pass">Pass</span></td></tr>
+<tr><td><b>Clean Text</b><br><code>clean-text</code></td><td>live panel</td><td>1/5 <br><small>route: live-panels</small></td><td>✓ 2</td><td>✓ 2</td><td>—</td><td>—</td><td>—</td><td>0.1</td><td><span class="pill pass">Pass</span></td></tr>
+<tr><td><b>Lorem Ipsum</b><br><code>lorem-ipsum</code></td><td>live panel</td><td>2/5 <br><small>route: live-panels</small><br><small>chat: flows 5.3</small></td><td>✓ 2</td><td>✓ 2</td><td>—</td><td>—</td><td>—</td><td>0.1</td><td><span class="pill pass">Pass</span></td></tr>
+<tr><td><b>QR Code</b><br><code>qr-code-generator</code></td><td>page</td><td>3/5 <br><small>route: tools universal</small><br><small>palette: search: wifi qr</small><br><small>chat: flows 5.3</small></td><td>✓ 30</td><td>✓ 4</td><td>✓ 4</td><td>✓ 14</td><td>✓ 4</td><td>—</td><td><span class="pill pass">Pass</span></td></tr>
+<tr><td><b>JSON Formatter</b><br><code>json-formatter</code></td><td>page</td><td>4/5 <br><small>route: tools universal + live-panels</small><br><small>palette: search: jsno formater</small><br><small>explore: redesign live panel</small><br><small>paste: flows 5.4</small></td><td>✓ 34</td><td>✓ 6</td><td>✓ 4</td><td>✓ 15</td><td>✓ 4</td><td>1</td><td><span class="pill pass">Pass</span></td></tr>
+<tr><td><b>JWT Decoder</b><br><code>jwt-decoder</code></td><td>page</td><td>3/5 <br><small>route: tools universal + live-panels</small><br><small>palette: platform ⌘K</small><br><small>paste: flows 5.4</small></td><td>✓ 30</td><td>✓ 10</td><td>✓ 4</td><td>✓ 14</td><td>✓ 4</td><td>1</td><td><span class="pill pass">Pass</span></td></tr>
+<tr><td><b>Base64</b><br><code>base64</code></td><td>live panel</td><td>2/5 <br><small>route: live-panels + redesign #base64</small><br><small>chat: flows 5.3</small></td><td>✓ 6</td><td>✓ 4</td><td>—</td><td>—</td><td>—</td><td>0.1</td><td><span class="pill pass">Pass</span></td></tr>
+<tr><td><b>Regex Tester</b><br><code>regex-tester</code></td><td>live panel</td><td>1/5 <br><small>route: live-panels</small></td><td>✓ 2</td><td>✓ 2</td><td>—</td><td>—</td><td>—</td><td>0.1</td><td><span class="pill pass">Pass</span></td></tr>
+<tr><td><b>UUID Generator</b><br><code>uuid-generator</code></td><td>live panel</td><td>2/5 <br><small>route: live-panels</small><br><small>chat: flows 5.3</small></td><td>✓ 2</td><td>✓ 2</td><td>—</td><td>—</td><td>—</td><td>0.1</td><td><span class="pill pass">Pass</span></td></tr>
+<tr><td><b>URL Encoder</b><br><code>url-encoder</code></td><td>live panel</td><td>1/5 <br><small>route: live-panels</small></td><td>✓ 2</td><td>✓ 2</td><td>—</td><td>—</td><td>—</td><td>0.1</td><td><span class="pill pass">Pass</span></td></tr>
+<tr><td><b>Timestamp</b><br><code>timestamp-converter</code></td><td>live panel</td><td>2/5 <br><small>route: live-panels</small><br><small>chat: flows 5.3</small></td><td>✓ 2</td><td>✓ 2</td><td>—</td><td>—</td><td>—</td><td>1</td><td><span class="pill pass">Pass</span></td></tr>
+<tr><td><b>Hash Generator</b><br><code>hash-generator</code></td><td>live panel</td><td>2/5 <br><small>route: live-panels</small><br><small>chat: flows 5.3</small></td><td>✓ 2</td><td>✓ 2</td><td>—</td><td>—</td><td>—</td><td>5</td><td><span class="pill pass">Pass</span></td></tr>
+<tr><td><b>SQL Formatter</b><br><code>sql-formatter</code></td><td>live panel</td><td>1/5 <br><small>route: live-panels</small></td><td>✓ 2</td><td>✓ 2</td><td>—</td><td>—</td><td>—</td><td>0.1</td><td><span class="pill pass">Pass</span></td></tr>
+<tr><td><b>CSV ↔ JSON</b><br><code>json-to-csv</code></td><td>live panel</td><td>1/5 <br><small>route: live-panels</small></td><td>✓ 2</td><td>✓ 2</td><td>—</td><td>—</td><td>—</td><td>0.1</td><td><span class="pill pass">Pass</span></td></tr>
+<tr><td><b>JSON to TypeScript</b><br><code>json-to-typescript</code></td><td>live panel</td><td>1/5 <br><small>route: live-panels</small></td><td>✓ 2</td><td>✓ 2</td><td>—</td><td>—</td><td>—</td><td>0.1</td><td><span class="pill pass">Pass</span></td></tr>
+<tr><td><b>Cron Builder</b><br><code>cron-generator</code></td><td>live panel</td><td>1/5 <br><small>route: live-panels</small></td><td>✓ 2</td><td>✓ 2</td><td>—</td><td>—</td><td>—</td><td>2</td><td><span class="pill pass">Pass</span></td></tr>
+<tr><td><b>Color Converter</b><br><code>color-converter</code></td><td>live panel</td><td>1/5 <br><small>route: live-panels</small></td><td>✓ 2</td><td>✓ 2</td><td>—</td><td>—</td><td>—</td><td>0.1</td><td><span class="pill pass">Pass</span></td></tr>
+<tr><td><b>Password Generator</b><br><code>password-generator</code></td><td>live panel</td><td>2/5 <br><small>route: live-panels</small><br><small>chat: flows 5.3</small></td><td>✓ 2</td><td>✓ 2</td><td>—</td><td>—</td><td>—</td><td>0.1</td><td><span class="pill pass">Pass</span></td></tr>
+<tr><td><b>Background Remover</b><br><code>background-remover</code></td><td>page</td><td>3/5 <br><small>route: tools universal</small><br><small>palette: search: bg</small><br><small>chat: plan.spec (continue)</small></td><td>✓ 20</td><td>✓ 4</td><td>✓ 4</td><td>✓ 10</td><td>✓ 4</td><td>—</td><td><span class="pill pass">Pass</span></td></tr>
+</tbody></table>
+<h2>Tests by project</h2><table><thead><tr><th>Project</th><th>Passed</th><th>Flaky</th><th>Failed</th><th>Skipped</th></tr></thead><tbody>
+<tr><td>platform</td><td>20</td><td>0</td><td>0</td><td>0</td></tr><tr><td>chromium</td><td>194</td><td>0</td><td>0</td><td>11</td></tr><tr><td>webkit</td><td>193</td><td>0</td><td>0</td><td>12</td></tr><tr><td>mobile-pixel7</td><td>90</td><td>0</td><td>0</td><td>12</td></tr><tr><td>mobile-iphone14</td><td>89</td><td>0</td><td>0</td><td>13</td></tr>
+</tbody></table>
+<h2>Coming soon (53)</h2><p>Merge PDF · Split PDF · Word to PDF · PDF to JPG · JPG to PDF · Rotate PDF · Fill &amp; Sign · Protect PDF · Watermark PDF · Crop Image · Passport Photo · Image to Text · Photo Metadata (EXIF) Remover · Bulk Rename · Diff Checker · Resume Builder · Barcode · Unit Converter · Time Zone Converter · YAML ↔ JSON · API Tester · Code Playground · Minifier · Markdown Editor · .env Redactor · Meta Tag Generator · Schema Generator · Chmod Calculator · HTML Entities · Base Converter · CSS Gradients · Compress Video · Video Converter · Trim Video · Video to GIF · Extract Audio · Audio Converter · Screen Recorder · Transcribe · Subtitles · Social Resizer · Thumbnail Preview · Post Formatter · Caption Builder · Hashtag Finder · Bio Formatter · Image Upscaler · Text to Speech · Meme Maker · Watermark · Color Palette · Eyedropper · Collage Maker</p>
+<h2>3. Flow results (spec §5)</h2>
+<table class="md"><thead><tr><th>Flow</th><th>Result</th><th>Evidence</th></tr></thead><tbody><tr><td>5.1 Intent parser</td><td>✅ 48 / 48</td><td><code>intent.test.ts</code>: all 7 required phrases (ordered steps, parameters, highlight spans), not-ok steps with a kind reply, &quot;password&quot; on a PDF = Protect, explicit <code>WxH</code></td></tr><tr><td>5.2 Paste detection</td><td>✅ 28 / 28</td><td><code>detect.test.ts</code>: JWT, valid and invalid JSON, 10- and 13-digit timestamps, hex/rgb/hsl, cron, SQL, URL, Base64, regex, CSV, text; &quot;select a plan&quot; stays text</td></tr><tr><td>5.3 Generators from chat and the hero ask bar</td><td>✅ 7 cases × 2 browsers</td><td><code>flows.spec.ts</code>: 10 UUIDs (v4, unique), 24-char password, 3 lorem paragraphs, SHA-256 of &quot;hello world&quot; (copied value checked), Base64, current timestamp on a frozen clock, QR opens the QR tool</td></tr><tr><td>5.4 Global paste</td><td>✅ 4 cases × 2</td><td>image file opens as a file; JSON → &quot;Open in JSON Formatter&quot; carries it in; JWT → Decode shows claims; a short sentence stays in the composer</td></tr><tr><td>5.5 Drop flow</td><td>✅ 3 cases × 2, plus visual</td><td><code>drop-flow.spec.ts</code>: PDF page count (including compressed object streams), image dimensions, several PDFs → Merge. Veil, orb and satellites are covered by <code>redesign-ui</code> and the visual compare (state c)</td></tr><tr><td>5.6 Plan → Run → Results</td><td>✅ 6 cases × 2</td><td><code>plan.spec.ts</code>: compress + split 1–5 on a real PDF gives a downloadable 5-page PDF; steps not built say so; PDF to Word continues on its own page with the file; the sample PDF runs for real; §4 image compress ≤ 200,000 bytes; resize for Instagram fits 1080×1350</td></tr><tr><td>5.7 Live panel</td><td>✅ 18 panels × 2</td><td><code>live-panels.spec.ts</code>: every option changes the output, Sample/Clear/Copy, status bar, full screen + Esc, ⌘Enter, deep link, &quot;Open in … ⤢&quot;</td></tr><tr><td>5.8 ⌘K palette</td><td>✅</td><td>shrink → Compress PDF, jwt → JWT Decoder, bg → Background Remover, iphone → HEIC to JPG; arrows + Enter; Esc; no-results state (<code>flows</code>, <code>platform</code>, <code>search.test.ts</code>)</td></tr><tr><td>5.9 Voice (Pro) demo</td><td>✅</td><td>with a file loaded, words stream into the composer with highlighting, then it sends</td></tr><tr><td>5.10 Theme, recents, storage blocked</td><td>✅</td><td><code>platform.spec.ts</code>: recents and favourites survive a reload; the page works with localStorage throwing; dark theme is applied before first paint</td></tr></tbody></table>
+<h2>4. Bug table</h2>
+<p>Each fix was its own branch, squash-merged into <code>integration/ui-restore</code>, with a test that failed before the fix. PR notes are in <code>reports/prs/</code>.</p>
+<table class="md"><thead><tr><th>ID</th><th>Severity</th><th>Tool / flow</th><th>Problem</th><th>Root cause</th><th>Fix</th><th>Commit</th><th>Re-tested ✅</th></tr></thead><tbody><tr><td>B1</td><td>Critical</td><td>Plan → Run</td><td>Plans showed invented results (&quot;−58%&quot;, 42% of input size); Download made no file</td><td><code>executePlan</code> animated bars, then posted a made-up result</td><td>Steps that exist run for real in the PDF and image workers, outputs chain, Download saves the real file; other steps say &quot;Coming soon&quot;</td><td><code>1895855</code> #61</td><td>✅</td></tr><tr><td>B2</td><td>High</td><td>Intent</td><td>&quot;protect it with a password&quot; opened the password generator</td><td>Generator phrases were checked before file steps</td><td>File steps win when a file is loaded</td><td><code>1895855</code> #61</td><td>✅</td></tr><tr><td>B3</td><td>Medium</td><td>Workspace</td><td>Send stayed disabled after Run with no file</td><td>Busy flag set before an early return</td><td>Busy is released in <code>finally</code></td><td><code>1895855</code> #61</td><td>✅</td></tr><tr><td>B4</td><td>Medium</td><td>Plan card</td><td>Unbuilt steps were tagged &quot;On device&quot;</td><td>Tag didn't come from the registry</td><td><code>stepTag()</code>: On device / Private server / Coming soon; Run is disabled when nothing can run</td><td><code>1895855</code> #61</td><td>✅</td></tr><tr><td>B5</td><td>High</td><td>PDF to Word</td><td>No way to bring a file from the home page</td><td>Page didn't read the handoff</td><td>&quot;Continue in PDF to Word →&quot; passes the file</td><td><code>1895855</code> #61</td><td>✅</td></tr><tr><td>B6</td><td>Medium</td><td>Samples</td><td>Sample PDF/JSON were fake bytes; the photo's size was inflated</td><td>Placeholders</td><td>Real 24-page PDF (pdf-lib), real 400-user JSON, real photo size</td><td><code>1895855</code> #61</td><td>✅</td></tr><tr><td>B7</td><td>Medium</td><td>a11y</td><td>Save chip was 28 px tall on phones</td><td>Fixed <code>h-[28px]</code> from #48</td><td>44 px on phones, 28 px from <code>sm</code> up</td><td><code>538db17</code> #62</td><td>✅</td></tr><tr><td>B8</td><td>Low</td><td>Tooling</td><td><code>verify</code> failed after any e2e run</td><td>ESLint linted Playwright's generated report</td><td>Ignore <code>playwright-report/</code>, <code>test-results/</code>, <code>.lighthouseci/</code></td><td><code>d518d0e</code> #63</td><td>✅</td></tr><tr><td>B9</td><td>Medium</td><td>Home bento</td><td>Plan chips flickered near opacity 0</td><td><code>innerHTML</code> rebuilt every frame, restarting the fade</td><td>Rebuild only when the plan changes; no fade at mount</td><td><code>ca2ddc8</code> #64</td><td>✅</td></tr><tr><td>B10</td><td>Test</td><td>Hero squiggle test</td><td>Flaky offset vs the reference</td><td>The reference places its squiggle on <code>fonts.ready</code>, mid-animation</td><td>Test rewinds the reference animation, then places it</td><td><code>a4ef609</code> #65</td><td>✅</td></tr><tr><td>B11</td><td>High</td><td>PDF to Word (server)</td><td>Sweeper could delete uploads still waiting in the queue</td><td>Only the active job's folder was kept</td><td>Keep every pending job (waiting, delayed, retrying); skip the sweep if the queue can't be read</td><td><code>3e4347a</code> #66</td><td>✅ (unit); the baseline e2e failure did not reproduce, see PR</td></tr><tr><td>B12</td><td>High</td><td>Plan resize</td><td>&quot;resize for instagram&quot; gave 1600 px; &quot;resize 1920x1080&quot; ignored the size</td><td>Platform read from display text; size not passed to the step</td><td>Step carries <code>w</code>/<code>h</code>; <code>WxH</code> anywhere in the text is used</td><td><code>3f73422</code> #68</td><td>✅</td></tr><tr><td>B13</td><td>High</td><td>Image Compressor (Safari)</td><td>PNG + target size failed in Safari; &quot;200 kb&quot; could give 205 KB</td><td>Safari can't encode WebP; KB (1000) vs KiB (1024) mix</td><td>Probe encoder, fall back to JPG with a note; targets floored to whole KiB</td><td><code>4bea5e1</code> #69</td><td>✅</td></tr><tr><td>B14</td><td>Medium</td><td>Drop flow</td><td>PDF card showed no page count for many PDFs</td><td>Text search for <code>/Type /Page</code> misses compressed object streams</td><td>Fall back to pdf-lib page count (≤ 100 MB)</td><td><code>6aebba8</code> #70</td><td>✅</td></tr><tr><td>B15</td><td>High</td><td>Hero ask bar</td><td>Typing a request and pressing Enter did nothing</td><td>DOM value + synthetic events bypassed React state</td><td>Ask is passed as a prop and sent through the normal path</td><td><code>40ccdd4</code> #71</td><td>✅</td></tr><tr><td>B16</td><td>Medium</td><td>QR from chat</td><td>&quot;make a qr code&quot; opened nothing</td><td>Tried to open a home panel; QR is a page</td><td>Routed tools open their page</td><td><code>40ccdd4</code> #71</td><td>✅</td></tr><tr><td>B17</td><td>Low</td><td>⌘K</td><td>&quot;shrink&quot; ranked Image Compressor above Compress PDF</td><td>Near-tie decided by tiny Fuse score differences</td><td>Bucketed scores, ties go to the more popular tool</td><td><code>714fabc</code> #72</td><td>✅</td></tr><tr><td>B18</td><td>Medium</td><td>Home bento (phone)</td><td>Bento grew and shrank up to 142 px every few seconds</td><td>Demo samples of different lengths wrap differently</td><td>Reserve the tallest sample's height at mount and on width change</td><td><code>add3b66</code> #75</td><td>✅</td></tr></tbody></table>
+<p><b>Test-infrastructure fixes:</b> <code>#76</code>: the four tests that open the reference page got a 240 s budget. Under a full parallel run, closing the heavy reference page alone took up to 61 s; assertions are unchanged. Coverage added without bugs: #67 (§4 gaps), #73 (flows 5.4/5.7/5.8/5.9), #74 (privacy and timing).</p>
+<p><b>Screenshots:</b> failing-state traces live in Playwright's <code>test-results/</code> (gitignored, large). The committed <code>reports/e2e/</code> shots show the working tools; the full before/after visual set for the UI is in <code>design/reference/v2/</code> and <code>reports/ui/</code>.</p>
+<h2>5. Still failing / not implemented</h2>
+<p><b>Not implemented (53 tools, shown as &quot;Coming soon&quot; with actions disabled).</b> The full list is in the JSON (<code>comingSoon</code>) and the HTML report. Plan steps that would need them (merge, protect, GIF, trim, and so on) are tagged &quot;Coming soon&quot; and are never run or faked. Next step: build them through the registry (see README, &quot;add a tool in 5 steps&quot;).</p>
+<p><b>Open items that need your decision (not changed on my own):</b></p>
+<table class="md"><thead><tr><th>Item</th><th>What happens</th><th>Suggested fix</th><th>Why I didn't do it</th></tr></thead><tbody><tr><td>5 MB paste into a textarea</td><td>The browser spends ~280 ms laying out the text before any KlipKit code runs, which is over the 200 ms &quot;never block&quot; budget. Formatting itself stays under 60 ms (worker)</td><td>Show inputs over ~1 MB as a chip (&quot;huge.json · 5 MB · Edit anyway&quot;)</td><td>Changes the UI beyond the reference</td></tr><tr><td>LCP budget (2 s)</td><td>Simulated LCP is 3.4 s on every page, so the CI Lighthouse step fails. With real throttling it is 1.8–2.1 s (§7)</td><td>Load less before first paint: preload only the one font the first screen needs, defer the serif italic</td><td>Changes how fonts load and appear; your call</td></tr><tr><td>Platform resize sizes</td><td>Every &quot;resize for X&quot; uses 1080×1350, including YouTube</td><td>Per-platform sizes (YouTube 1280×720, Story 1080×1920, …)</td><td>The reference shows one size</td></tr><tr><td>Explore &quot;● Live&quot; tag</td><td>Green on white is about 3.4:1 (12 px bold text)</td><td>Use the darker <code>--g-c</code> green</td><td>A colour change against the reference</td></tr><tr><td>Unused Inter font files in <code>src/fonts</code></td><td>Not loaded anywhere since Geist</td><td>Delete them</td><td>Rule: no deletions without asking</td></tr><tr><td>Firefox locally</td><td>Can't launch on macOS 27</td><td>Runs in CI</td><td>Environment, not app</td></tr></tbody></table>
+<p><b>Low, known:</b> a paste in the first instant before the page finishes loading is ignored.</p>
+<h2>6. Privacy results</h2>
+<p>A network guard (<code>tests/e2e/helpers.ts</code>) records every request. <code>assertClean()</code> fails the test on any request to another origin, any failed request or any console error. <code>assertNoUpload()</code> fails it on any request that carries a body. The guard runs in the universal checks for every tool page (<code>tools.spec.ts</code>), and in <code>plan.spec.ts</code>, <code>platform.spec.ts</code> and <code>perf-privacy.spec.ts</code>. It does not run in every spec: the redesign and visual suites don't use it.</p>
+<ul><li><b>Third-party domains seen: none</b>, in every guarded test, on all 4 browser projects.</li><li><b>Live panels (18):</b> one page, every panel run 5 times: <b>0 requests with a body</b>, 0 third-party, 0 failed requests, 0 console errors (<code>perf-privacy.spec.ts</code>).</li><li><b>On-device tools</b> (image ×4, Compress PDF, QR, JSON, JWT, Background Remover): <b>0 uploads</b>. The only requests are the page's own assets, plus the self-hosted model for Background Remover.</li><li><b>PDF to Word</b> is the only tool that uploads, to KlipKit's own server (<code>/api/convert</code>). Files are deleted within the retention window (sweeper tested in <code>worker-sweep.test.ts</code> and <code>server-tools.spec.ts</code>).</li><li><b>Fonts</b> are self-hosted (<code>next/font/local</code>); no CDN requests.</li></ul>
+<h2>7. Performance</h2>
+<p><b>Panels (Chromium, median of 5 runs):</b> 16 of 18 live panels take ≤ 1 ms. The slowest: Hash Generator 5 ms (WebCrypto SHA-1/256/512), Cron Builder 2 ms, then JSON Formatter, JWT Decoder and Timestamp at 1 ms. All are far under the 50 ms budget.</p>
+<p><b>Large input:</b> formatting a 5 MB JSON never blocks the page for more than 200 ms once the text is in. Measured peak: about 60 ms, because parsing happens in a worker.</p>
+<p><b>Lighthouse (mobile emulation, 3 runs per page, median):</b></p>
+<p>Fresh run on the final build (#76).</p>
+<table class="md"><thead><tr><th>Page</th><th>Performance</th><th>Accessibility</th><th>Best practices</th><th>SEO</th><th>LCP (s)</th><th>CLS</th><th>TBT (ms)</th></tr></thead><tbody><tr><td><code>/</code></td><td>90</td><td>100</td><td>100</td><td>100</td><td>3.5</td><td>0.005</td><td>149</td></tr><tr><td><code>/image-compressor</code></td><td>92</td><td>100</td><td>100</td><td>100</td><td>3.4</td><td>0.000</td><td>25</td></tr><tr><td><code>/heic-to-jpg</code></td><td>92</td><td>100</td><td>100</td><td>100</td><td>3.4</td><td>0.000</td><td>29</td></tr><tr><td><code>/json-formatter</code></td><td>92</td><td>100</td><td>100</td><td>100</td><td>3.4</td><td>0.000</td><td>21</td></tr><tr><td><code>/jwt-decoder</code></td><td>92</td><td>100</td><td>100</td><td>100</td><td>3.4</td><td>0.000</td><td>20</td></tr><tr><td><code>/qr-code-generator</code></td><td>92</td><td>100</td><td>100</td><td>100</td><td>3.4</td><td>0.000</td><td>38</td></tr><tr><td><code>/compress-image-to-50kb</code></td><td>92</td><td>100</td><td>100</td><td>100</td><td>3.4</td><td>0.000</td><td>31</td></tr><tr><td><code>/heic-to-jpg-on-windows</code></td><td>92</td><td>100</td><td>100</td><td>100</td><td>3.4</td><td>0.000</td><td>32</td></tr><tr><td><code>/wifi-qr-code-generator</code></td><td>92</td><td>100</td><td>100</td><td>100</td><td>3.4</td><td>0.000</td><td>21</td></tr><tr><td><code>/image-tools</code></td><td>92</td><td>100</td><td>100</td><td>100</td><td>3.4</td><td>0.000</td><td>22</td></tr><tr><td><code>/developer-tools</code></td><td>92</td><td>100</td><td>100</td><td>100</td><td>3.4</td><td>0.000</td><td>21</td></tr><tr><td><code>/compress-pdf</code></td><td>92</td><td>100</td><td>100</td><td>66 (noindex on purpose)</td><td>3.4</td><td>0.000</td><td>32</td></tr><tr><td><code>/background-remover</code></td><td>92</td><td>100</td><td>100</td><td>66 (noindex on purpose)</td><td>3.4</td><td>0.000</td><td>33</td></tr><tr><td><code>/pdf-to-word</code></td><td>91</td><td>100</td><td>100</td><td>66 (noindex on purpose)</td><td>3.6</td><td>0.000</td><td>45</td></tr></tbody></table>
+<p><b>Budgets:</b> performance ≥ 90, accessibility and best practices ≥ 95, CLS ≤ 0.05 and SEO 100 on indexable pages are met everywhere. <b>LCP ≤ 2 s is not met: it is the only failing assertion (14 of 14 pages), so the CI Lighthouse step fails.</b></p>
+<p><b>What the LCP number means.</b> The 3.4 s is Lighthouse's *simulated* estimate. Unthrottled, LCP happens at first paint (118 ms), and the LCP element is plain text (the tool page's intro paragraph); 87% of the estimate is &quot;render delay&quot;. Measured with real throttling instead (<code>--throttling-method=devtools</code>: slow 4G, 4× CPU), LCP is <b>2.1 s on the home page and 1.8 s on Image Compressor</b>, equal to first paint. So the real number is at or just over the budget, not 70% over. To get under it in both modes, less has to load before first paint (two serif fonts plus Geist, about 140 KB, and the CSS). That's a design-level change (font loading), so it's listed under §5 for your decision rather than done here.</p>
+<p><b>Slowest tools</b> (live panels, median ms): Hash Generator 5, Cron Builder 2, JSON Formatter 1, JWT Decoder 1, Timestamp 1; the other 13 are 0.1. Tool pages do their work in workers. Their budgets are checked by <code>tools.spec.ts</code> (for example the 5 MB JSON above, and image and PDF jobs that finish with a verified output).</p>
+<h2>8. How to re-run</h2>
+<ol><li>Install once: <code>npm ci</code> and <code>npx playwright install --with-deps chromium webkit firefox</code>.</li><li>Unit tests, typecheck, lint and build: <code>npm run verify</code>.</li><li>All end-to-end tests on the production build: <code>npm run test:e2e</code>. To match this report exactly: <code>npm run build &amp;&amp; npx playwright test --project=platform --project=chromium --project=webkit --project=mobile-pixel7 --project=mobile-iphone14 --workers=4</code>.</li><li>Rebuild this report's data and HTML from that run: <code>npx jiti scripts/tools-report.ts</code> (reads <code>test-results/results.json</code> and <code>test-results/perf.json</code>, writes <code>reports/tools-e2e-results.json</code> and <code>reports/tools-e2e-report.html</code>).</li><li>Lighthouse: <code>npm run test:perf</code>.</li><li>Accessibility only: <code>npm run test:a11y</code>. Open the last Playwright report: <code>npm run test:report</code>.</li></ol>
+<p><b>CI:</b> <code>.github/workflows/test.yml</code> runs all of this on every push and pull request (Ubuntu, with Firefox, Valkey and LibreOffice) and uploads <code>playwright-report/</code>, <code>reports/</code> and the Lighthouse reports as artifacts.</p>
 
-    <div class="stats">
-      <div class="card">
-        <div class="num">182 / 182</div>
-        <div class="lbl">Unit & Logic Tests</div>
-        <span class="pill ok" style="margin-top:8px">100% Pass Rate</span>
-      </div>
-      <div class="card">
-        <div class="num">72 / 72</div>
-        <div class="lbl">Browser Tool Tests</div>
-        <span class="pill ok" style="margin-top:8px">11 Skipped (Safari/Models)</span>
-      </div>
-      <div class="card">
-        <div class="num">173 / 173</div>
-        <div class="lbl">Mobile Viewports Passed</div>
-        <span class="pill ok" style="margin-top:8px">Pixel 7 + iPhone 14</span>
-      </div>
-      <div class="card">
-        <div class="num">0</div>
-        <div class="lbl">Privacy Leaks</div>
-        <span class="pill ok" style="margin-top:8px">100% Client-Side</span>
-      </div>
-    </div>
-
-    <section class="sec">
-      <h2>Resolved Bug Table</h2>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Severity</th>
-              <th>Tool / Flow</th>
-              <th>Problem</th>
-              <th>Root Cause & Fix</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><code>T-BUG-01</code></td>
-              <td><span class="pill bad">High</span></td>
-              <td>Base64 / Chat</td>
-              <td class="bug-desc">Quoted chat arguments like <code>base64 of "hello world"</code> encoded the literal quotes.</td>
-              <td>Added quote stripping <code>.replace(/^["“']|["”']$/g, '')</code> in intent generator parse.</td>
-              <td><span class="pill ok">✅ Re-tested</span></td>
-            </tr>
-            <tr>
-              <td><code>T-BUG-02</code></td>
-              <td><span class="pill accent">Medium</span></td>
-              <td>Command Palette (⌘K)</td>
-              <td class="bug-desc">Shortcut did not focus <code>#pq</code>; locator matched inactive hidden duplicate element.</td>
-              <td>Removed inert duplicate palette in GlobalModals; added <code>id="pq"</code> and autoFocus to active palette.</td>
-              <td><span class="pill ok">✅ Re-tested</span></td>
-            </tr>
-            <tr>
-              <td><code>T-BUG-03</code></td>
-              <td><span class="pill bad">High</span></td>
-              <td>Workspace Navigation</td>
-              <td class="bug-desc">Clicking Favourite button on tool routes timed out due to pointer events intercepted by header.</td>
-              <td>Fixed header (84px) covered top content; added <code>#main > main { padding-top: calc(84px + 1.5rem); }</code>.</td>
-              <td><span class="pill ok">✅ Re-tested</span></td>
-            </tr>
-            <tr>
-              <td><code>T-BUG-04</code></td>
-              <td><span class="pill accent">Medium</span></td>
-              <td>Image Compressor</td>
-              <td class="bug-desc">axe target-size failure on range slider.</td>
-              <td>Added <code>h-6 min-h-[24px] cursor-pointer</code> to quality range slider.</td>
-              <td><span class="pill ok">✅ Re-tested</span></td>
-            </tr>
-            <tr>
-              <td><code>T-BUG-05</code></td>
-              <td><span class="pill accent">Medium</span></td>
-              <td>QR Code Generator</td>
-              <td class="bug-desc">axe color-contrast failure on tab list.</td>
-              <td>Redesigned tabs to <code>bg-soft border-line</code> with 11:1 contrast text.</td>
-              <td><span class="pill ok">✅ Re-tested</span></td>
-            </tr>
-            <tr>
-              <td><code>T-BUG-06</code></td>
-              <td><span class="pill bad">High</span></td>
-              <td>PWA Offline</td>
-              <td class="bug-desc">Offline test timed out waiting for service worker activation.</td>
-              <td>Window load listener never fired after hydration; added <code>document.readyState === 'complete'</code> check.</td>
-              <td><span class="pill ok">✅ Re-tested</span></td>
-            </tr>
-            <tr>
-              <td><code>T-BUG-07</code></td>
-              <td><span class="pill accent">Medium</span></td>
-              <td>Mobile Viewport</td>
-              <td class="bug-desc">Pixel 7 test failed on 34px horizontal overflow on homepage.</td>
-              <td>Added <code>overflow-x: clip</code> to <code>html</code> and streamlined search button on screens &lt; 640px.</td>
-              <td><span class="pill ok">✅ Re-tested</span></td>
-            </tr>
-            <tr>
-              <td><code>T-BUG-08</code></td>
-              <td><span class="pill accent">Medium</span></td>
-              <td>Mobile Touch Targets</td>
-              <td class="bug-desc">Touch targets under 44px on header brand and theme icon button on small screens.</td>
-              <td>Set <code>min-height: 44px</code> on <code>.brand</code> and <code>min-width: 44px; flex-shrink: 0</code> on <code>.icon-btn</code>.</td>
-              <td><span class="pill ok">✅ Re-tested</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <section class="sec">
-      <h2>Universal Flows (Section 5.1–5.10)</h2>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Flow ID</th>
-              <th>Flow Description</th>
-              <th>Test Count</th>
-              <th>Status</th>
-              <th>Highlights</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><code>5.1</code></td>
-              <td>Intent Parser</td>
-              <td>48 cases</td>
-              <td><span class="pill ok">48 / 48 Passed</span></td>
-              <td>Multi-step chains, compression targets, Instagram resizing, polite responses for mismatch</td>
-            </tr>
-            <tr>
-              <td><code>5.2</code></td>
-              <td>Paste Detection</td>
-              <td>28 cases</td>
-              <td><span class="pill ok">28 / 28 Passed</span></td>
-              <td>JWT, JSON, timestamps, hex/rgb, cron, SQL, CSV; no false positive SQL on normal English</td>
-            </tr>
-            <tr>
-              <td><code>5.3</code></td>
-              <td>Chat & Ask Generators</td>
-              <td>8 cases</td>
-              <td><span class="pill ok">8 / 8 Passed</span></td>
-              <td>UUIDs, password length, lorem ipsum, sha256, base64, timestamps</td>
-            </tr>
-            <tr>
-              <td><code>5.4</code></td>
-              <td>Global Paste Flow</td>
-              <td>4 cases</td>
-              <td><span class="pill ok">4 / 4 Passed</span></td>
-              <td>⌘V anywhere with files, JSON, or JWT dispatches directly to matching tool</td>
-            </tr>
-            <tr>
-              <td><code>5.5</code></td>
-              <td>Drop Flow & Orb</td>
-              <td>4 cases</td>
-              <td><span class="pill ok">4 / 4 Passed</span></td>
-              <td>Dropzone activates orb glow, pulls satellites inward, reads real file metadata</td>
-            </tr>
-            <tr>
-              <td><code>5.6</code></td>
-              <td>Plan → Run → Results</td>
-              <td>4 cases</td>
-              <td><span class="pill ok">4 / 4 Passed</span></td>
-              <td>Progress bars, step completion badges, artifact downloads with measured file sizes</td>
-            </tr>
-            <tr>
-              <td><code>5.7</code></td>
-              <td>Live Panels (18 tools)</td>
-              <td>18 cases</td>
-              <td><span class="pill ok">18 / 18 Passed</span></td>
-              <td>Live option toggles (2 spaces, tabs, minify), status bar stats, Esc keyboard handling</td>
-            </tr>
-            <tr>
-              <td><code>5.8</code></td>
-              <td>⌘K Command Palette</td>
-              <td>4 cases</td>
-              <td><span class="pill ok">4 / 4 Passed</span></td>
-              <td>Synonyms (shrink → compress, jwt, iphone → heic), keyboard navigation, empty states</td>
-            </tr>
-            <tr>
-              <td><code>5.9</code></td>
-              <td>Voice Pro Demo Sheet</td>
-              <td>2 cases</td>
-              <td><span class="pill ok">2 / 2 Passed</span></td>
-              <td>Audio waveform animation, real-time simulated word streaming, auto-send</td>
-            </tr>
-            <tr>
-              <td><code>5.10</code></td>
-              <td>Theme, Recents & Storage</td>
-              <td>4 cases</td>
-              <td><span class="pill ok">4 / 4 Passed</span></td>
-              <td>Blocked localStorage private mode resilience, dark theme before first paint, recents persistence</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <section class="sec">
-      <h2>How to Re-Run Tests</h2>
-      <div class="card" style="font-family: var(--mono); font-size: 13px; line-height: 1.6; background: var(--solid);">
-        # 1. Run unit test suite (182 tests)<br>
-        npm run test:unit<br><br>
-        # 2. Build production standalone bundle<br>
-        npm run build<br><br>
-        # 3. Run Playwright tools & platform tests<br>
-        E2E_PORT=3210 npx playwright test tests/e2e/tools.spec.ts --project=chromium<br>
-        E2E_PORT=3210 npx playwright test tests/e2e/platform.spec.ts --project=chromium<br>
-        E2E_PORT=3210 npx playwright test --project=platform<br>
-        E2E_PORT=3210 npx playwright test --project=mobile-pixel7<br>
-        E2E_PORT=3210 npx playwright test --project=mobile-iphone14
-      </div>
-    </section>
-  </div>
-</body>
-</html>
-
+<script>document.getElementById("q").addEventListener("input",e=>{const q=e.target.value.toLowerCase();for(const r of document.querySelectorAll("#m tbody tr"))r.style.display=r.textContent.toLowerCase().includes(q)?"":"none"})</script>
+</main></body></html>

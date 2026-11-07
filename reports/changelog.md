@@ -4,6 +4,23 @@ Every change landed as its own branch, squash-merged into `integration/ui-restor
 
 | # | Title | Branch | PR notes |
 |---|---|---|---|
+| 77 | docs: Phase 4 tools end-to-end report (md, HTML, JSON) and its generator; changelog through #77 | `docs/tools-e2e-report` | [reports/prs/docs-tools-e2e-report.md](reports/prs/docs-tools-e2e-report.md) |
+| 76 | test: longer time limit for tests that open the reference page (teardown is slow under load) | `test/reference-page-timeout` | [reports/prs/test-reference-page-timeout.md](reports/prs/test-reference-page-timeout.md) |
+| 75 | fix(home): bento cards keep one height while their demos cycle (no layout shift on phones) | `fix/bento-height-cycle` | [reports/prs/fix-bento-height-cycle.md](reports/prs/fix-bento-height-cycle.md) |
+| 74 | test: privacy + timing for every live panel; 5 MB JSON stays responsive | `test/privacy-and-perf` | [reports/prs/test-privacy-and-perf.md](reports/prs/test-privacy-and-perf.md) |
+| 73 | test: flows 5.4 paste, 5.7 every live panel, 5.8 synonyms, 5.9 voice | `test/flow-coverage` | [reports/prs/test-flow-coverage.md](reports/prs/test-flow-coverage.md) |
+| 72 | fix(search): near ties go to the more popular tool (shrink → Compress PDF) | `fix/palette-shrink-ranking` | [reports/prs/fix-palette-shrink-ranking.md](reports/prs/fix-palette-shrink-ranking.md) |
+| 71 | fix(home): hero ask bar sent nothing; QR request opens the QR page | `fix/qr-ask-dead-end` | [reports/prs/fix-qr-ask-dead-end.md](reports/prs/fix-qr-ask-dead-end.md) |
+| 70 | fix(drop): count pages of PDFs with compressed object streams | `fix/file-card-pdf-pages` | [reports/prs/fix-file-card-pdf-pages.md](reports/prs/fix-file-card-pdf-pages.md) |
+| 69 | fix(image): PNG + target size works in Safari (JPG); plan targets never exceed what was asked | `fix/image-target-safari-kb` | [reports/prs/fix-image-target-safari-kb.md](reports/prs/fix-image-target-safari-kb.md) |
+| 68 | fix(plan): resize to the size the card shows (1080 × 1350 for Instagram) | `fix/plan-resize-platform` | [reports/prs/fix-plan-resize-platform.md](reports/prs/fix-plan-resize-platform.md) |
+| 67 | test: §4 gaps — SQL AND indented, generated TypeScript compiles; 1600×1200 photo fixture | `test/expected-values-gaps` | [reports/prs/test-expected-values-gaps.md](reports/prs/test-expected-values-gaps.md) |
+| 66 | fix(worker): sweeper kept only the converting job; queued uploads were deleted | `fix/worker-sweep-keeps-queued-jobs` | [reports/prs/fix-worker-sweep-keeps-queued-jobs.md](reports/prs/fix-worker-sweep-keeps-queued-jobs.md) |
+| 65 | test: measure the reference squiggle independent of font-load timing | `test/squiggle-deterministic` | [reports/prs/test-squiggle-deterministic.md](reports/prs/test-squiggle-deterministic.md) |
+| 64 | fix(bento): plan chips rebuilt every frame and flickered; no fade at load | `fix/bento-chip-flicker` | [reports/prs/fix-bento-chip-flicker.md](reports/prs/fix-bento-chip-flicker.md) |
+| 63 | chore(lint): ignore generated test output so verify doesn't fail after an e2e run | `chore/eslint-ignore-test-output` | [reports/prs/chore-eslint-ignore-test-output.md](reports/prs/chore-eslint-ignore-test-output.md) |
+| 62 | fix(a11y): Save chip is a 44 px tap target on phones | `fix/save-chip-touch-target` | [reports/prs/fix-save-chip-touch-target.md](reports/prs/fix-save-chip-touch-target.md) |
+| 61 | fix(plan): run plans for real; no invented results; file steps beat generators | `fix/plan-runner-real` | [reports/prs/fix-plan-runner-real.md](reports/prs/fix-plan-runner-real.md) |
 | 60 | docs: Hallmark pass results, v2 visual baseline, changelog through #60 | `docs/hallmark-v2-baseline` | [reports/prs/docs-hallmark-v2-baseline.md](reports/prs/docs-hallmark-v2-baseline.md) |
 | 59 | fix(a11y): home eyebrow, chip glyphs and dark kickers below AA contrast | `fix/a11y-home-contrast` | [reports/prs/fix-a11y-home-contrast.md](reports/prs/fix-a11y-home-contrast.md) |
 | 58 | perf: render the QR code on the server (mobile Lighthouse 86 → 92) | `perf/qr-ssr-code` | [reports/prs/perf-qr-ssr-code.md](reports/prs/perf-qr-ssr-code.md) |

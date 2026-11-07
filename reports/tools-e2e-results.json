@@ -1,146 +1,941 @@
 {
-  "timestamp": "2026-11-05T13:35:00.000Z",
-  "summary": {
-    "totalTools": 76,
-    "liveImplementedTools": 28,
-    "routedWorkspaceTools": 10,
-    "liveInteractivePanelTools": 18,
-    "plannedComingSoonTools": 48,
-    "unitTests": {
-      "total": 182,
-      "passed": 182,
+  "generated": "2026-11-07T13:26:14.712Z",
+  "totals": {
+    "toolsInRegistry": 79,
+    "live": 26,
+    "comingSoon": 53,
+    "toolsPassing": 26,
+    "toolsFailing": 0,
+    "tests": {
+      "passed": 586,
+      "flaky": 0,
       "failed": 0,
-      "passRate": "100%"
-    },
-    "e2eTests": {
-      "desktopChromiumTools": { "total": 83, "passed": 72, "skipped": 11, "failed": 0 },
-      "desktopPlatform": { "total": 20, "passed": 20, "skipped": 0, "failed": 0 },
-      "redesignUI": { "total": 11, "passed": 11, "skipped": 0, "failed": 0 },
-      "mobilePixel7": { "total": 99, "passed": 87, "skipped": 12, "failed": 0 },
-      "mobileIPhone14": { "total": 99, "passed": 86, "skipped": 13, "failed": 0 }
-    },
-    "universalFlows": {
-      "total": 10,
-      "passed": 10,
-      "failed": 0,
-      "passRate": "100%"
-    },
-    "privacyViolations": 0,
-    "accessibilityCriticalViolations": 0
-  },
-  "expectedVectors": [
-    { "tool": "Hash Generator", "input": "abc", "status": "passed", "output": "SHA-1 a9993e364706816aba3e25717850c26c9cd0d89d · SHA-256 ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad · SHA-512 start ddaf35a193617abacc417349ae204131" },
-    { "tool": "Hash (chat)", "input": "sha256 of hello world", "status": "passed", "output": "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9" },
-    { "tool": "Base64 encode", "input": "KlipKit ✨", "status": "passed", "output": "S2xpcEtpdCDinKg= (round-trip intact)" },
-    { "tool": "Base64 (chat)", "input": "base64 of \"hello world\"", "status": "passed", "output": "aGVsbG8gd29ybGQ=" },
-    { "tool": "URL encode", "input": "compress pdf & split?", "status": "passed", "output": "compress%20pdf%20%26%20split%3F" },
-    { "tool": "Timestamp", "input": "1730592000", "status": "passed", "output": "ISO 2024-11-03T00:00:00.000Z · 3 November 2024" },
-    { "tool": "JWT Decoder", "input": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...", "status": "passed", "output": "alg HS256, sub user_42, Asha Rao, Valid" },
-    { "tool": "JWT expired", "input": "exp: 1730503600", "status": "passed", "output": "Expired" },
-    { "tool": "JSON Formatter", "input": "{\"a\":1,\"b\":[1,2]}", "status": "passed", "output": "2-space pretty output 8 lines; minify compact" },
-    { "tool": "JSON errors", "input": "{\"a\":1,}", "status": "passed", "output": "line 1, column 8, Trailing comma" },
-    { "tool": "JSON errors", "input": "{'a':1}", "status": "passed", "output": "Use double quotes, line 1 col 2" },
-    { "tool": "JSON errors", "input": "{a:1}", "status": "passed", "output": "Keys need double quotes" },
-    { "tool": "JSON errors", "input": "{\"a\":[1,2", "status": "passed", "output": "Unexpected end — something isn't closed" },
-    { "tool": "CSV ↔ JSON", "input": "name,city\\nRohan,\"Delhi, NCR\"", "status": "passed", "output": "[{\"name\":\"Rohan\",\"city\":\"Delhi, NCR\"}] (identical round-trip)" },
-    { "tool": "JSON to TS", "input": "{\"id\":1,\"tags\":[\"a\"],\"addr\":{\"pin\":411001}}", "status": "passed", "output": "interface Addr { pin: number } / interface Root; compiles with tsc" },
-    { "tool": "Cron", "input": "*/15 9-18 * * 1-5", "status": "passed", "output": "Every 15 minutes, from 09:00 to 18:59, on Monday to Friday" },
-    { "tool": "Color Converter", "input": "#6D5DF5", "status": "passed", "output": "rgb(109, 93, 245), hsl(246, 88%, 66%), contrast with white 4.63:1 (AA)" },
-    { "tool": "Regex Tester", "input": "[\\w.+-]+@[\\w-]+\\.[\\w.]+", "status": "passed", "output": "exactly 2 matches" },
-    { "tool": "UUID Generator", "input": "10000", "status": "passed", "output": "10,000 UUIDs v4, 0 duplicates" },
-    { "tool": "Password Generator", "input": "length 24", "status": "passed", "output": "24 characters, 0 duplicates across 1,000 runs" },
-    { "tool": "Word Counter", "input": "Hello world. This is KlipKit.", "status": "passed", "output": "5 words, 2 sentences" },
-    { "tool": "Case Converter", "input": "drop it paste it", "status": "passed", "output": "camel, snake, kebab, title, UPPER all valid" },
-    { "tool": "SQL Formatter", "input": "select a from t where x=1 and y=2", "status": "passed", "output": "keywords uppercased with newlines" },
-    { "tool": "Image Compressor", "input": "1600x1200 PNG <= 200KB", "status": "passed", "output": "output <= 200KB, valid image, aspect ratio kept" },
-    { "tool": "Resize", "input": "resize for instagram", "status": "passed", "output": "1080x720 (within 1080x1350)" },
-    { "tool": "PDF Merge / Split / Compress", "input": "fixtures", "status": "passed", "output": "merge sum of pages, split 5 pages, compress smaller" }
-  ],
-  "flows": [
-    { "id": "5.1", "name": "Intent parser (48 cases)", "passed": 48, "failed": 0, "status": "passed" },
-    { "id": "5.2", "name": "Paste detection (28 cases)", "passed": 28, "failed": 0, "status": "passed" },
-    { "id": "5.3", "name": "Generators from chat & ask bar", "passed": 8, "failed": 0, "status": "passed" },
-    { "id": "5.4", "name": "Global paste (image, JSON, JWT, text)", "passed": 4, "failed": 0, "status": "passed" },
-    { "id": "5.5", "name": "Drop flow & energised orb", "passed": 4, "failed": 0, "status": "passed" },
-    { "id": "5.6", "name": "Plan → Run → Results", "passed": 4, "failed": 0, "status": "passed" },
-    { "id": "5.7", "name": "Live panel interaction (18 panels)", "passed": 18, "failed": 0, "status": "passed" },
-    { "id": "5.8", "name": "⌘K palette synonyms & navigation", "passed": 4, "failed": 0, "status": "passed" },
-    { "id": "5.9", "name": "Voice Pro sheet streaming demo", "passed": 2, "failed": 0, "status": "passed" },
-    { "id": "5.10", "name": "Theme, recents, localStorage blocked", "passed": 4, "failed": 0, "status": "passed" }
-  ],
-  "bugsResolved": [
-    {
-      "id": "T-BUG-01",
-      "severity": "High",
-      "tool": "Chat Generators / Base64",
-      "problem": "Quoted chat arguments like `base64 of \"hello world\"` retained bounding quotes, producing base64 of '\"hello world\"'",
-      "rootCause": "Regex in `genParse` matched `of (.+)$` without stripping wrapping quotes",
-      "fix": "Added quote trimming `.replace(/^[\"“']|[\"”']$/g, '')` before executing generator",
-      "retested": true
-    },
-    {
-      "id": "T-BUG-02",
-      "severity": "Medium",
-      "tool": "Command Palette (⌘K)",
-      "problem": "Pressing ⌘K did not focus search input; locator('#pq') matched an inactive hidden duplicate component",
-      "rootCause": "GlobalModals rendered a duplicate inert CommandPalette holding id='pq' while the layout's active CommandPalette lacked id='pq'",
-      "fix": "Removed duplicate CommandPalette from GlobalModals, added id='pq' and autoFocus to active search CommandPalette, synced open event",
-      "retested": true
-    },
-    {
-      "id": "T-BUG-03",
-      "severity": "High",
-      "tool": "Tool Workspaces / Navigation",
-      "problem": "Clicking Favourite button or breadcrumbs on tool pages timed out; pointer events intercepted by header",
-      "rootCause": "Fixed header (#nav) height 84px overlapped top 84px of main content on non-home routes",
-      "fix": "Added `#main > main { padding-top: calc(84px + 1.5rem); }` to provide dedicated clearance below fixed navigation",
-      "retested": true
-    },
-    {
-      "id": "T-BUG-04",
-      "severity": "Medium",
-      "tool": "Image Compressor",
-      "problem": "axe violation `light target-size: .w-48`",
-      "rootCause": "Native range slider had default height below 24px WCAG 2.2 target threshold",
-      "fix": "Added `h-6 min-h-[24px]` and cursor-pointer to quality input range slider",
-      "retested": true
-    },
-    {
-      "id": "T-BUG-05",
-      "severity": "Medium",
-      "tool": "QR Code Generator",
-      "problem": "axe violation `light color-contrast` on tab buttons",
-      "rootCause": "Tabs inside bg-muted had low contrast on inactive tabs and unconstrained colors",
-      "fix": "Refactored tab container to bg-soft border-line with high-contrast text-ink2 and solid active pill (11:1 contrast)",
-      "retested": true
-    },
-    {
-      "id": "T-BUG-06",
-      "severity": "High",
-      "tool": "Service Worker / PWA Offline",
-      "problem": "PWA offline test timed out waiting for `navigator.serviceWorker.ready`",
-      "rootCause": "Script used `addEventListener('load')` which never fired if the hydration script executed after window load completed",
-      "fix": "Updated registration script to check `document.readyState === 'complete'` and register immediately if already loaded",
-      "retested": true
-    },
-    {
-      "id": "T-BUG-07",
-      "severity": "Medium",
-      "tool": "Mobile Viewport (Pixel 7 / iPhone 14)",
-      "problem": "Mobile friendly test failed on 34px horizontal overflow on homepage",
-      "rootCause": "DocumentElement lacked `overflow-x: clip`, allowing orbiting hero satellites to extend document scroll width",
-      "fix": "Added `overflow-x: clip` to `html` and streamlined mobile navigation `.kbtn` on screens <640px",
-      "retested": true
-    },
-    {
-      "id": "T-BUG-08",
-      "severity": "Medium",
-      "tool": "Mobile Touch Targets",
-      "problem": "Touch targets under 44px on header brand and theme icon button on small screens",
-      "rootCause": "Brand anchor was 38px tall; theme icon button shrank in flex row without min dimensions",
-      "fix": "Added min-height: 44px to `.brand` and min-width: 44px, min-height: 44px, flex-shrink: 0 to `.icon-btn`",
-      "retested": true
+      "skipped": 48
     }
-  ]
+  },
+  "byProject": {
+    "platform": {
+      "passed": 20,
+      "flaky": 0,
+      "failed": 0,
+      "skipped": 0
+    },
+    "chromium": {
+      "passed": 194,
+      "flaky": 0,
+      "failed": 0,
+      "skipped": 11
+    },
+    "webkit": {
+      "passed": 193,
+      "flaky": 0,
+      "failed": 0,
+      "skipped": 12
+    },
+    "mobile-pixel7": {
+      "passed": 90,
+      "flaky": 0,
+      "failed": 0,
+      "skipped": 12
+    },
+    "mobile-iphone14": {
+      "passed": 89,
+      "flaky": 0,
+      "failed": 0,
+      "skipped": 13
+    }
+  },
+  "tools": [
+    {
+      "slug": "compress-pdf",
+      "name": "Compress PDF",
+      "category": "productivity",
+      "kind": "page",
+      "entryPoints": {
+        "route": "tools universal",
+        "palette": "search: shrink",
+        "explore": "redesign A1/F5",
+        "chat": "plan.spec"
+      },
+      "entryCount": 4,
+      "tests": {
+        "passed": 36,
+        "flaky": 0,
+        "failed": 0,
+        "skipped": 4
+      },
+      "output": "✓ 36",
+      "privacy": "✓ 8",
+      "a11y": "✓ 4",
+      "mobile": "✓ 18",
+      "dark": "✓ 4",
+      "medianMs": null,
+      "status": "pass"
+    },
+    {
+      "slug": "pdf-to-word",
+      "name": "PDF to Word",
+      "category": "productivity",
+      "kind": "page · server",
+      "entryPoints": {
+        "route": "tools universal",
+        "palette": "search: pdf to docx",
+        "chat": "plan.spec continue"
+      },
+      "entryCount": 3,
+      "tests": {
+        "passed": 19,
+        "flaky": 0,
+        "failed": 0,
+        "skipped": 4
+      },
+      "output": "✓ 1",
+      "privacy": "✓ 4",
+      "a11y": "✓ 4",
+      "mobile": "✓ 8",
+      "dark": "✓ 4",
+      "medianMs": null,
+      "status": "pass"
+    },
+    {
+      "slug": "image-compressor",
+      "name": "Image Compressor",
+      "category": "productivity",
+      "kind": "page",
+      "entryPoints": {
+        "route": "tools universal",
+        "palette": "search: reduce image size",
+        "chat": "plan.spec §4"
+      },
+      "entryCount": 3,
+      "tests": {
+        "passed": 62,
+        "flaky": 0,
+        "failed": 0,
+        "skipped": 4
+      },
+      "output": "✓ 62",
+      "privacy": "✓ 8",
+      "a11y": "✓ 4",
+      "mobile": "✓ 30",
+      "dark": "✓ 4",
+      "medianMs": null,
+      "status": "pass"
+    },
+    {
+      "slug": "image-resizer",
+      "name": "Resize Image",
+      "category": "productivity",
+      "kind": "page",
+      "entryPoints": {
+        "route": "tools universal",
+        "chat": "plan.spec §4 resize"
+      },
+      "entryCount": 2,
+      "tests": {
+        "passed": 24,
+        "flaky": 0,
+        "failed": 0,
+        "skipped": 4
+      },
+      "output": "✓ 24",
+      "privacy": "✓ 4",
+      "a11y": "✓ 4",
+      "mobile": "✓ 12",
+      "dark": "✓ 4",
+      "medianMs": null,
+      "status": "pass"
+    },
+    {
+      "slug": "image-converter",
+      "name": "Convert Image",
+      "category": "productivity",
+      "kind": "page",
+      "entryPoints": {
+        "route": "tools universal"
+      },
+      "entryCount": 1,
+      "tests": {
+        "passed": 28,
+        "flaky": 0,
+        "failed": 0,
+        "skipped": 4
+      },
+      "output": "✓ 28",
+      "privacy": "✓ 4",
+      "a11y": "✓ 4",
+      "mobile": "✓ 14",
+      "dark": "✓ 4",
+      "medianMs": null,
+      "status": "pass"
+    },
+    {
+      "slug": "heic-to-jpg",
+      "name": "HEIC to JPG",
+      "category": "productivity",
+      "kind": "page",
+      "entryPoints": {
+        "route": "tools universal",
+        "palette": "platform ⌘K + search: iphone"
+      },
+      "entryCount": 2,
+      "tests": {
+        "passed": 24,
+        "flaky": 0,
+        "failed": 0,
+        "skipped": 4
+      },
+      "output": "✓ 24",
+      "privacy": "✓ 4",
+      "a11y": "✓ 4",
+      "mobile": "✓ 12",
+      "dark": "✓ 4",
+      "medianMs": null,
+      "status": "pass"
+    },
+    {
+      "slug": "word-counter",
+      "name": "Word Counter",
+      "category": "productivity",
+      "kind": "live panel",
+      "entryPoints": {
+        "route": "live-panels"
+      },
+      "entryCount": 1,
+      "tests": {
+        "passed": 2,
+        "flaky": 0,
+        "failed": 0,
+        "skipped": 0
+      },
+      "output": "✓ 2",
+      "privacy": "✓ 2",
+      "a11y": "—",
+      "mobile": "—",
+      "dark": "—",
+      "medianMs": 0.1,
+      "status": "pass"
+    },
+    {
+      "slug": "case-converter",
+      "name": "Case Converter",
+      "category": "productivity",
+      "kind": "live panel",
+      "entryPoints": {
+        "route": "live-panels"
+      },
+      "entryCount": 1,
+      "tests": {
+        "passed": 2,
+        "flaky": 0,
+        "failed": 0,
+        "skipped": 0
+      },
+      "output": "✓ 2",
+      "privacy": "✓ 2",
+      "a11y": "—",
+      "mobile": "—",
+      "dark": "—",
+      "medianMs": 0.1,
+      "status": "pass"
+    },
+    {
+      "slug": "clean-text",
+      "name": "Clean Text",
+      "category": "productivity",
+      "kind": "live panel",
+      "entryPoints": {
+        "route": "live-panels"
+      },
+      "entryCount": 1,
+      "tests": {
+        "passed": 2,
+        "flaky": 0,
+        "failed": 0,
+        "skipped": 0
+      },
+      "output": "✓ 2",
+      "privacy": "✓ 2",
+      "a11y": "—",
+      "mobile": "—",
+      "dark": "—",
+      "medianMs": 0.1,
+      "status": "pass"
+    },
+    {
+      "slug": "lorem-ipsum",
+      "name": "Lorem Ipsum",
+      "category": "productivity",
+      "kind": "live panel",
+      "entryPoints": {
+        "route": "live-panels",
+        "chat": "flows 5.3"
+      },
+      "entryCount": 2,
+      "tests": {
+        "passed": 4,
+        "flaky": 0,
+        "failed": 0,
+        "skipped": 0
+      },
+      "output": "✓ 2",
+      "privacy": "✓ 2",
+      "a11y": "—",
+      "mobile": "—",
+      "dark": "—",
+      "medianMs": 0.1,
+      "status": "pass"
+    },
+    {
+      "slug": "qr-code-generator",
+      "name": "QR Code",
+      "category": "productivity",
+      "kind": "page",
+      "entryPoints": {
+        "route": "tools universal",
+        "palette": "search: wifi qr",
+        "chat": "flows 5.3"
+      },
+      "entryCount": 3,
+      "tests": {
+        "passed": 30,
+        "flaky": 0,
+        "failed": 0,
+        "skipped": 4
+      },
+      "output": "✓ 30",
+      "privacy": "✓ 4",
+      "a11y": "✓ 4",
+      "mobile": "✓ 14",
+      "dark": "✓ 4",
+      "medianMs": null,
+      "status": "pass"
+    },
+    {
+      "slug": "json-formatter",
+      "name": "JSON Formatter",
+      "category": "developer",
+      "kind": "page",
+      "entryPoints": {
+        "route": "tools universal + live-panels",
+        "palette": "search: jsno formater",
+        "explore": "redesign live panel",
+        "paste": "flows 5.4"
+      },
+      "entryCount": 4,
+      "tests": {
+        "passed": 34,
+        "flaky": 0,
+        "failed": 0,
+        "skipped": 6
+      },
+      "output": "✓ 34",
+      "privacy": "✓ 6",
+      "a11y": "✓ 4",
+      "mobile": "✓ 15",
+      "dark": "✓ 4",
+      "medianMs": 1,
+      "status": "pass"
+    },
+    {
+      "slug": "jwt-decoder",
+      "name": "JWT Decoder",
+      "category": "developer",
+      "kind": "page",
+      "entryPoints": {
+        "route": "tools universal + live-panels",
+        "palette": "platform ⌘K",
+        "paste": "flows 5.4"
+      },
+      "entryCount": 3,
+      "tests": {
+        "passed": 30,
+        "flaky": 0,
+        "failed": 0,
+        "skipped": 4
+      },
+      "output": "✓ 30",
+      "privacy": "✓ 10",
+      "a11y": "✓ 4",
+      "mobile": "✓ 14",
+      "dark": "✓ 4",
+      "medianMs": 1,
+      "status": "pass"
+    },
+    {
+      "slug": "base64",
+      "name": "Base64",
+      "category": "developer",
+      "kind": "live panel",
+      "entryPoints": {
+        "route": "live-panels + redesign #base64",
+        "chat": "flows 5.3"
+      },
+      "entryCount": 2,
+      "tests": {
+        "passed": 6,
+        "flaky": 0,
+        "failed": 0,
+        "skipped": 0
+      },
+      "output": "✓ 6",
+      "privacy": "✓ 4",
+      "a11y": "—",
+      "mobile": "—",
+      "dark": "—",
+      "medianMs": 0.1,
+      "status": "pass"
+    },
+    {
+      "slug": "regex-tester",
+      "name": "Regex Tester",
+      "category": "developer",
+      "kind": "live panel",
+      "entryPoints": {
+        "route": "live-panels"
+      },
+      "entryCount": 1,
+      "tests": {
+        "passed": 2,
+        "flaky": 0,
+        "failed": 0,
+        "skipped": 0
+      },
+      "output": "✓ 2",
+      "privacy": "✓ 2",
+      "a11y": "—",
+      "mobile": "—",
+      "dark": "—",
+      "medianMs": 0.1,
+      "status": "pass"
+    },
+    {
+      "slug": "uuid-generator",
+      "name": "UUID Generator",
+      "category": "developer",
+      "kind": "live panel",
+      "entryPoints": {
+        "route": "live-panels",
+        "chat": "flows 5.3"
+      },
+      "entryCount": 2,
+      "tests": {
+        "passed": 2,
+        "flaky": 0,
+        "failed": 0,
+        "skipped": 0
+      },
+      "output": "✓ 2",
+      "privacy": "✓ 2",
+      "a11y": "—",
+      "mobile": "—",
+      "dark": "—",
+      "medianMs": 0.1,
+      "status": "pass"
+    },
+    {
+      "slug": "url-encoder",
+      "name": "URL Encoder",
+      "category": "developer",
+      "kind": "live panel",
+      "entryPoints": {
+        "route": "live-panels"
+      },
+      "entryCount": 1,
+      "tests": {
+        "passed": 2,
+        "flaky": 0,
+        "failed": 0,
+        "skipped": 0
+      },
+      "output": "✓ 2",
+      "privacy": "✓ 2",
+      "a11y": "—",
+      "mobile": "—",
+      "dark": "—",
+      "medianMs": 0.1,
+      "status": "pass"
+    },
+    {
+      "slug": "timestamp-converter",
+      "name": "Timestamp",
+      "category": "developer",
+      "kind": "live panel",
+      "entryPoints": {
+        "route": "live-panels",
+        "chat": "flows 5.3"
+      },
+      "entryCount": 2,
+      "tests": {
+        "passed": 4,
+        "flaky": 0,
+        "failed": 0,
+        "skipped": 0
+      },
+      "output": "✓ 2",
+      "privacy": "✓ 2",
+      "a11y": "—",
+      "mobile": "—",
+      "dark": "—",
+      "medianMs": 1,
+      "status": "pass"
+    },
+    {
+      "slug": "hash-generator",
+      "name": "Hash Generator",
+      "category": "developer",
+      "kind": "live panel",
+      "entryPoints": {
+        "route": "live-panels",
+        "chat": "flows 5.3"
+      },
+      "entryCount": 2,
+      "tests": {
+        "passed": 2,
+        "flaky": 0,
+        "failed": 0,
+        "skipped": 0
+      },
+      "output": "✓ 2",
+      "privacy": "✓ 2",
+      "a11y": "—",
+      "mobile": "—",
+      "dark": "—",
+      "medianMs": 5,
+      "status": "pass"
+    },
+    {
+      "slug": "sql-formatter",
+      "name": "SQL Formatter",
+      "category": "developer",
+      "kind": "live panel",
+      "entryPoints": {
+        "route": "live-panels"
+      },
+      "entryCount": 1,
+      "tests": {
+        "passed": 2,
+        "flaky": 0,
+        "failed": 0,
+        "skipped": 0
+      },
+      "output": "✓ 2",
+      "privacy": "✓ 2",
+      "a11y": "—",
+      "mobile": "—",
+      "dark": "—",
+      "medianMs": 0.1,
+      "status": "pass"
+    },
+    {
+      "slug": "json-to-csv",
+      "name": "CSV ↔ JSON",
+      "category": "developer",
+      "kind": "live panel",
+      "entryPoints": {
+        "route": "live-panels"
+      },
+      "entryCount": 1,
+      "tests": {
+        "passed": 2,
+        "flaky": 0,
+        "failed": 0,
+        "skipped": 0
+      },
+      "output": "✓ 2",
+      "privacy": "✓ 2",
+      "a11y": "—",
+      "mobile": "—",
+      "dark": "—",
+      "medianMs": 0.1,
+      "status": "pass"
+    },
+    {
+      "slug": "json-to-typescript",
+      "name": "JSON to TypeScript",
+      "category": "developer",
+      "kind": "live panel",
+      "entryPoints": {
+        "route": "live-panels"
+      },
+      "entryCount": 1,
+      "tests": {
+        "passed": 2,
+        "flaky": 0,
+        "failed": 0,
+        "skipped": 0
+      },
+      "output": "✓ 2",
+      "privacy": "✓ 2",
+      "a11y": "—",
+      "mobile": "—",
+      "dark": "—",
+      "medianMs": 0.1,
+      "status": "pass"
+    },
+    {
+      "slug": "cron-generator",
+      "name": "Cron Builder",
+      "category": "developer",
+      "kind": "live panel",
+      "entryPoints": {
+        "route": "live-panels"
+      },
+      "entryCount": 1,
+      "tests": {
+        "passed": 2,
+        "flaky": 0,
+        "failed": 0,
+        "skipped": 0
+      },
+      "output": "✓ 2",
+      "privacy": "✓ 2",
+      "a11y": "—",
+      "mobile": "—",
+      "dark": "—",
+      "medianMs": 2,
+      "status": "pass"
+    },
+    {
+      "slug": "color-converter",
+      "name": "Color Converter",
+      "category": "developer",
+      "kind": "live panel",
+      "entryPoints": {
+        "route": "live-panels"
+      },
+      "entryCount": 1,
+      "tests": {
+        "passed": 2,
+        "flaky": 0,
+        "failed": 0,
+        "skipped": 0
+      },
+      "output": "✓ 2",
+      "privacy": "✓ 2",
+      "a11y": "—",
+      "mobile": "—",
+      "dark": "—",
+      "medianMs": 0.1,
+      "status": "pass"
+    },
+    {
+      "slug": "password-generator",
+      "name": "Password Generator",
+      "category": "developer",
+      "kind": "live panel",
+      "entryPoints": {
+        "route": "live-panels",
+        "chat": "flows 5.3"
+      },
+      "entryCount": 2,
+      "tests": {
+        "passed": 4,
+        "flaky": 0,
+        "failed": 0,
+        "skipped": 0
+      },
+      "output": "✓ 2",
+      "privacy": "✓ 2",
+      "a11y": "—",
+      "mobile": "—",
+      "dark": "—",
+      "medianMs": 0.1,
+      "status": "pass"
+    },
+    {
+      "slug": "background-remover",
+      "name": "Background Remover",
+      "category": "creator",
+      "kind": "page",
+      "entryPoints": {
+        "route": "tools universal",
+        "palette": "search: bg",
+        "chat": "plan.spec (continue)"
+      },
+      "entryCount": 3,
+      "tests": {
+        "passed": 20,
+        "flaky": 0,
+        "failed": 0,
+        "skipped": 8
+      },
+      "output": "✓ 20",
+      "privacy": "✓ 4",
+      "a11y": "✓ 4",
+      "mobile": "✓ 10",
+      "dark": "✓ 4",
+      "medianMs": null,
+      "status": "pass"
+    }
+  ],
+  "comingSoon": [
+    {
+      "slug": "merge-pdf",
+      "name": "Merge PDF",
+      "category": "productivity"
+    },
+    {
+      "slug": "split-pdf",
+      "name": "Split PDF",
+      "category": "productivity"
+    },
+    {
+      "slug": "word-to-pdf",
+      "name": "Word to PDF",
+      "category": "productivity"
+    },
+    {
+      "slug": "pdf-to-jpg",
+      "name": "PDF to JPG",
+      "category": "productivity"
+    },
+    {
+      "slug": "jpg-to-pdf",
+      "name": "JPG to PDF",
+      "category": "productivity"
+    },
+    {
+      "slug": "organize-pdf",
+      "name": "Rotate PDF",
+      "category": "productivity"
+    },
+    {
+      "slug": "sign-pdf",
+      "name": "Fill & Sign",
+      "category": "productivity"
+    },
+    {
+      "slug": "protect-pdf",
+      "name": "Protect PDF",
+      "category": "productivity"
+    },
+    {
+      "slug": "pdf-watermark",
+      "name": "Watermark PDF",
+      "category": "productivity"
+    },
+    {
+      "slug": "crop-image",
+      "name": "Crop Image",
+      "category": "productivity"
+    },
+    {
+      "slug": "passport-photo-maker",
+      "name": "Passport Photo",
+      "category": "productivity"
+    },
+    {
+      "slug": "image-to-text",
+      "name": "Image to Text",
+      "category": "productivity"
+    },
+    {
+      "slug": "exif-remover",
+      "name": "Photo Metadata (EXIF) Remover",
+      "category": "productivity"
+    },
+    {
+      "slug": "bulk-rename",
+      "name": "Bulk Rename",
+      "category": "productivity"
+    },
+    {
+      "slug": "diff-checker",
+      "name": "Diff Checker",
+      "category": "productivity"
+    },
+    {
+      "slug": "resume-builder",
+      "name": "Resume Builder",
+      "category": "productivity"
+    },
+    {
+      "slug": "barcode-generator",
+      "name": "Barcode",
+      "category": "productivity"
+    },
+    {
+      "slug": "unit-converter",
+      "name": "Unit Converter",
+      "category": "productivity"
+    },
+    {
+      "slug": "time-zone-converter",
+      "name": "Time Zone Converter",
+      "category": "productivity"
+    },
+    {
+      "slug": "json-to-yaml",
+      "name": "YAML ↔ JSON",
+      "category": "developer"
+    },
+    {
+      "slug": "api-tester",
+      "name": "API Tester",
+      "category": "developer"
+    },
+    {
+      "slug": "html-playground",
+      "name": "Code Playground",
+      "category": "developer"
+    },
+    {
+      "slug": "code-minifier",
+      "name": "Minifier",
+      "category": "developer"
+    },
+    {
+      "slug": "markdown-editor",
+      "name": "Markdown Editor",
+      "category": "developer"
+    },
+    {
+      "slug": "env-redactor",
+      "name": ".env Redactor",
+      "category": "developer"
+    },
+    {
+      "slug": "meta-tag-generator",
+      "name": "Meta Tag Generator",
+      "category": "developer"
+    },
+    {
+      "slug": "schema-generator",
+      "name": "Schema Generator",
+      "category": "developer"
+    },
+    {
+      "slug": "chmod-calculator",
+      "name": "Chmod Calculator",
+      "category": "developer"
+    },
+    {
+      "slug": "html-entities",
+      "name": "HTML Entities",
+      "category": "developer"
+    },
+    {
+      "slug": "number-base-converter",
+      "name": "Base Converter",
+      "category": "developer"
+    },
+    {
+      "slug": "css-generator",
+      "name": "CSS Gradients",
+      "category": "developer"
+    },
+    {
+      "slug": "video-compressor",
+      "name": "Compress Video",
+      "category": "creator"
+    },
+    {
+      "slug": "video-converter",
+      "name": "Video Converter",
+      "category": "creator"
+    },
+    {
+      "slug": "video-trimmer",
+      "name": "Trim Video",
+      "category": "creator"
+    },
+    {
+      "slug": "video-to-gif",
+      "name": "Video to GIF",
+      "category": "creator"
+    },
+    {
+      "slug": "extract-audio",
+      "name": "Extract Audio",
+      "category": "creator"
+    },
+    {
+      "slug": "audio-converter",
+      "name": "Audio Converter",
+      "category": "creator"
+    },
+    {
+      "slug": "screen-recorder",
+      "name": "Screen Recorder",
+      "category": "creator"
+    },
+    {
+      "slug": "transcription",
+      "name": "Transcribe",
+      "category": "creator"
+    },
+    {
+      "slug": "subtitle-generator",
+      "name": "Subtitles",
+      "category": "creator"
+    },
+    {
+      "slug": "social-image-resizer",
+      "name": "Social Resizer",
+      "category": "creator"
+    },
+    {
+      "slug": "thumbnail-preview",
+      "name": "Thumbnail Preview",
+      "category": "creator"
+    },
+    {
+      "slug": "social-post-formatter",
+      "name": "Post Formatter",
+      "category": "creator"
+    },
+    {
+      "slug": "title-builder",
+      "name": "Caption Builder",
+      "category": "creator"
+    },
+    {
+      "slug": "hashtag-finder",
+      "name": "Hashtag Finder",
+      "category": "creator"
+    },
+    {
+      "slug": "bio-formatter",
+      "name": "Bio Formatter",
+      "category": "creator"
+    },
+    {
+      "slug": "image-upscaler",
+      "name": "Image Upscaler",
+      "category": "creator"
+    },
+    {
+      "slug": "text-to-speech",
+      "name": "Text to Speech",
+      "category": "creator"
+    },
+    {
+      "slug": "meme-generator",
+      "name": "Meme Maker",
+      "category": "creator"
+    },
+    {
+      "slug": "image-watermark",
+      "name": "Watermark",
+      "category": "creator"
+    },
+    {
+      "slug": "color-palette-from-image",
+      "name": "Color Palette",
+      "category": "creator"
+    },
+    {
+      "slug": "image-color-picker",
+      "name": "Eyedropper",
+      "category": "creator"
+    },
+    {
+      "slug": "collage-maker",
+      "name": "Collage Maker",
+      "category": "creator"
+    }
+  ],
+  "failures": [],
+  "flaky": []
 }
-
