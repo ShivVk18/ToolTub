@@ -222,7 +222,7 @@ export function FeelSection() {
         Easy to use. <em className="text-muted italic">Actually enjoyable.</em>
       </h2>
       <p className="sp text-center !text-ink2 text-[19px] mt-[14px]">
-        Most tool sites feel like work. KlipKit feels like magic, without the learning curve.
+        Most tool sites make you hunt through menus. Here you drop a file or say what you need, and it's done.
       </p>
 
       {/* 12-Column Bento Grid matching KlipKit_UI.html */}

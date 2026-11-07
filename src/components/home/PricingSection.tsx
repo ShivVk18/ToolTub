@@ -160,7 +160,8 @@ export function PricingSection({ onOpenPro }: PricingSectionProps) {
           <div className="pn text-[20px] font-semibold flex items-center justify-between">
             Pro{" "}
             <span className="pro inline-flex items-center px-[8px] py-[3px] rounded-full text-white text-[11px] font-bold tracking-[0.8px] bg-gradient-to-br from-[#8C7DFF] to-[#FF9C82]">
-              MOST LOVED
+              {/* Hallmark A7: no users yet, so no popularity claim. */}
+              MOST CAPABLE
             </span>
           </div>
           <div

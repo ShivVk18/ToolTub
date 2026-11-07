@@ -436,6 +436,15 @@ test.describe("KlipKit Redesign UI & Visual Layer", () => {
     await expect(card("Audio Converter").locator(".ti svg")).toBeVisible();
   });
 
+  test("A7: no unearned claims: no 'MOST LOVED' badge, no 'feels like magic'", async ({ page }) => {
+    await page.goto("/");
+    const body = page.locator("body");
+    await expect(body).not.toContainText(/most loved/i);
+    await expect(body).not.toContainText(/like magic/i);
+    await expect(page.locator("#pricing .plan.dark .pro")).toHaveText("MOST CAPABLE");
+    await expect(page.locator("#feel .sp")).toContainText("drop a file or say what you need");
+  });
+
   test("opening a live panel docks the orb and hides the satellites", async ({ page }) => {
     await page.goto("/#base64");
     await expect(page.locator("#panel")).toBeVisible();
