@@ -1,786 +1,1282 @@
 [
   {
-    "state": "a_hero_rest",
-    "theme": "light",
-    "viewport": "1920x1080",
-    "diffPercent": 4.95,
-    "passed": false
-  },
-  {
-    "state": "b_cursor_near_orb",
-    "theme": "light",
-    "viewport": "1920x1080",
-    "diffPercent": 4.54,
-    "passed": false
-  },
-  {
-    "state": "c_file_dragged",
-    "theme": "light",
-    "viewport": "1920x1080",
-    "diffPercent": 9.31,
-    "passed": false
-  },
-  {
-    "state": "d_workspace_dropped",
-    "theme": "light",
-    "viewport": "1920x1080",
-    "diffPercent": 6.57,
-    "passed": false
-  },
-  {
-    "state": "e_typing_plan",
-    "theme": "light",
-    "viewport": "1920x1080",
-    "diffPercent": 6.82,
-    "passed": false
-  },
-  {
-    "state": "f_plan_done",
-    "theme": "light",
-    "viewport": "1920x1080",
-    "diffPercent": 6.79,
-    "passed": false
-  },
-  {
-    "state": "g_pasted_json",
-    "theme": "light",
-    "viewport": "1920x1080",
-    "diffPercent": 6.19,
-    "passed": false
-  },
-  {
-    "state": "h_live_panel",
-    "theme": "light",
-    "viewport": "1920x1080",
-    "diffPercent": 3.87,
-    "passed": false
-  },
-  {
-    "state": "i_palette",
-    "theme": "light",
-    "viewport": "1920x1080",
-    "diffPercent": 48.36,
-    "passed": false
-  },
-  {
-    "state": "j_voice_sheet",
-    "theme": "light",
-    "viewport": "1920x1080",
-    "diffPercent": 29.6,
-    "passed": false
-  },
-  {
-    "state": "k_scrolled_nav",
-    "theme": "light",
-    "viewport": "1920x1080",
-    "diffPercent": 9.52,
-    "passed": false
-  },
-  {
-    "state": "l_marquee",
-    "theme": "light",
-    "viewport": "1920x1080",
-    "diffPercent": 11.5,
-    "passed": false
-  },
-  {
-    "state": "m_bento",
-    "theme": "light",
-    "viewport": "1920x1080",
-    "diffPercent": 7.78,
-    "passed": false
-  },
-  {
-    "state": "n_explore",
-    "theme": "light",
-    "viewport": "1920x1080",
-    "diffPercent": 17.06,
-    "passed": false
-  },
-  {
-    "state": "o_pricing",
-    "theme": "light",
-    "viewport": "1920x1080",
-    "diffPercent": 15.62,
-    "passed": false
-  },
-  {
-    "state": "p_footer_wordmark",
-    "theme": "light",
-    "viewport": "1920x1080",
-    "diffPercent": 10.23,
-    "passed": false
-  },
-  {
-    "state": "a_hero_rest",
-    "theme": "dark",
-    "viewport": "1920x1080",
-    "diffPercent": 3.01,
-    "passed": false
-  },
-  {
-    "state": "b_cursor_near_orb",
-    "theme": "dark",
-    "viewport": "1920x1080",
-    "diffPercent": 3,
-    "passed": false
-  },
-  {
-    "state": "c_file_dragged",
-    "theme": "dark",
-    "viewport": "1920x1080",
-    "diffPercent": 2.78,
-    "passed": false
-  },
-  {
-    "state": "d_workspace_dropped",
-    "theme": "dark",
-    "viewport": "1920x1080",
-    "diffPercent": 2.76,
-    "passed": false
-  },
-  {
-    "state": "e_typing_plan",
-    "theme": "dark",
-    "viewport": "1920x1080",
-    "diffPercent": 3.16,
-    "passed": false
-  },
-  {
-    "state": "f_plan_done",
-    "theme": "dark",
-    "viewport": "1920x1080",
-    "diffPercent": 3.04,
-    "passed": false
-  },
-  {
-    "state": "g_pasted_json",
-    "theme": "dark",
-    "viewport": "1920x1080",
-    "diffPercent": 2.16,
-    "passed": false
-  },
-  {
-    "state": "h_live_panel",
-    "theme": "dark",
-    "viewport": "1920x1080",
-    "diffPercent": 3.48,
-    "passed": false
-  },
-  {
-    "state": "i_palette",
-    "theme": "dark",
-    "viewport": "1920x1080",
-    "diffPercent": 8.43,
-    "passed": false
-  },
-  {
-    "state": "j_voice_sheet",
-    "theme": "dark",
-    "viewport": "1920x1080",
-    "diffPercent": 15.87,
-    "passed": false
-  },
-  {
-    "state": "k_scrolled_nav",
-    "theme": "dark",
-    "viewport": "1920x1080",
-    "diffPercent": 7.76,
-    "passed": false
-  },
-  {
-    "state": "l_marquee",
-    "theme": "dark",
-    "viewport": "1920x1080",
-    "diffPercent": 8.1,
-    "passed": false
-  },
-  {
-    "state": "m_bento",
-    "theme": "dark",
-    "viewport": "1920x1080",
-    "diffPercent": 6.29,
-    "passed": false
-  },
-  {
-    "state": "n_explore",
-    "theme": "dark",
-    "viewport": "1920x1080",
-    "diffPercent": 8.73,
-    "passed": false
-  },
-  {
-    "state": "o_pricing",
-    "theme": "dark",
-    "viewport": "1920x1080",
-    "diffPercent": 11.18,
-    "passed": false
-  },
-  {
-    "state": "p_footer_wordmark",
-    "theme": "dark",
-    "viewport": "1920x1080",
-    "diffPercent": 7,
-    "passed": false
-  },
-  {
-    "state": "a_hero_rest",
+    "state": "a",
+    "desc": "hero at rest",
     "theme": "light",
     "viewport": "2560x1440",
-    "diffPercent": 3.09,
-    "passed": false
+    "diffPercent": 0.28,
+    "passed": true
   },
   {
-    "state": "b_cursor_near_orb",
+    "state": "b",
+    "desc": "cursor near the orb",
     "theme": "light",
     "viewport": "2560x1440",
-    "diffPercent": 3.11,
-    "passed": false
+    "diffPercent": 0.31,
+    "passed": true
   },
   {
-    "state": "c_file_dragged",
+    "state": "c",
+    "desc": "file dragged over the page",
     "theme": "light",
     "viewport": "2560x1440",
-    "diffPercent": 15.98,
-    "passed": false
+    "diffPercent": 0.41,
+    "passed": true
   },
   {
-    "state": "d_workspace_dropped",
+    "state": "d",
+    "desc": "workspace after the sample PDF",
     "theme": "light",
     "viewport": "2560x1440",
-    "diffPercent": 4.18,
-    "passed": false
+    "diffPercent": 0.51,
+    "passed": true
   },
   {
-    "state": "e_typing_plan",
+    "state": "e",
+    "desc": "typing a multi-step instruction",
     "theme": "light",
     "viewport": "2560x1440",
-    "diffPercent": 4.2,
-    "passed": false
+    "diffPercent": 0.51,
+    "passed": true
   },
   {
-    "state": "f_plan_done",
+    "state": "f",
+    "desc": "plan running and done",
     "theme": "light",
     "viewport": "2560x1440",
-    "diffPercent": 4.29,
-    "passed": false
+    "diffPercent": 1.72,
+    "passed": true
   },
   {
-    "state": "g_pasted_json",
+    "state": "g",
+    "desc": "pasted JSON flow",
     "theme": "light",
     "viewport": "2560x1440",
-    "diffPercent": 4.03,
-    "passed": false
+    "diffPercent": 0.55,
+    "passed": true
   },
   {
-    "state": "h_live_panel",
+    "state": "h",
+    "desc": "live panel (JSON Formatter)",
     "theme": "light",
     "viewport": "2560x1440",
-    "diffPercent": 2.38,
-    "passed": false
+    "diffPercent": 0.38,
+    "passed": true
   },
   {
-    "state": "i_palette",
+    "state": "i",
+    "desc": "⌘K palette",
     "theme": "light",
     "viewport": "2560x1440",
-    "diffPercent": 56.58,
-    "passed": false
+    "diffPercent": 0.29,
+    "passed": true
   },
   {
-    "state": "j_voice_sheet",
+    "state": "j",
+    "desc": "Pro voice sheet",
     "theme": "light",
     "viewport": "2560x1440",
-    "diffPercent": 18.22,
-    "passed": false
+    "diffPercent": 0.37,
+    "passed": true
   },
   {
-    "state": "k_scrolled_nav",
+    "state": "k",
+    "desc": "scrolled 200 px (capsule nav)",
     "theme": "light",
     "viewport": "2560x1440",
-    "diffPercent": 5.66,
-    "passed": false
+    "diffPercent": 1.22,
+    "passed": true
   },
   {
-    "state": "l_marquee",
+    "state": "l",
+    "desc": "marquee band",
     "theme": "light",
     "viewport": "2560x1440",
-    "diffPercent": 6.41,
+    "diffPercent": 2.5,
     "passed": false
   },
   {
-    "state": "m_bento",
+    "state": "m",
+    "desc": "bento section",
     "theme": "light",
     "viewport": "2560x1440",
-    "diffPercent": 6.76,
-    "passed": false
+    "diffPercent": 1.94,
+    "passed": true
   },
   {
-    "state": "n_explore",
+    "state": "n",
+    "desc": "Explore grid + tab change",
     "theme": "light",
     "viewport": "2560x1440",
-    "diffPercent": 10.19,
-    "passed": false
+    "diffPercent": 1.46,
+    "passed": true
   },
   {
-    "state": "o_pricing",
+    "state": "o",
+    "desc": "pricing (yearly)",
     "theme": "light",
     "viewport": "2560x1440",
-    "diffPercent": 9.65,
-    "passed": false
+    "diffPercent": 0.6,
+    "passed": true
   },
   {
-    "state": "p_footer_wordmark",
+    "state": "p",
+    "desc": "footer wordmark with the cursor over it",
     "theme": "light",
     "viewport": "2560x1440",
-    "diffPercent": 9.72,
+    "diffPercent": 0.47,
+    "passed": true
+  },
+  {
+    "state": "a",
+    "desc": "hero at rest",
+    "theme": "dark",
+    "viewport": "2560x1440",
+    "diffPercent": 0.27,
+    "passed": true
+  },
+  {
+    "state": "b",
+    "desc": "cursor near the orb",
+    "theme": "dark",
+    "viewport": "2560x1440",
+    "diffPercent": 0.26,
+    "passed": true
+  },
+  {
+    "state": "c",
+    "desc": "file dragged over the page",
+    "theme": "dark",
+    "viewport": "2560x1440",
+    "diffPercent": 0.37,
+    "passed": true
+  },
+  {
+    "state": "d",
+    "desc": "workspace after the sample PDF",
+    "theme": "dark",
+    "viewport": "2560x1440",
+    "diffPercent": 0.72,
+    "passed": true
+  },
+  {
+    "state": "e",
+    "desc": "typing a multi-step instruction",
+    "theme": "dark",
+    "viewport": "2560x1440",
+    "diffPercent": 0.44,
+    "passed": true
+  },
+  {
+    "state": "f",
+    "desc": "plan running and done",
+    "theme": "dark",
+    "viewport": "2560x1440",
+    "diffPercent": 1.44,
+    "passed": true
+  },
+  {
+    "state": "g",
+    "desc": "pasted JSON flow",
+    "theme": "dark",
+    "viewport": "2560x1440",
+    "diffPercent": 0.37,
+    "passed": true
+  },
+  {
+    "state": "h",
+    "desc": "live panel (JSON Formatter)",
+    "theme": "dark",
+    "viewport": "2560x1440",
+    "diffPercent": 0.38,
+    "passed": true
+  },
+  {
+    "state": "i",
+    "desc": "⌘K palette",
+    "theme": "dark",
+    "viewport": "2560x1440",
+    "diffPercent": 0.28,
+    "passed": true
+  },
+  {
+    "state": "j",
+    "desc": "Pro voice sheet",
+    "theme": "dark",
+    "viewport": "2560x1440",
+    "diffPercent": 0.38,
+    "passed": true
+  },
+  {
+    "state": "k",
+    "desc": "scrolled 200 px (capsule nav)",
+    "theme": "dark",
+    "viewport": "2560x1440",
+    "diffPercent": 0.45,
+    "passed": true
+  },
+  {
+    "state": "l",
+    "desc": "marquee band",
+    "theme": "dark",
+    "viewport": "2560x1440",
+    "diffPercent": 1.73,
+    "passed": true
+  },
+  {
+    "state": "m",
+    "desc": "bento section",
+    "theme": "dark",
+    "viewport": "2560x1440",
+    "diffPercent": 1.78,
+    "passed": true
+  },
+  {
+    "state": "n",
+    "desc": "Explore grid + tab change",
+    "theme": "dark",
+    "viewport": "2560x1440",
+    "diffPercent": 1.44,
+    "passed": true
+  },
+  {
+    "state": "o",
+    "desc": "pricing (yearly)",
+    "theme": "dark",
+    "viewport": "2560x1440",
+    "diffPercent": 0.76,
+    "passed": true
+  },
+  {
+    "state": "p",
+    "desc": "footer wordmark with the cursor over it",
+    "theme": "dark",
+    "viewport": "2560x1440",
+    "diffPercent": 0.53,
+    "passed": true
+  },
+  {
+    "state": "a",
+    "desc": "hero at rest",
+    "theme": "light",
+    "viewport": "1920x1080",
+    "diffPercent": 0.52,
+    "passed": true
+  },
+  {
+    "state": "b",
+    "desc": "cursor near the orb",
+    "theme": "light",
+    "viewport": "1920x1080",
+    "diffPercent": 0.51,
+    "passed": true
+  },
+  {
+    "state": "c",
+    "desc": "file dragged over the page",
+    "theme": "light",
+    "viewport": "1920x1080",
+    "diffPercent": 0.69,
+    "passed": true
+  },
+  {
+    "state": "d",
+    "desc": "workspace after the sample PDF",
+    "theme": "light",
+    "viewport": "1920x1080",
+    "diffPercent": 0.9,
+    "passed": true
+  },
+  {
+    "state": "e",
+    "desc": "typing a multi-step instruction",
+    "theme": "light",
+    "viewport": "1920x1080",
+    "diffPercent": 0.91,
+    "passed": true
+  },
+  {
+    "state": "f",
+    "desc": "plan running and done",
+    "theme": "light",
+    "viewport": "1920x1080",
+    "diffPercent": 3.5,
     "passed": false
   },
   {
-    "state": "a_hero_rest",
+    "state": "g",
+    "desc": "pasted JSON flow",
+    "theme": "light",
+    "viewport": "1920x1080",
+    "diffPercent": 0.96,
+    "passed": true
+  },
+  {
+    "state": "h",
+    "desc": "live panel (JSON Formatter)",
+    "theme": "light",
+    "viewport": "1920x1080",
+    "diffPercent": 0.71,
+    "passed": true
+  },
+  {
+    "state": "i",
+    "desc": "⌘K palette",
+    "theme": "light",
+    "viewport": "1920x1080",
+    "diffPercent": 0.53,
+    "passed": true
+  },
+  {
+    "state": "j",
+    "desc": "Pro voice sheet",
+    "theme": "light",
+    "viewport": "1920x1080",
+    "diffPercent": 1.8,
+    "passed": true
+  },
+  {
+    "state": "k",
+    "desc": "scrolled 200 px (capsule nav)",
+    "theme": "light",
+    "viewport": "1920x1080",
+    "diffPercent": 1.69,
+    "passed": true
+  },
+  {
+    "state": "l",
+    "desc": "marquee band",
+    "theme": "light",
+    "viewport": "1920x1080",
+    "diffPercent": 3.52,
+    "passed": false
+  },
+  {
+    "state": "m",
+    "desc": "bento section",
+    "theme": "light",
+    "viewport": "1920x1080",
+    "diffPercent": 2.83,
+    "passed": false
+  },
+  {
+    "state": "n",
+    "desc": "Explore grid + tab change",
+    "theme": "light",
+    "viewport": "1920x1080",
+    "diffPercent": 2.54,
+    "passed": false
+  },
+  {
+    "state": "o",
+    "desc": "pricing (yearly)",
+    "theme": "light",
+    "viewport": "1920x1080",
+    "diffPercent": 1.86,
+    "passed": true
+  },
+  {
+    "state": "p",
+    "desc": "footer wordmark with the cursor over it",
+    "theme": "light",
+    "viewport": "1920x1080",
+    "diffPercent": 0.66,
+    "passed": true
+  },
+  {
+    "state": "a",
+    "desc": "hero at rest",
+    "theme": "dark",
+    "viewport": "1920x1080",
+    "diffPercent": 0.51,
+    "passed": true
+  },
+  {
+    "state": "b",
+    "desc": "cursor near the orb",
+    "theme": "dark",
+    "viewport": "1920x1080",
+    "diffPercent": 0.5,
+    "passed": true
+  },
+  {
+    "state": "c",
+    "desc": "file dragged over the page",
+    "theme": "dark",
+    "viewport": "1920x1080",
+    "diffPercent": 0.71,
+    "passed": true
+  },
+  {
+    "state": "d",
+    "desc": "workspace after the sample PDF",
+    "theme": "dark",
+    "viewport": "1920x1080",
+    "diffPercent": 1.31,
+    "passed": true
+  },
+  {
+    "state": "e",
+    "desc": "typing a multi-step instruction",
+    "theme": "dark",
+    "viewport": "1920x1080",
+    "diffPercent": 0.82,
+    "passed": true
+  },
+  {
+    "state": "f",
+    "desc": "plan running and done",
+    "theme": "dark",
+    "viewport": "1920x1080",
+    "diffPercent": 2.82,
+    "passed": false
+  },
+  {
+    "state": "g",
+    "desc": "pasted JSON flow",
+    "theme": "dark",
+    "viewport": "1920x1080",
+    "diffPercent": 0.66,
+    "passed": true
+  },
+  {
+    "state": "h",
+    "desc": "live panel (JSON Formatter)",
+    "theme": "dark",
+    "viewport": "1920x1080",
+    "diffPercent": 0.69,
+    "passed": true
+  },
+  {
+    "state": "i",
+    "desc": "⌘K palette",
+    "theme": "dark",
+    "viewport": "1920x1080",
+    "diffPercent": 0.52,
+    "passed": true
+  },
+  {
+    "state": "j",
+    "desc": "Pro voice sheet",
+    "theme": "dark",
+    "viewport": "1920x1080",
+    "diffPercent": 1.81,
+    "passed": true
+  },
+  {
+    "state": "k",
+    "desc": "scrolled 200 px (capsule nav)",
+    "theme": "dark",
+    "viewport": "1920x1080",
+    "diffPercent": 1.43,
+    "passed": true
+  },
+  {
+    "state": "l",
+    "desc": "marquee band",
+    "theme": "dark",
+    "viewport": "1920x1080",
+    "diffPercent": 3.34,
+    "passed": false
+  },
+  {
+    "state": "m",
+    "desc": "bento section",
+    "theme": "dark",
+    "viewport": "1920x1080",
+    "diffPercent": 2.5,
+    "passed": false
+  },
+  {
+    "state": "n",
+    "desc": "Explore grid + tab change",
+    "theme": "dark",
+    "viewport": "1920x1080",
+    "diffPercent": 2.48,
+    "passed": false
+  },
+  {
+    "state": "o",
+    "desc": "pricing (yearly)",
+    "theme": "dark",
+    "viewport": "1920x1080",
+    "diffPercent": 2.02,
+    "passed": false
+  },
+  {
+    "state": "p",
+    "desc": "footer wordmark with the cursor over it",
+    "theme": "dark",
+    "viewport": "1920x1080",
+    "diffPercent": 0.77,
+    "passed": true
+  },
+  {
+    "state": "a",
+    "desc": "hero at rest",
     "theme": "light",
     "viewport": "1440x900",
-    "diffPercent": 6.25,
+    "diffPercent": 0.85,
+    "passed": true
+  },
+  {
+    "state": "b",
+    "desc": "cursor near the orb",
+    "theme": "light",
+    "viewport": "1440x900",
+    "diffPercent": 0.85,
+    "passed": true
+  },
+  {
+    "state": "c",
+    "desc": "file dragged over the page",
+    "theme": "light",
+    "viewport": "1440x900",
+    "diffPercent": 1.14,
+    "passed": true
+  },
+  {
+    "state": "d",
+    "desc": "workspace after the sample PDF",
+    "theme": "light",
+    "viewport": "1440x900",
+    "diffPercent": 1.38,
+    "passed": true
+  },
+  {
+    "state": "e",
+    "desc": "typing a multi-step instruction",
+    "theme": "light",
+    "viewport": "1440x900",
+    "diffPercent": 1.38,
+    "passed": true
+  },
+  {
+    "state": "f",
+    "desc": "plan running and done",
+    "theme": "light",
+    "viewport": "1440x900",
+    "diffPercent": 3.46,
     "passed": false
   },
   {
-    "state": "b_cursor_near_orb",
+    "state": "g",
+    "desc": "pasted JSON flow",
     "theme": "light",
     "viewport": "1440x900",
+    "diffPercent": 1.41,
+    "passed": true
+  },
+  {
+    "state": "h",
+    "desc": "live panel (JSON Formatter)",
+    "theme": "light",
+    "viewport": "1440x900",
+    "diffPercent": 1.14,
+    "passed": true
+  },
+  {
+    "state": "i",
+    "desc": "⌘K palette",
+    "theme": "light",
+    "viewport": "1440x900",
+    "diffPercent": 0.83,
+    "passed": true
+  },
+  {
+    "state": "j",
+    "desc": "Pro voice sheet",
+    "theme": "light",
+    "viewport": "1440x900",
+    "diffPercent": 2.34,
+    "passed": false
+  },
+  {
+    "state": "k",
+    "desc": "scrolled 200 px (capsule nav)",
+    "theme": "light",
+    "viewport": "1440x900",
+    "diffPercent": 2.39,
+    "passed": false
+  },
+  {
+    "state": "l",
+    "desc": "marquee band",
+    "theme": "light",
+    "viewport": "1440x900",
+    "diffPercent": 4,
+    "passed": false
+  },
+  {
+    "state": "m",
+    "desc": "bento section",
+    "theme": "light",
+    "viewport": "1440x900",
+    "diffPercent": 3.57,
+    "passed": false
+  },
+  {
+    "state": "n",
+    "desc": "Explore grid + tab change",
+    "theme": "light",
+    "viewport": "1440x900",
+    "diffPercent": 3.25,
+    "passed": false
+  },
+  {
+    "state": "o",
+    "desc": "pricing (yearly)",
+    "theme": "light",
+    "viewport": "1440x900",
+    "diffPercent": 2.21,
+    "passed": false
+  },
+  {
+    "state": "p",
+    "desc": "footer wordmark with the cursor over it",
+    "theme": "light",
+    "viewport": "1440x900",
+    "diffPercent": 1.13,
+    "passed": true
+  },
+  {
+    "state": "a",
+    "desc": "hero at rest",
+    "theme": "dark",
+    "viewport": "1440x900",
+    "diffPercent": 0.87,
+    "passed": true
+  },
+  {
+    "state": "b",
+    "desc": "cursor near the orb",
+    "theme": "dark",
+    "viewport": "1440x900",
+    "diffPercent": 0.91,
+    "passed": true
+  },
+  {
+    "state": "c",
+    "desc": "file dragged over the page",
+    "theme": "dark",
+    "viewport": "1440x900",
+    "diffPercent": 1.23,
+    "passed": true
+  },
+  {
+    "state": "d",
+    "desc": "workspace after the sample PDF",
+    "theme": "dark",
+    "viewport": "1440x900",
+    "diffPercent": 2,
+    "passed": true
+  },
+  {
+    "state": "e",
+    "desc": "typing a multi-step instruction",
+    "theme": "dark",
+    "viewport": "1440x900",
+    "diffPercent": 1.36,
+    "passed": true
+  },
+  {
+    "state": "f",
+    "desc": "plan running and done",
+    "theme": "dark",
+    "viewport": "1440x900",
+    "diffPercent": 2.21,
+    "passed": false
+  },
+  {
+    "state": "g",
+    "desc": "pasted JSON flow",
+    "theme": "dark",
+    "viewport": "1440x900",
+    "diffPercent": 1.1,
+    "passed": true
+  },
+  {
+    "state": "h",
+    "desc": "live panel (JSON Formatter)",
+    "theme": "dark",
+    "viewport": "1440x900",
+    "diffPercent": 1.15,
+    "passed": true
+  },
+  {
+    "state": "i",
+    "desc": "⌘K palette",
+    "theme": "dark",
+    "viewport": "1440x900",
+    "diffPercent": 0.83,
+    "passed": true
+  },
+  {
+    "state": "j",
+    "desc": "Pro voice sheet",
+    "theme": "dark",
+    "viewport": "1440x900",
+    "diffPercent": 2.29,
+    "passed": false
+  },
+  {
+    "state": "k",
+    "desc": "scrolled 200 px (capsule nav)",
+    "theme": "dark",
+    "viewport": "1440x900",
+    "diffPercent": 1.01,
+    "passed": true
+  },
+  {
+    "state": "l",
+    "desc": "marquee band",
+    "theme": "dark",
+    "viewport": "1440x900",
+    "diffPercent": 3.08,
+    "passed": false
+  },
+  {
+    "state": "m",
+    "desc": "bento section",
+    "theme": "dark",
+    "viewport": "1440x900",
+    "diffPercent": 3.44,
+    "passed": false
+  },
+  {
+    "state": "n",
+    "desc": "Explore grid + tab change",
+    "theme": "dark",
+    "viewport": "1440x900",
+    "diffPercent": 3.32,
+    "passed": false
+  },
+  {
+    "state": "o",
+    "desc": "pricing (yearly)",
+    "theme": "dark",
+    "viewport": "1440x900",
+    "diffPercent": 2.61,
+    "passed": false
+  },
+  {
+    "state": "p",
+    "desc": "footer wordmark with the cursor over it",
+    "theme": "dark",
+    "viewport": "1440x900",
+    "diffPercent": 1.43,
+    "passed": true
+  },
+  {
+    "state": "a",
+    "desc": "hero at rest",
+    "theme": "light",
+    "viewport": "768x1024",
+    "diffPercent": 1.12,
+    "passed": true
+  },
+  {
+    "state": "b",
+    "desc": "cursor near the orb",
+    "theme": "light",
+    "viewport": "768x1024",
+    "diffPercent": 1.12,
+    "passed": true
+  },
+  {
+    "state": "c",
+    "desc": "file dragged over the page",
+    "theme": "light",
+    "viewport": "768x1024",
+    "diffPercent": 1.53,
+    "passed": true
+  },
+  {
+    "state": "d",
+    "desc": "workspace after the sample PDF",
+    "theme": "light",
+    "viewport": "768x1024",
+    "diffPercent": 1.77,
+    "passed": true
+  },
+  {
+    "state": "e",
+    "desc": "typing a multi-step instruction",
+    "theme": "light",
+    "viewport": "768x1024",
+    "diffPercent": 1.9,
+    "passed": true
+  },
+  {
+    "state": "f",
+    "desc": "plan running and done",
+    "theme": "light",
+    "viewport": "768x1024",
+    "diffPercent": 6.31,
+    "passed": false
+  },
+  {
+    "state": "g",
+    "desc": "pasted JSON flow",
+    "theme": "light",
+    "viewport": "768x1024",
+    "diffPercent": 1.93,
+    "passed": true
+  },
+  {
+    "state": "h",
+    "desc": "live panel (JSON Formatter)",
+    "theme": "light",
+    "viewport": "768x1024",
+    "diffPercent": 0.83,
+    "passed": true
+  },
+  {
+    "state": "i",
+    "desc": "⌘K palette",
+    "theme": "light",
+    "viewport": "768x1024",
+    "diffPercent": 1.4,
+    "passed": true
+  },
+  {
+    "state": "j",
+    "desc": "Pro voice sheet",
+    "theme": "light",
+    "viewport": "768x1024",
+    "diffPercent": 12.91,
+    "passed": false
+  },
+  {
+    "state": "k",
+    "desc": "scrolled 200 px (capsule nav)",
+    "theme": "light",
+    "viewport": "768x1024",
+    "diffPercent": 2.51,
+    "passed": false
+  },
+  {
+    "state": "l",
+    "desc": "marquee band",
+    "theme": "light",
+    "viewport": "768x1024",
+    "diffPercent": 4.25,
+    "passed": false
+  },
+  {
+    "state": "m",
+    "desc": "bento section",
+    "theme": "light",
+    "viewport": "768x1024",
     "diffPercent": 6,
     "passed": false
   },
   {
-    "state": "c_file_dragged",
-    "theme": "light",
-    "viewport": "1440x900",
-    "diffPercent": 7.47,
-    "passed": false
-  },
-  {
-    "state": "d_workspace_dropped",
-    "theme": "light",
-    "viewport": "1440x900",
-    "diffPercent": 9.76,
-    "passed": false
-  },
-  {
-    "state": "e_typing_plan",
-    "theme": "light",
-    "viewport": "1440x900",
-    "diffPercent": 10.09,
-    "passed": false
-  },
-  {
-    "state": "f_plan_done",
-    "theme": "light",
-    "viewport": "1440x900",
-    "diffPercent": 10.12,
-    "passed": false
-  },
-  {
-    "state": "g_pasted_json",
-    "theme": "light",
-    "viewport": "1440x900",
-    "diffPercent": 9.21,
-    "passed": false
-  },
-  {
-    "state": "h_live_panel",
-    "theme": "light",
-    "viewport": "1440x900",
-    "diffPercent": 4.41,
-    "passed": false
-  },
-  {
-    "state": "i_palette",
-    "theme": "light",
-    "viewport": "1440x900",
-    "diffPercent": 41.27,
-    "passed": false
-  },
-  {
-    "state": "j_voice_sheet",
-    "theme": "light",
-    "viewport": "1440x900",
-    "diffPercent": 37.75,
-    "passed": false
-  },
-  {
-    "state": "k_scrolled_nav",
-    "theme": "light",
-    "viewport": "1440x900",
-    "diffPercent": 11.28,
-    "passed": false
-  },
-  {
-    "state": "l_marquee",
-    "theme": "light",
-    "viewport": "1440x900",
-    "diffPercent": 10.83,
-    "passed": false
-  },
-  {
-    "state": "m_bento",
-    "theme": "light",
-    "viewport": "1440x900",
-    "diffPercent": 10.51,
-    "passed": false
-  },
-  {
-    "state": "n_explore",
-    "theme": "light",
-    "viewport": "1440x900",
-    "diffPercent": 23.23,
-    "passed": false
-  },
-  {
-    "state": "o_pricing",
-    "theme": "light",
-    "viewport": "1440x900",
-    "diffPercent": 20.18,
-    "passed": false
-  },
-  {
-    "state": "p_footer_wordmark",
-    "theme": "light",
-    "viewport": "1440x900",
-    "diffPercent": 14.26,
-    "passed": false
-  },
-  {
-    "state": "a_hero_rest",
+    "state": "n",
+    "desc": "Explore grid + tab change",
     "theme": "light",
     "viewport": "768x1024",
-    "diffPercent": 8.09,
+    "diffPercent": 3.09,
     "passed": false
   },
   {
-    "state": "b_cursor_near_orb",
+    "state": "o",
+    "desc": "pricing (yearly)",
     "theme": "light",
     "viewport": "768x1024",
-    "diffPercent": 8.12,
+    "diffPercent": 12.16,
     "passed": false
   },
   {
-    "state": "c_file_dragged",
+    "state": "p",
+    "desc": "footer wordmark with the cursor over it",
     "theme": "light",
     "viewport": "768x1024",
-    "diffPercent": 27.03,
+    "diffPercent": 2.08,
     "passed": false
   },
   {
-    "state": "d_workspace_dropped",
-    "theme": "light",
+    "state": "a",
+    "desc": "hero at rest",
+    "theme": "dark",
     "viewport": "768x1024",
-    "diffPercent": 13.71,
-    "passed": false
+    "diffPercent": 1.06,
+    "passed": true
   },
   {
-    "state": "e_typing_plan",
-    "theme": "light",
+    "state": "b",
+    "desc": "cursor near the orb",
+    "theme": "dark",
     "viewport": "768x1024",
-    "diffPercent": 14.67,
-    "passed": false
+    "diffPercent": 1.08,
+    "passed": true
   },
   {
-    "state": "f_plan_done",
-    "theme": "light",
+    "state": "c",
+    "desc": "file dragged over the page",
+    "theme": "dark",
     "viewport": "768x1024",
-    "diffPercent": 14.69,
-    "passed": false
+    "diffPercent": 1.47,
+    "passed": true
   },
   {
-    "state": "g_pasted_json",
-    "theme": "light",
+    "state": "d",
+    "desc": "workspace after the sample PDF",
+    "theme": "dark",
     "viewport": "768x1024",
-    "diffPercent": 13.01,
+    "diffPercent": 2.9,
     "passed": false
   },
   {
-    "state": "h_live_panel",
-    "theme": "light",
+    "state": "e",
+    "desc": "typing a multi-step instruction",
+    "theme": "dark",
     "viewport": "768x1024",
-    "diffPercent": 5.61,
-    "passed": false
+    "diffPercent": 1.98,
+    "passed": true
   },
   {
-    "state": "i_palette",
-    "theme": "light",
+    "state": "f",
+    "desc": "plan running and done",
+    "theme": "dark",
     "viewport": "768x1024",
-    "diffPercent": 54.17,
+    "diffPercent": 5.24,
     "passed": false
   },
   {
-    "state": "j_voice_sheet",
-    "theme": "light",
+    "state": "g",
+    "desc": "pasted JSON flow",
+    "theme": "dark",
     "viewport": "768x1024",
-    "diffPercent": 27.52,
-    "passed": false
+    "diffPercent": 1.54,
+    "passed": true
   },
   {
-    "state": "k_scrolled_nav",
-    "theme": "light",
+    "state": "h",
+    "desc": "live panel (JSON Formatter)",
+    "theme": "dark",
     "viewport": "768x1024",
-    "diffPercent": 10.98,
-    "passed": false
+    "diffPercent": 0.94,
+    "passed": true
   },
   {
-    "state": "l_marquee",
-    "theme": "light",
+    "state": "i",
+    "desc": "⌘K palette",
+    "theme": "dark",
     "viewport": "768x1024",
-    "diffPercent": 14.81,
-    "passed": false
+    "diffPercent": 1.39,
+    "passed": true
   },
   {
-    "state": "m_bento",
-    "theme": "light",
+    "state": "j",
+    "desc": "Pro voice sheet",
+    "theme": "dark",
     "viewport": "768x1024",
-    "diffPercent": 10.07,
+    "diffPercent": 3.45,
     "passed": false
   },
   {
-    "state": "n_explore",
-    "theme": "light",
+    "state": "k",
+    "desc": "scrolled 200 px (capsule nav)",
+    "theme": "dark",
     "viewport": "768x1024",
-    "diffPercent": 24.06,
-    "passed": false
+    "diffPercent": 1.65,
+    "passed": true
   },
   {
-    "state": "o_pricing",
-    "theme": "light",
+    "state": "l",
+    "desc": "marquee band",
+    "theme": "dark",
     "viewport": "768x1024",
-    "diffPercent": 19.55,
+    "diffPercent": 4.98,
     "passed": false
   },
   {
-    "state": "p_footer_wordmark",
-    "theme": "light",
+    "state": "m",
+    "desc": "bento section",
+    "theme": "dark",
     "viewport": "768x1024",
-    "diffPercent": 29.66,
+    "diffPercent": 4.28,
     "passed": false
   },
   {
-    "state": "a_hero_rest",
+    "state": "n",
+    "desc": "Explore grid + tab change",
+    "theme": "dark",
+    "viewport": "768x1024",
+    "diffPercent": 3.26,
+    "passed": false
+  },
+  {
+    "state": "o",
+    "desc": "pricing (yearly)",
+    "theme": "dark",
+    "viewport": "768x1024",
+    "diffPercent": 11.14,
+    "passed": false
+  },
+  {
+    "state": "p",
+    "desc": "footer wordmark with the cursor over it",
+    "theme": "dark",
+    "viewport": "768x1024",
+    "diffPercent": 2.56,
+    "passed": false
+  },
+  {
+    "state": "a",
+    "desc": "hero at rest",
     "theme": "light",
     "viewport": "390x844",
-    "diffPercent": 16.33,
+    "diffPercent": 3.28,
     "passed": false
   },
   {
-    "state": "b_cursor_near_orb",
+    "state": "b",
+    "desc": "cursor near the orb",
     "theme": "light",
     "viewport": "390x844",
-    "diffPercent": 15.14,
+    "diffPercent": 3.23,
     "passed": false
   },
   {
-    "state": "c_file_dragged",
+    "state": "c",
+    "desc": "file dragged over the page",
     "theme": "light",
     "viewport": "390x844",
-    "diffPercent": 23.55,
+    "diffPercent": 4.97,
     "passed": false
   },
   {
-    "state": "d_workspace_dropped",
+    "state": "d",
+    "desc": "workspace after the sample PDF",
     "theme": "light",
     "viewport": "390x844",
-    "diffPercent": 24.85,
+    "diffPercent": 5.54,
     "passed": false
   },
   {
-    "state": "e_typing_plan",
+    "state": "e",
+    "desc": "typing a multi-step instruction",
     "theme": "light",
     "viewport": "390x844",
-    "diffPercent": 31.97,
+    "diffPercent": 9.01,
     "passed": false
   },
   {
-    "state": "f_plan_done",
+    "state": "f",
+    "desc": "plan running and done",
     "theme": "light",
     "viewport": "390x844",
-    "diffPercent": 31.93,
+    "diffPercent": 9.7,
     "passed": false
   },
   {
-    "state": "g_pasted_json",
+    "state": "g",
+    "desc": "pasted JSON flow",
     "theme": "light",
     "viewport": "390x844",
-    "diffPercent": 22.36,
+    "diffPercent": 4.78,
     "passed": false
   },
   {
-    "state": "h_live_panel",
+    "state": "h",
+    "desc": "live panel (JSON Formatter)",
     "theme": "light",
     "viewport": "390x844",
-    "diffPercent": 18.25,
+    "diffPercent": 5.71,
     "passed": false
   },
   {
-    "state": "i_palette",
+    "state": "i",
+    "desc": "⌘K palette",
     "theme": "light",
     "viewport": "390x844",
-    "diffPercent": 64.48,
+    "diffPercent": 4.01,
     "passed": false
   },
   {
-    "state": "j_voice_sheet",
+    "state": "j",
+    "desc": "Pro voice sheet",
     "theme": "light",
     "viewport": "390x844",
-    "diffPercent": 41.13,
+    "diffPercent": 4.8,
     "passed": false
   },
   {
-    "state": "k_scrolled_nav",
+    "state": "k",
+    "desc": "scrolled 200 px (capsule nav)",
     "theme": "light",
     "viewport": "390x844",
-    "diffPercent": 17.01,
+    "diffPercent": 4.42,
     "passed": false
   },
   {
-    "state": "l_marquee",
+    "state": "l",
+    "desc": "marquee band",
     "theme": "light",
     "viewport": "390x844",
-    "diffPercent": 13.37,
+    "diffPercent": 5.12,
     "passed": false
   },
   {
-    "state": "m_bento",
+    "state": "m",
+    "desc": "bento section",
     "theme": "light",
     "viewport": "390x844",
-    "diffPercent": 9.56,
+    "diffPercent": 7.83,
     "passed": false
   },
   {
-    "state": "n_explore",
+    "state": "n",
+    "desc": "Explore grid + tab change",
     "theme": "light",
     "viewport": "390x844",
-    "diffPercent": 23.16,
+    "diffPercent": 4.72,
     "passed": false
   },
   {
-    "state": "o_pricing",
+    "state": "o",
+    "desc": "pricing (yearly)",
     "theme": "light",
     "viewport": "390x844",
-    "diffPercent": 14.95,
+    "diffPercent": 3,
     "passed": false
   },
   {
-    "state": "p_footer_wordmark",
+    "state": "p",
+    "desc": "footer wordmark with the cursor over it",
     "theme": "light",
     "viewport": "390x844",
-    "diffPercent": 35.6,
+    "diffPercent": 11.01,
     "passed": false
   },
   {
-    "state": "a_hero_rest",
+    "state": "a",
+    "desc": "hero at rest",
     "theme": "dark",
     "viewport": "390x844",
-    "diffPercent": 11.73,
+    "diffPercent": 3.24,
     "passed": false
   },
   {
-    "state": "b_cursor_near_orb",
+    "state": "b",
+    "desc": "cursor near the orb",
     "theme": "dark",
     "viewport": "390x844",
-    "diffPercent": 11.75,
+    "diffPercent": 3.04,
     "passed": false
   },
   {
-    "state": "c_file_dragged",
+    "state": "c",
+    "desc": "file dragged over the page",
     "theme": "dark",
     "viewport": "390x844",
-    "diffPercent": 11.5,
+    "diffPercent": 4.25,
     "passed": false
   },
   {
-    "state": "d_workspace_dropped",
+    "state": "d",
+    "desc": "workspace after the sample PDF",
     "theme": "dark",
     "viewport": "390x844",
-    "diffPercent": 11.03,
+    "diffPercent": 6.57,
     "passed": false
   },
   {
-    "state": "e_typing_plan",
+    "state": "e",
+    "desc": "typing a multi-step instruction",
     "theme": "dark",
     "viewport": "390x844",
-    "diffPercent": 16.59,
+    "diffPercent": 10.06,
     "passed": false
   },
   {
-    "state": "f_plan_done",
+    "state": "f",
+    "desc": "plan running and done",
     "theme": "dark",
     "viewport": "390x844",
-    "diffPercent": 16.67,
+    "diffPercent": 9.47,
     "passed": false
   },
   {
-    "state": "g_pasted_json",
+    "state": "g",
+    "desc": "pasted JSON flow",
     "theme": "dark",
     "viewport": "390x844",
-    "diffPercent": 9.39,
+    "diffPercent": 4.95,
     "passed": false
   },
   {
-    "state": "h_live_panel",
+    "state": "h",
+    "desc": "live panel (JSON Formatter)",
     "theme": "dark",
     "viewport": "390x844",
-    "diffPercent": 15.64,
+    "diffPercent": 5.65,
     "passed": false
   },
   {
-    "state": "i_palette",
+    "state": "i",
+    "desc": "⌘K palette",
     "theme": "dark",
     "viewport": "390x844",
-    "diffPercent": 19.17,
+    "diffPercent": 4.07,
     "passed": false
   },
   {
-    "state": "j_voice_sheet",
+    "state": "j",
+    "desc": "Pro voice sheet",
     "theme": "dark",
     "viewport": "390x844",
-    "diffPercent": 25.47,
+    "diffPercent": 4.73,
     "passed": false
   },
   {
-    "state": "k_scrolled_nav",
+    "state": "k",
+    "desc": "scrolled 200 px (capsule nav)",
     "theme": "dark",
     "viewport": "390x844",
-    "diffPercent": 13.08,
+    "diffPercent": 5.53,
     "passed": false
   },
   {
-    "state": "l_marquee",
+    "state": "l",
+    "desc": "marquee band",
     "theme": "dark",
     "viewport": "390x844",
-    "diffPercent": 10.57,
+    "diffPercent": 5.93,
     "passed": false
   },
   {
-    "state": "m_bento",
+    "state": "m",
+    "desc": "bento section",
     "theme": "dark",
     "viewport": "390x844",
-    "diffPercent": 6.87,
+    "diffPercent": 8.71,
     "passed": false
   },
   {
-    "state": "n_explore",
+    "state": "n",
+    "desc": "Explore grid + tab change",
     "theme": "dark",
     "viewport": "390x844",
-    "diffPercent": 12.12,
+    "diffPercent": 5.43,
     "passed": false
   },
   {
-    "state": "o_pricing",
+    "state": "o",
+    "desc": "pricing (yearly)",
     "theme": "dark",
     "viewport": "390x844",
-    "diffPercent": 12.41,
+    "diffPercent": 3.08,
     "passed": false
   },
   {
-    "state": "p_footer_wordmark",
+    "state": "p",
+    "desc": "footer wordmark with the cursor over it",
     "theme": "dark",
     "viewport": "390x844",
-    "diffPercent": 28.77,
+    "diffPercent": 11.43,
     "passed": false
   }
 ]

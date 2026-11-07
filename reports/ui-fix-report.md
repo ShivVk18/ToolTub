@@ -99,7 +99,7 @@ Per viewport (last full run; **bold** = over 2%):
 ## 5. Lighthouse and axe
 
 - axe (home, light): 0 violations, including the bento demo content (now present at load). Tool pages: axe runs in the tools e2e suite (light + dark).
-- Lighthouse (mobile): _running — results appended below when done._
+- Lighthouse (mobile): see §8 (Phase 3 re-run on an idle machine).
 
 ## 6. Still open (with reason)
 
@@ -120,3 +120,27 @@ npm run visual                # reference vs app, all states/viewports/themes �
 npm run visual -- --states a,h --vp 1440x900 --theme light   # a subset
 ```
 Note: after editing `globals.css`, delete `.next/cache/turbopack` before building — Turbopack's persistent cache can keep serving the old CSS.
+
+## 8. Phase 3 (Hallmark pass) results — tag `hallmark-pass`
+
+**Visual compare against v1, the reference prototype:** 89/160 within 2% (Phase 2 ended at 113/160). The drop is the approved design changes, mainly Geist (A2), which changes every line of text and re-wraps phone layouts, then Explore (A3/F11), bento (A4/A7/F12) and pricing (A7). Every state was compared with the Phase 2 run, and no unexplained regression was found. The new look is saved as **v2** in `design/reference/v2/`, with the table of what moved and why. v1 stays at `design/reference/KlipKit_UI.html`.
+
+**Lighthouse (mobile, 3 runs each, median, load average about 5):**
+
+| Page | Perf | A11y | BP | SEO | LCP |
+|---|---|---|---|---|---|
+| / | 91 | 100 | 100 | 100 | 3.5 s |
+| /image-compressor | 92 | 100 | 100 | 100 | 3.4 s |
+| /heic-to-jpg | 91 | 100 | 100 | 100 | 3.6 s |
+| /json-formatter | 91 | 100 | 100 | 100 | 3.6 s |
+| /jwt-decoder | 92 | 100 | 100 | 100 | 3.4 s |
+| /qr-code-generator | 86 → **92** after #58 | 100 | 100 | 100 | 4.2 → 3.4 s |
+| /compress-image-to-50kb | 91 | 100 | 100 | 100 | 3.6 s |
+| /heic-to-jpg-on-windows | 96 | 100 | 100 | 100 | 2.7 s |
+| /wifi-qr-code-generator | 92 | 100 | 100 | 100 | 3.4 s |
+| /image-tools, /developer-tools | 92 | 100 | 100 | 100 | 3.4 s |
+| /compress-pdf, /background-remover, /pdf-to-word (beta, noindex) | 91–92 | 100 | 100 | 66 (noindex on purpose) | 3.4–3.6 s |
+
+The mobile ≥ 90 gate passes on every page. The stricter LCP ≤ 2 s budget in `lighthouserc.cjs` doesn't pass yet. First paint is 0.9 s, and most of the LCP is "render delay", likely the web fonts on slow 4G. It's open for Phase 4/5.
+
+**axe (WCAG 2.2 AA, serious and critical):** 0 violations across all 23 sitemap and beta pages × light/dark (46 runs), each page settled first. Two home tests are new (#59): one with the satellites settled, and one scrolled, where axe can resolve the hero's background.

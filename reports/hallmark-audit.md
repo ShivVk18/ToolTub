@@ -55,3 +55,30 @@ Covered: home (hero, workspace, plan, live panel, palette, Pro sheet, marquee, b
 ## Order of work after approval
 
 F1–F4 first (one PR each; they change every tool page at once), then F5 with Phase 4, then F6–F16, then approved ASK items. Each as `style/hallmark-<item>` with before/after screenshots, re-running the audit, visual compare (home must stay within 2%), axe and Lighthouse.
+
+## Re-audit after the pass (tag `hallmark-pass`)
+
+Every item was done as its own `style/hallmark-*` PR with a failing test first: F1–F16 (#38–#53), A7 (#54), A4+A5 (#55), A6 (#56), A2+A3 (#57). A2+A3 was merged after you reviewed the before/after; you chose "Geist + left-align Explore only". Pricing stays centred because its cards are centred.
+
+Re-checking the original gates on the final build:
+
+| Gate | Result |
+|---|---|
+| Centred everything | Explore header left-aligned. Tool, hub, search and legal pages use one left-aligned column (F2, F10). |
+| Uniform card grids | Hubs lead with large live cards and list the backlog as compact chips (F9). Explore cards have per-tool glyphs (F11). |
+| Nested cards | Bento demo flattened (A4). No other card → card → card found. |
+| Generic icon tiles | 37 developer/PDF tools have their own glyph; Protect PDF keeps the only padlock (F11). |
+| Stock glow | Dark aurora 30% softer (A5). The orb stays the one glowing object (K3). |
+| Generic / unearned copy | No "MOST LOVED", "magic" or invented stat (A7, F12). Tool count is honest (F5/A1). |
+| States (empty / error / success) | File tools validate on selection; file chip, retry and result row (F7). |
+| Dark mode | Native controls dark (F8); AA colours checked in both themes. |
+| Focus, motion | Unchanged and passing (2 px violet focus; decorative motion off under reduced motion). |
+
+**Found during the re-run and fixed:**
+- #58: /qr-code-generator scored 86 on mobile Lighthouse because the QR was painted only after JavaScript.
+- #59: home eyebrow, chip glyphs and dark kickers were below AA. The home axe test hadn't caught them because it ran where axe can't resolve the background.
+
+**Still open:**
+- **Explore "● Live" tag.** It keeps the reference's `--ok` green, about 3.4:1 at 12 px. Axe doesn't flag it (bold text in a translucent card), but the hubs already use the AA green `--g-c`. Should Explore match?
+- **LCP above the 2 s budget.** All pages measure about 3.4 s on mobile. First paint and Speed Index are 0.9 s; most of the LCP is "render delay", likely the three web fonts arriving late. Investigate in Phase 4/5 rather than guess.
+- **Unused fonts.** The Inter files in `src/fonts/` are no longer used. They stay until you OK deleting them.

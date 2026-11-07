@@ -4,6 +4,36 @@ Every change landed as its own branch, squash-merged into `integration/ui-restor
 
 | # | Title | Branch | PR notes |
 |---|---|---|---|
+| 60 | docs: Hallmark pass results, v2 visual baseline, changelog through #60 | `docs/hallmark-v2-baseline` | [reports/prs/docs-hallmark-v2-baseline.md](reports/prs/docs-hallmark-v2-baseline.md) |
+| 59 | fix(a11y): home eyebrow, chip glyphs and dark kickers below AA contrast | `fix/a11y-home-contrast` | [reports/prs/fix-a11y-home-contrast.md](reports/prs/fix-a11y-home-contrast.md) |
+| 58 | perf: render the QR code on the server (mobile Lighthouse 86 → 92) | `perf/qr-ssr-code` | [reports/prs/perf-qr-ssr-code.md](reports/prs/perf-qr-ssr-code.md) |
+| 57 | style(hallmark A2+A3): Geist for UI text; Explore header left-aligned | `style/hallmark-a2-a3-geist-explore` | [reports/prs/style-hallmark-a2-a3-geist-explore.md](reports/prs/style-hallmark-a2-a3-geist-explore.md) |
+| 56 | style(hallmark A6): tool pages adopt home devices (kickers, serif heads, FAQ details, orb drop) | `style/hallmark-a6-tool-pages` | [reports/prs/style-hallmark-a6-tool-pages.md](reports/prs/style-hallmark-a6-tool-pages.md) |
+| 55 | style(hallmark A4+A5): flatten the bento demo; softer dark aurora | `style/hallmark-a4-a5-bento-aurora` | [reports/prs/style-hallmark-a4-a5-bento-aurora.md](reports/prs/style-hallmark-a4-a5-bento-aurora.md) |
+| 54 | style(hallmark A7): drop the MOST LOVED badge and 'feels like magic' | `style/hallmark-a7-honest-copy` | [reports/prs/style-hallmark-a7-honest-copy.md](reports/prs/style-hallmark-a7-honest-copy.md) |
+| 53 | style(hallmark F7): validate files on selection; chip, retry and result row | `style/hallmark-f7-file-states` | [reports/prs/style-hallmark-f7-file-states.md](reports/prs/style-hallmark-f7-file-states.md) |
+| 52 | style(hallmark F8): accent-coloured controls, pill fields, dark slider track | `style/hallmark-f8-form-controls` | [reports/prs/style-hallmark-f8-form-controls.md](reports/prs/style-hallmark-f8-form-controls.md) |
+| 51 | style(hallmark F9): hubs lead with live tools; backlog as compact chips | `style/hallmark-f9-hub-pages` | [reports/prs/style-hallmark-f9-hub-pages.md](reports/prs/style-hallmark-f9-hub-pages.md) |
+| 50 | style(hallmark F10): related tools as chips, in the page's one column | `style/hallmark-f10-related-chips` | [reports/prs/style-hallmark-f10-related-chips.md](reports/prs/style-hallmark-f10-related-chips.md) |
+| 49 | style(hallmark F11): per-tool mono glyphs instead of one shared icon | `style/hallmark-f11-tool-glyphs` | [reports/prs/style-hallmark-f11-tool-glyphs.md](reports/prs/style-hallmark-f11-tool-glyphs.md) |
+| 48 | style(hallmark F13): pills everywhere, one primary, a labelled Save chip | `style/hallmark-f13-pills` | [reports/prs/style-hallmark-f13-pills.md](reports/prs/style-hallmark-f13-pills.md) |
+| 47 | style(hallmark F14): /search gets the pill input and palette-style rows | `style/hallmark-f14-search-page` | [reports/prs/style-hallmark-f14-search-page.md](reports/prs/style-hallmark-f14-search-page.md) |
+| 46 | style(hallmark F15): explainer used the raw keyword; placeholder guides listed | `style/hallmark-f15-content-names` | [reports/prs/style-hallmark-f15-content-names.md](reports/prs/style-hallmark-f15-content-names.md) |
+| 45 | style(hallmark F16): footer tagline wrapped into a column on phones | `style/hallmark-f16-footer-tagline` | [reports/prs/style-hallmark-f16-footer-tagline.md](reports/prs/style-hallmark-f16-footer-tagline.md) |
+| 44 | style(hallmark F12): the speed stat was invented; now measured | `style/hallmark-f12-measured-stat` | [reports/prs/style-hallmark-f12-measured-stat.md](reports/prs/style-hallmark-f12-measured-stat.md) |
+| 43 | style(hallmark F6): the privacy card's lock ring covered its label | `style/hallmark-f6-lock-ring` | [reports/prs/style-hallmark-f6-lock-ring.md](reports/prs/style-hallmark-f6-lock-ring.md) |
+| 42 | style(hallmark F5 + A1): honest tool count; unbuilt tools say Coming soon | `style/hallmark-f5-a1-honest-tools` | [reports/prs/style-hallmark-f5-a1-honest-tools.md](reports/prs/style-hallmark-f5-a1-honest-tools.md) |
+| 41 | style(hallmark F4): grey slabs where tool pages meant a soft surface | `style/hallmark-f4-muted-surfaces` | [reports/prs/style-hallmark-f4-muted-surfaces.md](reports/prs/style-hallmark-f4-muted-surfaces.md) |
+| 40 | style(hallmark F3): code rendered in Inter instead of monospace | `style/hallmark-f3-font-mono` | [reports/prs/style-hallmark-f3-font-mono.md](reports/prs/style-hallmark-f3-font-mono.md) |
+| 39 | style(hallmark F2): page titles inherited the hero's 112 px centred headline | `style/hallmark-f2-page-h1` | [reports/prs/style-hallmark-f2-page-h1.md](reports/prs/style-hallmark-f2-page-h1.md) |
+| 38 | style(hallmark F1): tool-page primary buttons were transparent | `style/hallmark-f1-button-reset` | [reports/prs/style-hallmark-f1-button-reset.md](reports/prs/style-hallmark-f1-button-reset.md) |
+| 37 | docs: design audit report (Phase 3, report only) | `docs/hallmark-audit` | [reports/prs/docs-hallmark-audit.md](reports/prs/docs-hallmark-audit.md) |
+| 36 | docs: design DNA | `docs/design-dna` | [reports/prs/docs-design-dna.md](reports/prs/docs-design-dna.md) |
+| 35 | fix(panel): opening a live tool left the hero orb and satellites over the panel | `fix/panel-docks-orb` | [reports/prs/fix-panel-docks-orb.md](reports/prs/fix-panel-docks-orb.md) |
+| 34 | docs: Phase 2 UI fix report and refreshed after-screenshots | `docs/ui-fix-report` | [reports/prs/docs-ui-fix-report.md](reports/prs/docs-ui-fix-report.md) |
+| 33 | fix(footer): keep the reference's single row on phones | `fix/footer-mobile-row` | [reports/prs/fix-footer-mobile-row.md](reports/prs/fix-footer-mobile-row.md) |
+| 32 | fix(nav): Pro and Go Pro open pricing, as in the reference | `fix/nav-go-pro-to-pricing` | [reports/prs/fix-nav-go-pro-to-pricing.md](reports/prs/fix-nav-go-pro-to-pricing.md) |
+| 31 | docs: changelog of every merged PR | `docs/changelog` | — |
 | 30 | fix(bento): no layout shift on scroll, content under reduced motion, AA contrast | `fix/bento-initial-frame` | [reports/prs/fix-bento-initial-frame.md](reports/prs/fix-bento-initial-frame.md) |
 | 29 | fix(workspace): the composer didn't grow with its text | `fix/composer-autosize` | [reports/prs/fix-composer-autosize.md](reports/prs/fix-composer-autosize.md) |
 | 28 | fix(footer): footer brand was nav-sized | `fix/footer-brand-size` | [reports/prs/fix-footer-brand-size.md](reports/prs/fix-footer-brand-size.md) |
