@@ -159,7 +159,7 @@
   --blobA: #3a2e9e;
   --blobB: #5e2a55;
   --blobC: #124b57;
-  --blobOp: 0.5;
+  --blobOp: 0.35; /* Hallmark A5: dark aurora ~30% softer (was 0.5); the corner blooms read as stock glow */
 }
 /* Margin/padding reset comes from Tailwind's preflight (in @layer base). Repeating it here, unlayered,
    overrode every Tailwind margin/padding utility (unlayered CSS beats layered CSS). */
@@ -2573,12 +2573,9 @@ body.scrolled #nav::before {
 .bento .fc {
   grid-column: span 4;
 }
+/* Hallmark A4: no surface of its own, so the composer (.bcomp) is the one inner card (was card → card → card). */
 .bdemo {
   margin-top: 26px;
-  border-radius: 24px;
-  background: var(--soft);
-  border: 1px solid var(--line);
-  padding: 22px;
 }
 .bfile {
   display: flex;

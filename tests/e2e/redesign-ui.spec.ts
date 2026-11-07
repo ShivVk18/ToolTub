@@ -445,6 +445,27 @@ test.describe("KlipKit Redesign UI & Visual Layer", () => {
     await expect(page.locator("#feel .sp")).toContainText("drop a file or say what you need");
   });
 
+  test("A4: the bento typing demo has one inner surface (the composer), not three nested cards", async ({ page }) => {
+    await page.goto("/");
+    const demo = await page.locator("#bento .b-big .bdemo").evaluate((e) => {
+      const cs = getComputedStyle(e);
+      return { bg: cs.backgroundColor, border: cs.borderTopWidth };
+    });
+    expect(demo).toEqual({ bg: "rgba(0, 0, 0, 0)", border: "0px" });
+    expect(await page.locator("#bdText").evaluate((e) => getComputedStyle(e).borderTopWidth)).toBe("1px");
+  });
+
+  test("A5: the dark-mode aurora is about 30% softer than light", async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem("theme", "dark"));
+    await page.goto("/");
+    const op = await page
+      .locator(".blob")
+      .first()
+      .evaluate((e) => Number(getComputedStyle(e).opacity));
+    expect(op).toBeLessThanOrEqual(0.35);
+    expect(op).toBeGreaterThan(0.2);
+  });
+
   test("opening a live panel docks the orb and hides the satellites", async ({ page }) => {
     await page.goto("/#base64");
     await expect(page.locator("#panel")).toBeVisible();
