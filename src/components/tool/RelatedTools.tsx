@@ -1,17 +1,26 @@
 import Link from "next/link";
 import type { ToolDefinition } from "@/registry/types";
+import { catColor } from "@/lib/designTools";
 
+/** Related tools as home-style chips (a pill with the category's colour mark), in the page's one column. */
 export function RelatedTools({ tools }: { tools: ToolDefinition[] }) {
   if (!tools.length) return null;
   return (
-    <section aria-labelledby="related" className="mt-10">
-      <h2 id="related" className="mb-3 text-sm font-medium text-fg-muted">
+    <section aria-labelledby="related" className="mt-10 max-w-3xl">
+      <h2 id="related" className="mb-3 text-sm font-medium text-ink2">
         Related tools
       </h2>
-      <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <ul className="flex flex-wrap gap-2 list-none p-0">
         {tools.map((t) => (
           <li key={t.slug}>
-            <ToolCard tool={t} />
+            <Link
+              href={`/${t.slug}`}
+              title={t.tagline}
+              className="inline-flex h-10 items-center gap-2 rounded-full border border-line bg-solid px-4 text-sm font-medium text-ink no-underline transition-colors hover:border-line2 hover:bg-soft"
+            >
+              <i aria-hidden className="block size-2 rounded-[3px]" style={{ background: catColor(t.category) }} />
+              {t.home?.name ?? t.name}
+            </Link>
           </li>
         ))}
       </ul>

@@ -143,4 +143,23 @@ test.describe("tool pages use the design system", () => {
     await expect(page.locator('[data-testid="send-next"]:visible')).toBeVisible();
     expect(await radius('[data-testid="send-next"]:visible')).toBe(true);
   });
+
+  test("F10: related tools are home-style chips in the same column as the title and the guide", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/json-formatter");
+    const related = page.locator('section[aria-labelledby="related"]');
+    const chips = related.getByRole("link");
+    expect(await chips.count()).toBeGreaterThan(0);
+    for (const c of await chips.all()) {
+      const pill = await c.evaluate(
+        (e) => parseFloat(getComputedStyle(e).borderTopLeftRadius) >= e.getBoundingClientRect().height / 2 - 1,
+      );
+      expect(pill).toBe(true);
+    }
+    const left = (l: import("@playwright/test").Locator) =>
+      l.evaluate((e) => Math.round(e.getBoundingClientRect().left));
+    const h1 = await left(page.locator("main h1").first());
+    expect(await left(related)).toBe(h1);
+    expect(await left(page.locator("article.prose-klip"))).toBe(h1);
+  });
 });

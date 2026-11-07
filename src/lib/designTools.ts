@@ -27,6 +27,9 @@ export const CATS: Record<"p" | "d" | "c", CategoryInfo> = {
   c: { n: "Creator", c: "#1F9D63" },
 };
 
+/** Category colour for a registry category id. */
+export const catColor = (c: CategoryId) => CATS[CAT_KEY[c]].c;
+
 /** Home-page cards, derived from the tool registry (the single source of truth) in Explore grid order. */
 export const TOOLS: ToolItem[] = homeTools().map((t) => ({
   n: t.home!.name,

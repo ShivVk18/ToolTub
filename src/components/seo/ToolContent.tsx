@@ -12,7 +12,7 @@ export function ToolContent({ tool, faqs }: { tool: ToolDefinition; faqs?: FAQ[]
   const reviewer = people[s.reviewedBy];
   const relatedChains = chains.filter((c) => isChainLive(c) && c.steps.some((st) => st.tool === tool.slug));
   return (
-    <article className="prose-klip mx-auto mt-16 max-w-3xl space-y-12">
+    <article className="prose-klip mt-16 max-w-3xl space-y-12">
       {/* 1. Answer-first summary */}
       <section>
         <h2>{s.answerQuestion}</h2>
