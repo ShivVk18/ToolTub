@@ -399,6 +399,24 @@ test.describe("KlipKit Redesign UI & Visual Layer", () => {
     expect(Math.abs((await h()) - before)).toBeLessThanOrEqual(2);
   });
 
+  test("bento keeps one height while its demos cycle through every sample (phone)", async ({ page }) => {
+    // The typing and paste demos cycle through texts of different lengths; on a phone the longer ones
+    // wrap onto more lines, so the cards used to grow and shrink every few seconds.
+    await page.clock.install();
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/");
+    await page.evaluate(() => document.fonts.ready);
+    await page.evaluate(() => document.getElementById("bento")!.scrollIntoView());
+    const heights: number[] = [];
+    for (let i = 0; i < 30; i++) {
+      await page.clock.runFor(700); // 21 s covers every typing demo (4 × 5.2 s) and paste sample (6 × 2.8 s)
+      heights.push(
+        await page.evaluate(() => Math.round(document.getElementById("bento")!.getBoundingClientRect().height)),
+      );
+    }
+    expect(Math.max(...heights) - Math.min(...heights), heights.join(",")).toBeLessThanOrEqual(2);
+  });
+
   test("bento demos show content under reduced motion", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");

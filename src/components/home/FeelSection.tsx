@@ -38,6 +38,7 @@ export function FeelSection() {
   const bdFileRef = useRef<HTMLDivElement>(null);
   const bdTextRef = useRef<HTMLDivElement>(null);
   const bdPlanRef = useRef<HTMLDivElement>(null);
+  const bdemoRef = useRef<HTMLDivElement>(null);
   const bpBoxRef = useRef<HTMLDivElement>(null);
   const bpCodeRef = useRef<HTMLDivElement>(null);
   const bpDetRef = useRef<HTMLDivElement>(null);
@@ -210,10 +211,43 @@ export function FeelSection() {
       });
     };
 
-    // t = 4 s: the first typing demo is fully typed and the paste card is fully visible.
-    frame(4, true);
+    // The demos cycle through texts of different lengths; on a phone the longer ones wrap onto more
+    // lines, so the cards grew and shrank every few seconds. Draw each sample once, keep the tallest
+    // height as a minimum, then go back to the resting frame. Re-measured when the width changes.
+    const reserve = () => {
+      const demo = bdemoRef.current;
+      const paste = bpBoxRef.current;
+      if (!demo || !paste) return;
+      demo.style.minHeight = paste.style.minHeight = "";
+      let maxDemo = 0;
+      let maxPaste = 0;
+      for (let i = 0; i < DEMOS.length; i++) {
+        frame(i * 5.2 + 4, true); // fully typed
+        maxDemo = Math.max(maxDemo, demo.offsetHeight);
+      }
+      for (let i = 0; i < PASTE_SAMPLES.length; i++) {
+        frame(i * 2.8 + 1.4, true);
+        maxPaste = Math.max(maxPaste, paste.offsetHeight);
+      }
+      demo.style.minHeight = `${maxDemo}px`;
+      paste.style.minHeight = `${maxPaste}px`;
+      // t = 4 s: the first typing demo is fully typed and the paste card is fully visible.
+      frame(4, true);
+    };
+    reserve();
+    let lastW = window.innerWidth;
+    const onResize = () => {
+      if (window.innerWidth === lastW) return; // mobile URL-bar resizes only change the height
+      lastW = window.innerWidth;
+      reserve();
+    };
+    window.addEventListener("resize", onResize);
+    document.fonts?.ready.then(reserve);
     const cleanup = addLoop((t) => frame(t), { target: sectionRef.current, motion: true });
-    return cleanup;
+    return () => {
+      cleanup();
+      window.removeEventListener("resize", onResize);
+    };
   }, []);
 
   const sparkColors = ["#A99BFF", "#FFB38A", "#7CD3A8", "#FFD45C", "#E5484D"];
@@ -247,7 +281,7 @@ export function FeelSection() {
           </h3>
           <p>Every phrase is understood as you type — highlighted, turned into steps, and run on your device.</p>
 
-          <div className="bdemo">
+          <div className="bdemo" ref={bdemoRef}>
             <div className="bfile" ref={bdFileRef} />
             <div id="bdText" className="bcomp font-sans" ref={bdTextRef} />
             <div className="bplan" ref={bdPlanRef} />
