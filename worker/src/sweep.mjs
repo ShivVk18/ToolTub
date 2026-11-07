@@ -17,3 +17,25 @@ export async function sweep(dir, retentionMs, active, now) {
     if (s && now - s.mtimeMs > retentionMs) await rm(p, { recursive: true, force: true });
   }
 }
+
+/** Queue states whose job folders must survive the sweep: their upload hasn't been converted yet. */
+export const PENDING_STATES = ["waiting", "active", "delayed", "prioritized", "waiting-children"];
+
+/**
+ * Job ids the sweeper must keep: the ones converting in this worker plus every job still in the queue.
+ * Only `active` was kept before, so a job that waited longer than the retention (e.g. across a worker
+ * restart or an outage) lost its upload and then failed. Returns null if the queue can't be read: the
+ * caller then skips this sweep rather than guess which folders are safe to delete.
+ * @param {ReadonlySet<string>} active
+ * @param {(types: string[]) => Promise<Array<{ data?: { id?: string } }>>} getJobs
+ * @returns {Promise<Set<string> | null>}
+ */
+export async function keepIds(active, getJobs) {
+  try {
+    const keep = new Set(active);
+    for (const j of await getJobs(PENDING_STATES)) if (j?.data?.id) keep.add(j.data.id);
+    return keep;
+  } catch {
+    return null;
+  }
+}

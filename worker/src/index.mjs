@@ -2,13 +2,13 @@
  * KlipKit conversion worker. Runs LibreOffice headless (MPL-2.0) in a container with NO network access.
  * - Consumes the "convert" BullMQ queue on Valkey (one job at a time per container; scale with replicas)
  * - Reads/writes files only inside JOBS_DIR/<job id>
- * - Sweeper deletes every job folder older than 1 hour, every 5 minutes
+ * - Sweeper deletes every job folder older than 1 hour, every 5 minutes, except jobs still queued or converting
  */
-import { Worker } from "bullmq";
+import { Queue, Worker } from "bullmq";
 import IORedis from "ioredis";
 import { execFile } from "node:child_process";
 import { rename, rm } from "node:fs/promises";
-import { sweep } from "./sweep.mjs";
+import { keepIds, sweep } from "./sweep.mjs";
 import { join } from "node:path";
 import { promisify } from "node:util";
 
@@ -91,7 +91,12 @@ async function convertJob(job) {
 
 new Worker("convert", convert, { connection, concurrency: Number(process.env.CONCURRENCY ?? 1) });
 
-const sweepNow = () => sweep(JOBS_DIR, RETENTION_MS, active, Date.now());
+// The sweeper keeps every job still in the queue (waiting, delayed, retrying), not only the one converting.
+const queue = new Queue("convert", { connection });
+const sweepNow = async () => {
+  const keep = await keepIds(active, (types) => queue.getJobs(types));
+  if (keep) await sweep(JOBS_DIR, RETENTION_MS, keep, Date.now());
+};
 setInterval(sweepNow, SWEEP_INTERVAL_MS);
 sweepNow();
 

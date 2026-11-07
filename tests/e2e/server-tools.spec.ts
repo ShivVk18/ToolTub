@@ -145,8 +145,12 @@ test("queued job shows its position and survives a worker restart", async ({ req
   const s = await (await request.get(`/api/jobs/${id}`)).json();
   expect(s.state).toBe("waiting");
   expect(s.position).toBe(1);
+  // Stay down past the retention time: the restarted worker's first sweep used to delete this queued
+  // job's upload (only the job converting was spared), so it failed. This made the test fail only under load.
+  await new Promise((r) => setTimeout(r, RETENTION_MS + 1500));
   await startWorker();
-  expect((await waitDone(request, id)).state).toBe("completed");
+  const done = await waitDone(request, id);
+  expect(done.state, `job failed: ${done.error ?? "no reason given"}`).toBe("completed");
 });
 
 test("files are deleted automatically after the retention time", async ({ request }) => {
