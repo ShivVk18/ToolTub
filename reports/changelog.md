@@ -4,6 +4,7 @@ Every change landed as its own branch, squash-merged into `integration/ui-restor
 
 | # | Title | Branch | PR notes |
 |---|---|---|---|
+| 85 | fix: per-platform resize sizes; AA contrast for the Explore "● Live" tag | `feat/decisions-mp3-cleanup` | [reports/prs/feat-decisions-mp3-cleanup.md](reports/prs/feat-decisions-mp3-cleanup.md) |
 | 84 | feat: Diff Checker, Code Minifier, HTML Playground, Text to Speech, Résumé Builder; home plans open the new tools; early paste kept | `feat/dev-text-tools` | [reports/prs/feat-dev-text-tools.md](reports/prs/feat-dev-text-tools.md) |
 | 83 | feat: 9 video, audio and speech tools (compress, convert, trim, GIF, extract audio, audio converter, screen recorder, transcription, subtitles) | `feat/video-audio-tools` | [reports/prs/feat-video-audio-tools.md](reports/prs/feat-video-audio-tools.md) |
 | 82 | feat: 12 image and creator tools (crop, EXIF remover, bulk rename, social resizer, thumbnail preview, meme, watermark, palette, colour picker, collage, passport photo, OCR) | `feat/image-creator-tools` | [reports/prs/feat-image-creator-tools.md](reports/prs/feat-image-creator-tools.md) |

@@ -164,10 +164,16 @@ describe("intent parser (35 phrase cases)", () => {
       },
     },
     {
+      phrase: "resize for linkedin",
+      kind: "image",
+      expectedIds: ["resize"],
+      check: (s) => expect([s[0].d, s[0].w, s[0].h]).toEqual(["LinkedIn · 1200 × 627", 1200, 627]),
+    },
+    {
       phrase: "resize for youtube",
       kind: "video",
       expectedIds: ["resize"],
-      check: (s) => expect(s[0].d).toBe("Youtube · 1080 × 1350"),
+      check: (s) => expect([s[0].d, s[0].w, s[0].h]).toEqual(["YouTube · 1280 × 720", 1280, 720]), // each platform has its own size
     },
     {
       phrase: "resize 1920x1080",

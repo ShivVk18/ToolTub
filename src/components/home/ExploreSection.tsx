@@ -193,7 +193,7 @@ export function ExploreSection({ onSelectTool }: ExploreSectionProps) {
 
                 <span className="tg absolute right-0 top-0 text-[12px] text-ink2 font-medium">
                   {isLive ? (
-                    <b style={{ color: "var(--ok)", fontWeight: 600 }}>● Live</b>
+                    <b style={{ color: "var(--g-c)", fontWeight: 600 }}>● Live</b>
                   ) : !t.routed ? (
                     "Coming soon"
                   ) : t.s ? (

@@ -192,8 +192,20 @@ export function parse(text: string, kind?: FileKind): { steps: IntentStep[]; spa
     if (r.id === "resize") {
       const mm = /for (\w+)/i.exec(m[0]);
       const dims = /(\d{3,4})\s*(?:x|×)\s*(\d{3,4})/i.exec(text);
-      s.d = mm ? `${mm[1][0].toUpperCase()}${mm[1].slice(1)} · 1080 × 1350` : m[0];
-      if (mm) [s.w, s.h] = [1080, 1350];
+      // Each platform's main feed size (Instagram portrait per spec §4); unknown names fall back to Instagram's.
+      const PLATFORMS: Record<string, [string, number, number]> = {
+        instagram: ["Instagram", 1080, 1350],
+        youtube: ["YouTube", 1280, 720],
+        linkedin: ["LinkedIn", 1200, 627],
+        tiktok: ["TikTok", 1080, 1920],
+        x: ["X", 1600, 900],
+        twitter: ["X / Twitter", 1600, 900],
+      };
+      const p = mm
+        ? (PLATFORMS[mm[1].toLowerCase()] ?? [`${mm[1][0].toUpperCase()}${mm[1].slice(1)}`, 1080, 1350])
+        : null;
+      s.d = p ? `${p[0]} · ${p[1]} × ${p[2]}` : m[0];
+      if (p) [s.w, s.h] = [p[1], p[2]];
       else if (dims) [s.w, s.h] = [+dims[1], +dims[2]];
     }
 
