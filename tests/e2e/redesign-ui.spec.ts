@@ -526,6 +526,36 @@ test.describe("KlipKit Redesign UI & Visual Layer", () => {
     });
   }
 
+  test("bento plan chips are built once per change, not every frame (they flickered near opacity 0)", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await page.evaluate(() => document.querySelector("#bento")!.scrollIntoView());
+    const rebuilds = await page.evaluate(
+      () =>
+        new Promise<number>((resolve) => {
+          let n = 0;
+          new MutationObserver((m) => (n += m.filter((r) => r.type === "childList").length)).observe(
+            document.querySelector("#bento .bplan")!,
+            { childList: true },
+          );
+          setTimeout(() => resolve(n), 4000);
+        }),
+    );
+    // the demo's plan changes a handful of times in 4 s (a step appears, the phrase resets)
+    expect(rebuilds).toBeLessThan(10);
+  });
+
+  test("bento chips drawn at load are fully opaque straight away (no entrance fade off screen)", async ({ page }) => {
+    await page.goto("/");
+    await page.locator("#bento .bplan .pv").first().waitFor({ state: "attached" }); // the mount frame has run
+    const ops = await page.evaluate(() =>
+      [...document.querySelectorAll<HTMLElement>("#bento .bplan .pv")].map((e) => e.getAnimations().length),
+    );
+    expect(ops.length).toBeGreaterThan(0);
+    expect(ops.every((n) => n === 0)).toBe(true);
+  });
+
   test("opening a live panel docks the orb and hides the satellites", async ({ page }) => {
     await page.goto("/#base64");
     await expect(page.locator("#panel")).toBeVisible();

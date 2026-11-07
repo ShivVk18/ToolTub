@@ -103,12 +103,22 @@ export function FeelSection() {
         }
 
         if (bdPlanRef.current) {
-          bdPlanRef.current.innerHTML = steps
+          const html = steps
             .map(
               (s, j) =>
                 `${j ? '<span style="color:var(--faint)">→</span>' : ""}<span class="pv inline-flex items-center gap-[6px] px-[12px] py-[6px] rounded-full text-[13px] font-medium bg-solid border border-line"><i style="width:7px;height:7px;border-radius:50%;display:inline-block;background:var(--u${(s.i ?? j) % 4})"></i>${s.t}${s.d ? ` <span style="color:var(--ink2);font-weight:400">· ${s.d}</span>` : ""}</span>`,
             )
             .join("");
+          // Only when the plan changes: rebuilding every frame restarted the chips' fade-in (chipIn),
+          // so they flickered near opacity 0 while the demo typed.
+          if (html !== bdPlanRef.current.dataset.html) {
+            bdPlanRef.current.dataset.html = html;
+            bdPlanRef.current.innerHTML = html;
+            // The mount frame draws the resting state off screen: no entrance fade there (nobody sees it,
+            // and the chips were half-transparent for the first 0.4 s). Live-demo changes still fade in.
+            if (force)
+              bdPlanRef.current.querySelectorAll<HTMLElement>(".pv").forEach((e) => (e.style.animation = "none"));
+          }
         }
       }
 
