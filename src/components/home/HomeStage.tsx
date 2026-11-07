@@ -574,6 +574,7 @@ export function HomeStage({ initialSlug, initialPreset, toolPage = false }: Home
             )
           }
           onNew={handleNew}
+          onPasteIn={handlePasteIn}
           onOpenVoice={() => openVoiceSheet()}
           isListening={isListening}
           voiceTranscript={voiceTranscript}

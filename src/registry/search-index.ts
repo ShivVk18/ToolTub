@@ -28,7 +28,7 @@ export const searchIndex: SearchEntry[] = tools.map((t) => ({
   tagline: t.tagline,
   hub: hubs.find((h) => h.id === t.hub)?.name ?? "",
   synonyms: [...t.synonyms, ...(t.seo ? [t.seo.primaryKeyword, ...t.seo.secondaryKeywords] : [])],
-  available: t.status !== "planned",
+  available: t.status !== "planned" || t.card, // card tools (Base64, Regex…) run in the chat
   category: t.category,
   icon: t.home?.icon,
   short: t.home?.name,

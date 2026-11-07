@@ -11,7 +11,7 @@ import {
   fmtSize,
   kindOf,
 } from "@/lib/fileKind";
-import { type PasteItem, PSUG, pasteAct } from "@/lib/engines/detect";
+import { type PasteItem, PSUG, pasteAct, looksLikeContent } from "@/lib/engines/detect";
 import { PT_TILE, PT_COLOR, ACT, runGen, ActionResult } from "@/lib/actions";
 import { genParse } from "@/lib/engines/generators";
 import { wordStats } from "@/lib/engines/text";
@@ -20,7 +20,9 @@ import { tween, wait, ease } from "@/lib/motion/animation";
 import { LiveToolCard } from "@/components/workspace/LiveToolCard";
 import { FileToolCard } from "@/components/workspace/FileToolCard";
 import { CARDS } from "@/lib/toolCards";
-import { useWorkspace, type ThreadMessage } from "@/lib/store/workspace";
+import { routeMessage } from "@/lib/intent/chatRouter";
+import { createToolSearch } from "@/lib/search";
+import { useWorkspace, liveCard, type ThreadMessage } from "@/lib/store/workspace";
 import { toolBySlug } from "@/lib/designTools";
 import { catalog } from "@/registry/catalog";
 import { planFor, stepTag, type StepPlan } from "@/lib/engines/plan";
@@ -39,9 +41,27 @@ export interface WorkspaceProps {
   isListening?: boolean;
   voiceTranscript?: string;
   onSetStatus?: (status: { text: string; color?: string; busy?: boolean }) => void;
+  /** Content typed into the composer starts the paste flow (the same path as a paste). */
+  onPasteIn?: (text: string) => void;
 }
 
 type MessageItem = ThreadMessage;
+
+/** "open regex tester": fuzzy search over the tools that work (card tools and tools with their own UI). */
+const searchTools = createToolSearch(
+  catalog
+    .filter((t) => t.status !== "planned" || t.card)
+    .map((t) => ({
+      slug: t.slug,
+      name: t.home?.name ? `${t.name} ${t.home.name}` : t.name,
+      tagline: t.tagline,
+      hub: t.hub,
+      synonyms: t.synonyms,
+      available: true,
+      category: t.category,
+    })),
+);
+const findTool = (q: string) => searchTools(q, 1)[0]?.slug;
 
 export function Workspace({
   file,
@@ -54,6 +74,7 @@ export function Workspace({
   isListening = false,
   voiceTranscript = "",
   onSetStatus,
+  onPasteIn,
 }: WorkspaceProps) {
   const messages = useWorkspace((st) => st.messages);
   const setMessages = useWorkspace((st) => st.setMessages);
@@ -334,6 +355,60 @@ export function Workspace({
     if (!trimmed || isBusy) return;
 
     setInputText("");
+
+    // ---- Chat router (lib/intent/chatRouter): the active card first, then paste, open, generator, file, help ----
+    const ws = useWorkspace.getState();
+    const active = ws.activeCardId ? ws.cards[ws.activeCardId] : undefined;
+    const activeMsg = active ? ws.messages.find((m) => m.type === "toolCard" && m.cardId === active.id) : undefined;
+    const cardCfg = active && activeMsg ? (CARDS[active.toolId] ?? null) : null;
+    const loaded = currentFileRef.current;
+    const route = routeMessage(trimmed, {
+      card: cardCfg,
+      cardIsLatest: !!liveCard(),
+      hasFile: !!(loaded || currentPasteRef.current),
+      looksLikeContent,
+      isGenerator: (t) => !!genParse(t),
+      hasFileStep: (t) => (loaded ? parse(t, loaded.kind).steps.some((x) => x.ok) : false),
+    });
+    if (route.kind === "option" && active && activeMsg) {
+      // reference: talkToWidget — switch the option, confirm, and bring the card down next to the conversation
+      const u: MessageItem = { id: "u-" + Date.now(), type: "user", html: escHtml(trimmed) };
+      setMessages((prev) => [...prev, u]);
+      await wait(280);
+      ws.updateCard(active.id, { option: route.value });
+      ws.setActiveCard(active.id);
+      setMessages((prev) => [
+        ...prev.filter((m) => m.id !== activeMsg.id),
+        { id: "bot-opt-" + Date.now(), type: "bot", html: `Done — switched to <b>${escHtml(route.label)}</b>.` },
+        activeMsg,
+      ]);
+      setTimeout(scrollThreadToBottom, 60);
+      return;
+    }
+    if (route.kind === "intoCard" && active) {
+      ws.updateCard(active.id, { input: trimmed });
+      toast(`Pasted into ${toolBySlug(active.toolId)?.n ?? "the tool"}`);
+      return;
+    }
+    if (route.kind === "paste" && onPasteIn) {
+      onPasteIn(trimmed);
+      return;
+    }
+    if (route.kind === "open") {
+      const hit = findTool(route.query);
+      setMessages((prev) => [...prev, { id: "u-" + Date.now(), type: "user", html: escHtml(trimmed) }]);
+      if (hit) openCard(hit);
+      else
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: "bot-nf-" + Date.now(),
+            type: "bot",
+            html: `I couldn't find a tool called “${escHtml(route.query)}”. Try ⌘K to search them all.`,
+          },
+        ]);
+      return;
+    }
 
     // Check if this is a generator request (e.g. "generate 5 uuids"). With a file loaded, words that
     // describe a step for that file win: "protect it with a password" on a PDF used to print a password.
