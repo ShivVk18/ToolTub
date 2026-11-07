@@ -27,6 +27,8 @@ import { useRouter } from "next/navigation";
 
 export interface WorkspaceProps {
   file: FileInfo | null;
+  /** A request from the hero ask bar: sent as if typed into the composer. */
+  pendingAsk?: { text: string; n: number } | null;
   pasteData?: PasteItem | null;
   contextToolName?: string | null;
   contextToolIcon?: React.ReactNode;
@@ -62,6 +64,7 @@ interface MessageItem {
 
 export function Workspace({
   file,
+  pendingAsk,
   pasteData,
   contextToolName,
   contextToolIcon,
@@ -318,7 +321,9 @@ export function Workspace({
 
       if (r.go && r.open) {
         const tool = toolBySlug(r.open);
-        if (tool) openPanel(tool, "");
+        // Tools with their own page (QR) open there; openPanel had no panel for them, so nothing happened.
+        if (tool?.live) openPanel(tool, "");
+        else if (tool?.routed) router.push(`/${tool.slug}`);
         return;
       }
 
@@ -520,6 +525,13 @@ export function Workspace({
     setHandoff({ from: "home", items: [{ name: file.name, type: file.type, blob: file.blob }] });
     router.push(`/${slug}`);
   };
+
+  // Hero ask bar → send it through the normal path (latest handleSend via a ref, once per request).
+  const sendRef = useRef(handleSend);
+  sendRef.current = handleSend;
+  useEffect(() => {
+    if (pendingAsk) sendRef.current(pendingAsk.text);
+  }, [pendingAsk]);
 
   const handleDownload = (res: { name: string; url?: string; blob?: Blob; real?: boolean }) => {
     if (!res.blob) return;

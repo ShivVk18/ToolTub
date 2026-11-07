@@ -39,6 +39,8 @@ export function HomeStage() {
   const [voiceTranscript, setVoiceTranscript] = useState("");
   const [voiceDemoText, setVoiceDemoText] = useState<string | null>(null);
 
+  /** Text from the hero ask bar, sent by the workspace once it's open. */
+  const [pendingAsk, setPendingAsk] = useState<{ text: string; n: number } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const orbControllerRef = useRef<OrbController | null>(null);
 
@@ -494,20 +496,16 @@ export function HomeStage() {
             setMode("work");
             document.body.classList.add("is-work");
             orbControllerRef.current?.triggerGulp(0.8);
-            setTimeout(() => {
-              const cmp = document.getElementById("cmp") as HTMLTextAreaElement | null;
-              if (cmp) {
-                cmp.value = text;
-                cmp.dispatchEvent(new Event("input", { bubbles: true }));
-                cmp.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
-              }
-            }, 300);
+            // Through React state: writing the textarea's value and dispatching events didn't update the
+            // composer's state, so the ask bar sent nothing (React's value tracker swallowed the input event).
+            setTimeout(() => setPendingAsk({ text, n: Date.now() }), 300);
           }}
           hintText={isDragging ? "Release to let KlipKit read it ✨" : undefined}
         />
 
         {/* Workspace Section */}
         <Workspace
+          pendingAsk={pendingAsk}
           file={currentFile}
           pasteData={currentPaste}
           contextToolName={contextTool?.n}
