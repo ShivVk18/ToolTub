@@ -165,7 +165,8 @@ describe("single source of truth (ADR 0002)", () => {
   });
   it("every routed tool has a page component", () => {
     const src = readFileSync(join(__dirname, "../../src/tools/index.tsx"), "utf8");
-    for (const t of routedTools()) expect(src, t.slug).toContain(`"${t.slug}":`);
+    // keys are quoted unless they're plain identifiers (Prettier writes `transcription:` without quotes)
+    for (const t of routedTools()) expect(src, t.slug).toMatch(new RegExp(`(^|\\s)("${t.slug}"|${t.slug}):`, "m"));
   });
   it("the client catalog carries no SEO copy", () => {
     for (const t of catalog) expect("seo" in t, t.slug).toBe(false);

@@ -55,6 +55,15 @@ const TOOLS = [
   { slug: "collage-maker", h1: "Collage & Grid Maker", device: true, action: true },
   { slug: "passport-photo-maker", h1: "Passport & ID Photo Maker", device: true, action: true },
   { slug: "image-to-text", h1: "Image to Text (OCR)", device: true, action: true },
+  { slug: "video-compressor", h1: "Video Compressor", device: true, action: true },
+  { slug: "video-converter", h1: "Video Converter", device: true, action: true },
+  { slug: "video-trimmer", h1: "Video Trimmer", device: true, action: true },
+  { slug: "video-to-gif", h1: "Video to GIF", device: true, action: true },
+  { slug: "extract-audio", h1: "Extract Audio from Video", device: true, action: true },
+  { slug: "audio-converter", h1: "Audio Converter & Trimmer", device: true, action: true },
+  { slug: "screen-recorder", h1: "Screen Recorder", device: true, action: false },
+  { slug: "transcription", h1: "Transcription (Short Clips)", device: true, action: true },
+  { slug: "subtitle-generator", h1: "Subtitle Generator & Editor", device: true, action: false },
 ];
 
 const DEVICE_BADGE = "Runs on your device — nothing uploaded";

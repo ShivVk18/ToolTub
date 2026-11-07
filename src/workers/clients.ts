@@ -56,3 +56,27 @@ type PdfOps = {
 export const pdfWorker = createWorkerClient<PdfOps>(
   () => new Worker(new URL("./pdf.worker.ts", import.meta.url), { type: "module" }),
 );
+
+import type { Probe, CompressVideoJob, GifJob, AudioJob } from "./media-ops";
+type MediaOps = {
+  probe: (job: { file: Blob }) => Probe;
+  compress: (job: CompressVideoJob) => {
+    blob: Blob;
+    ext: string;
+    originalSize: number;
+    duration: number;
+    note?: string;
+  };
+  convert: (job: { file: Blob; to: "mp4" | "webm" | "mov" }) => { blob: Blob; ext: string; note?: string };
+  trim: (job: { file: Blob; start: number; end: number }) => { blob: Blob; ext: string; length: number };
+  audio: (job: AudioJob) => { blob: Blob; ext: string; duration: number; note?: string };
+  gif: (job: GifJob) => { blob: Blob; frames: number; width: number; height: number };
+};
+export const mediaWorker = createWorkerClient<MediaOps>(
+  () => new Worker(new URL("./media.worker.ts", import.meta.url), { type: "module" }),
+);
+
+import type { TranscribeJob, TranscribeResult } from "./whisper.worker";
+export const whisperWorker = createWorkerClient<{ transcribe: (job: TranscribeJob) => TranscribeResult }>(
+  () => new Worker(new URL("./whisper.worker.ts", import.meta.url), { type: "module" }),
+);

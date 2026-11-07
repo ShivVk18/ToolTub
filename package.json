@@ -36,6 +36,7 @@
     "ioredis": "^6.0.0",
     "libheif-js": "^1.23.5",
     "lucide-react": "^1.66.0",
+    "mediabunny": "^1.65.2",
     "next": "16.4.4",
     "onnxruntime-web": "^1.31.1",
     "pdf-lib": "^1.17.1",

@@ -42,6 +42,15 @@ const components: Record<string, ComponentType<ToolProps>> = {
   "collage-maker": lazy(() => import("./ImageCreator").then((m) => m.CollageMaker)),
   "passport-photo-maker": lazy(() => import("./ImageAI").then((m) => m.PassportPhotoMaker)),
   "image-to-text": lazy(() => import("./ImageAI").then((m) => m.ImageToText)),
+  "video-compressor": lazy(() => import("./VideoTools").then((m) => m.VideoCompressor)),
+  "video-converter": lazy(() => import("./VideoTools").then((m) => m.VideoConverter)),
+  "video-trimmer": lazy(() => import("./VideoTools").then((m) => m.VideoTrimmer)),
+  "video-to-gif": lazy(() => import("./VideoTools").then((m) => m.VideoToGif)),
+  "extract-audio": lazy(() => import("./VideoTools").then((m) => m.ExtractAudio)),
+  "audio-converter": lazy(() => import("./VideoTools").then((m) => m.AudioConverter)),
+  "screen-recorder": lazy(() => import("./VideoTools").then((m) => m.ScreenRecorder)),
+  transcription: lazy(() => import("./Speech").then((m) => m.Transcription)),
+  "subtitle-generator": lazy(() => import("./Speech").then((m) => m.SubtitleGenerator)),
 };
 
 export function ToolUI(props: ToolProps) {

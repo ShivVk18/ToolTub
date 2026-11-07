@@ -41,6 +41,8 @@ yarn-error.log*
 next-env.d.ts
 public/vendor/
 public/models/*.onnx
+# self-hosted Whisper model (41 MB); see public/models/README.md
+public/models/whisper-tiny/
 worker/node_modules
 tests/fixtures/generated/
 playwright-report/

@@ -5,6 +5,24 @@ import { catalog } from "./catalog";
 export { PANEL_SLUGS, homeTools } from "./catalog";
 
 const META: Record<string, string> = {
+  transcription:
+    "Turn speech in audio or video into text with Whisper running on your device, in English, Hindi and 15 more languages. Nothing is uploaded. Free and no sign-up.",
+  "subtitle-generator":
+    "Generate SRT and VTT subtitles from a video with Whisper on your device, or open an existing subtitle file to edit text and timings. Nothing is uploaded. Free.",
+  "video-compressor":
+    "Compress MP4, WebM or MOV videos to a smaller size or a target in MB, with hardware encoding in your browser. Nothing is uploaded. Free and no sign-up.",
+  "video-converter":
+    "Convert videos between MP4, WebM and MOV right in your browser using hardware encoding where available. Nothing is uploaded. Free, no sign-up, no watermark.",
+  "video-trimmer":
+    "Cut a video or audio file to the part you want by start and end time, with a live preview. Runs in your browser; nothing is uploaded. Free, no sign-up.",
+  "video-to-gif":
+    "Turn a short video clip into a looping GIF with your choice of length, frame rate and width. Runs in your browser; nothing is uploaded. Free and no sign-up.",
+  "extract-audio":
+    "Pull the soundtrack out of a video as M4A, WAV, WebM or OGG audio. Runs in your browser, so the video never leaves your device. Free and no sign-up needed.",
+  "audio-converter":
+    "Convert and trim audio between M4A, WAV, WebM and OGG from MP3, WAV, M4A, OGG or FLAC. Runs in your browser; nothing is uploaded. Free and no sign-up.",
+  "screen-recorder":
+    "Record your screen, a window or a browser tab with sound and optional microphone, then download it. No install, no upload, no watermark. Free, no sign-up.",
   "crop-image":
     "Crop, rotate and flip images with aspect presets like 1:1, 4:5 and 16:9, or exact pixel sizes. Runs in your browser; nothing is uploaded. Free, no sign-up.",
   "exif-remover":

@@ -226,3 +226,86 @@ export async function pdfText(
     [bytes.toString("base64"), password ?? ""] as const,
   );
 }
+
+/** Records a test clip in the browser (animated canvas, optional 440 Hz tone) with MediaRecorder. */
+export async function recordClip(
+  page: Page,
+  seconds: number,
+  withAudio: boolean,
+): Promise<{ bytes: Buffer; ext: string }> {
+  await page.goto("/robots.txt");
+  const r = await page.evaluate(
+    async ([seconds, withAudio]) => {
+      const c = document.createElement("canvas");
+      c.width = 320;
+      c.height = 240;
+      const x = c.getContext("2d")!;
+      const stream = c.captureStream(30);
+      let ac: AudioContext | null = null;
+      if (withAudio) {
+        ac = new AudioContext();
+        const osc = ac.createOscillator();
+        osc.frequency.value = 440;
+        const dest = ac.createMediaStreamDestination();
+        osc.connect(dest);
+        osc.start();
+        dest.stream.getAudioTracks().forEach((t) => stream.addTrack(t));
+      }
+      const type = ["video/webm;codecs=vp8,opus", "video/webm", "video/mp4"].find((t) =>
+        MediaRecorder.isTypeSupported(t),
+      )!;
+      const rec = new MediaRecorder(stream, { mimeType: type });
+      const chunks: Blob[] = [];
+      rec.ondataavailable = (e) => chunks.push(e.data);
+      const stopped = new Promise((res) => (rec.onstop = res));
+      rec.start(200);
+      const t0 = performance.now();
+      await new Promise<void>((done) => {
+        const draw = () => {
+          const t = (performance.now() - t0) / 1000;
+          x.fillStyle = `hsl(${(t * 120) % 360} 70% 50%)`;
+          x.fillRect(0, 0, 320, 240);
+          x.fillStyle = "#fff";
+          x.fillRect(20 + ((t * 100) % 260), 100, 40, 40);
+          if (t < seconds) requestAnimationFrame(draw);
+          else done();
+        };
+        draw();
+      });
+      rec.stop();
+      await stopped;
+      await ac?.close();
+      const blob = new Blob(chunks, { type: rec.mimeType });
+      const b = new Uint8Array(await blob.arrayBuffer());
+      let s = "";
+      for (let i = 0; i < b.length; i += 0x8000) s += String.fromCharCode(...b.subarray(i, i + 0x8000));
+      return { b64: btoa(s), ext: rec.mimeType.includes("mp4") ? "mp4" : "webm" };
+    },
+    [seconds, withAudio] as const,
+  );
+  return { bytes: Buffer.from(r.b64, "base64"), ext: r.ext };
+}
+
+/** Loads media bytes in an element: duration, size, and whether it has sound (video element only reports size). */
+export async function mediaInfo(page: Page, bytes: Buffer, type: string) {
+  return page.evaluate(
+    async ([b64, type]) => {
+      const u8 = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+      const el = document.createElement(type.startsWith("audio") ? "audio" : "video");
+      el.muted = true;
+      el.src = URL.createObjectURL(new Blob([u8], { type }));
+      await new Promise((res, rej) => {
+        el.onloadedmetadata = res;
+        el.onerror = () => rej(new Error("can't play: " + (el.error?.message ?? el.error?.code)));
+      });
+      // WebM from MediaRecorder can report Infinity until seeked to the end
+      if (!isFinite(el.duration)) {
+        el.currentTime = 1e9;
+        await new Promise((res) => (el.ondurationchange = res));
+      }
+      const v = el as HTMLVideoElement;
+      return { duration: el.duration, width: v.videoWidth ?? 0, height: v.videoHeight ?? 0 };
+    },
+    [bytes.toString("base64"), type] as const,
+  );
+}

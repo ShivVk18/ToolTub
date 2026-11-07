@@ -920,7 +920,7 @@ const rows: Row[] = [
     [[VID], [VID]],
     ["compress video", "reduce video size", "discord 10mb"],
     ["video-converter", "video-trimmer", "extract-audio"],
-    "planned",
+    "beta",
   ],
   [
     "video-converter",
@@ -935,7 +935,7 @@ const rows: Row[] = [
     [[VID], [VID]],
     ["mov to mp4", "webm to mp4"],
     ["video-compressor", "video-to-gif"],
-    "planned",
+    "beta",
   ],
   [
     "video-trimmer",
@@ -950,7 +950,7 @@ const rows: Row[] = [
     [[VID], [VID]],
     ["trim video", "cut video"],
     ["video-compressor", "video-to-gif"],
-    "planned",
+    "beta",
   ],
   [
     "video-to-gif",
@@ -965,7 +965,7 @@ const rows: Row[] = [
     [[VID], [IMG]],
     ["gif maker", "mp4 to gif"],
     ["video-trimmer", "image-compressor"],
-    "planned",
+    "beta",
   ],
   [
     "extract-audio",
@@ -980,7 +980,7 @@ const rows: Row[] = [
     [[VID], [AUD]],
     ["video to mp3", "mp4 to mp3", "video to audio"],
     ["transcription", "video-compressor"],
-    "planned",
+    "beta",
   ],
   [
     "audio-converter",
@@ -995,7 +995,7 @@ const rows: Row[] = [
     [[AUD], [AUD]],
     ["mp3 converter", "trim audio", "wav to mp3"],
     ["extract-audio", "transcription"],
-    "planned",
+    "beta",
   ],
   [
     "screen-recorder",
@@ -1010,7 +1010,7 @@ const rows: Row[] = [
     [[], [VID]],
     ["record screen", "screen capture online"],
     ["video-trimmer", "video-compressor"],
-    "planned",
+    "beta",
   ],
   [
     "transcription",
@@ -1025,7 +1025,7 @@ const rows: Row[] = [
     [[AUD, VID], [TXT]],
     ["transcribe audio", "speech to text", "video to text"],
     ["subtitle-generator", "word-counter"],
-    "planned",
+    "beta",
   ],
   [
     "subtitle-generator",
@@ -1043,7 +1043,7 @@ const rows: Row[] = [
     ],
     ["srt generator", "auto captions", "add subtitles to video"],
     ["transcription", "video-compressor"],
-    "planned",
+    "beta",
   ],
 
   // ───────────── Creator · Visual & social ─────────────
