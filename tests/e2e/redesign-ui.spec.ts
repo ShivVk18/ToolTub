@@ -1,5 +1,6 @@
 import { PNG } from "pngjs";
 import { test, expect } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
 import { assertAccessible } from "./helpers";
 
 test.describe("KlipKit Redesign UI & Visual Layer", () => {
@@ -492,6 +493,38 @@ test.describe("KlipKit Redesign UI & Visual Layer", () => {
     expect(await align("#explore .eyb")).toBe("left");
     expect(await align("#pricing .sh")).toBe("center");
   });
+
+  for (const theme of ["light", "dark"] as const) {
+    test(`home passes axe (no serious/critical) in ${theme} mode, satellites settled`, async ({ page }) => {
+      await page.addInitScript((t) => localStorage.setItem("theme", t), theme);
+      await page.goto("/");
+      await page.evaluate(() => document.fonts.ready);
+      await page.waitForTimeout(3000); // satellites fade in; judge their resting state
+      await assertAccessible(page, `home ${theme}`);
+    });
+  }
+
+  for (const theme of ["light", "dark"] as const) {
+    test(`hero text passes contrast against a resolvable background (${theme}, scrolled)`, async ({ page }) => {
+      // At the top, axe can't resolve the colour behind the hero's translucent pills ("incomplete"), so a
+      // failing contrast went unreported. Scrolled, it measures against the page colour, as a reader sees it.
+      // Reduced motion holds the looping bento demo on its final frame, so no element is caught mid-fade.
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.addInitScript((t) => localStorage.setItem("theme", t), theme);
+      await page.goto("/");
+      await page.evaluate(() => document.fonts.ready);
+      await page.evaluate(() => document.querySelector("#explore")!.scrollIntoView());
+      await page.waitForTimeout(800);
+      const r = await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+        .exclude("#sats") // aria-hidden decoration that dims with depth (WCAG 1.4.3 exempts pure decoration)
+        .analyze();
+      const bad = r.violations
+        .filter((v) => v.impact === "serious" || v.impact === "critical")
+        .map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(" ")).join(" | ")}`);
+      expect(bad).toEqual([]);
+    });
+  }
 
   test("opening a live panel docks the orb and hides the satellites", async ({ page }) => {
     await page.goto("/#base64");

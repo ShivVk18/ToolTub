@@ -134,6 +134,7 @@
   --g-p: #b73a3e;
   --g-d: #6052d8;
   --g-c: #18774b;
+  --g-o: #b3553a; /* hero "JWT" chip: the reference's #f2734f is 2.7:1 on light */
   --bg: #f3f0e8;
   --bg2: #ece7dc;
   --panel: rgba(255, 255, 255, 0.66);
@@ -172,6 +173,7 @@
   --g-p: #e96266;
   --g-d: #8a7df7;
   --g-c: #2ca36c;
+  --g-o: #f2734f;
   --bg: #0e0d12;
   --bg2: #15141b;
   --panel: rgba(28, 27, 35, 0.66);
@@ -525,7 +527,7 @@ body.is-work #hero {
   background: var(--panel);
   backdrop-filter: blur(10px);
   font-size: 15px;
-  color: var(--muted);
+  color: var(--ink2); /* --muted is 4.21:1 on the pill; same AA rule as K7 */
 }
 .eyebrow b {
   color: var(--accent);
@@ -2553,6 +2555,10 @@ body.scrolled #nav::before {
   font-style: normal;
   color: #5240df;
   margin-right: 10px;
+}
+/* The reference's #5240df is 2.7:1 on the dark background; --g-d is the AA violet for dark (light unchanged). */
+[data-theme="dark"] .eyb i {
+  color: var(--g-d);
 }
 /* Left-aligned kicker for page columns (tool pages). --g-d keeps the number AA in dark mode too. */
 .eyb.eyb-l {

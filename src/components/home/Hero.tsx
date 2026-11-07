@@ -248,7 +248,7 @@ export function Hero({ onPickSample, onOrbSlotClick, onPasteText, onSubmitAsk, h
           className="chip alt"
           onClick={() => onPasteText?.('{"user":{"id":42,"name":"Asha Rao","roles":["admin"],"active":true}}')}
         >
-          <span style={{ color: "var(--accent)", fontWeight: 600 }}>&#123; &#125;</span> Paste JSON
+          <span style={{ color: "var(--g-d)", fontWeight: 600 }}>&#123; &#125;</span> Paste JSON
         </button>
 
         <button
@@ -261,11 +261,11 @@ export function Hero({ onPickSample, onOrbSlotClick, onPasteText, onSubmitAsk, h
             )
           }
         >
-          <span style={{ color: "#F2734F", fontWeight: 600 }}>JWT</span> Paste a token
+          <span style={{ color: "var(--g-o)", fontWeight: 600 }}>JWT</span> Paste a token
         </button>
 
         <button type="button" data-alt="2" className="chip alt" onClick={() => onSubmitAsk?.("generate 10 uuids")}>
-          <span style={{ color: "var(--accent)" }}>✦</span> Generate UUIDs
+          <span style={{ color: "var(--g-d)" }}>✦</span> Generate UUIDs
         </button>
       </div>
 
