@@ -231,4 +231,38 @@ test.describe("tool pages use the design system", () => {
     const lum = (0.2126 * png.data[o] + 0.7152 * png.data[o + 1] + 0.0722 * png.data[o + 2]) / 255;
     expect(lum).toBeLessThan(0.35);
   });
+
+  test("A6: tool pages use the home's devices: kickers + serif heads, FAQ as details, orb drop target", async ({
+    page,
+  }) => {
+    await page.goto("/json-formatter");
+    const article = page.locator("article.prose-klip");
+    const serif = await page.evaluate(() =>
+      getComputedStyle(document.documentElement).getPropertyValue("--serif").trim(),
+    );
+    const h2 = article.locator("h2").first();
+    const unq = (f: string) => f.replace(/"/g, "");
+    expect(unq(await h2.evaluate((e) => getComputedStyle(e).fontFamily))).toBe(unq(serif));
+    // every section opens with a numbered kicker, as on the home page
+    const sections = article.locator("section");
+    const n = await sections.count();
+    expect(n).toBeGreaterThan(3);
+    await expect(sections.first().locator(".eyb i")).toHaveText("01");
+    expect(await article.locator("section > .eyb").count()).toBe(n);
+
+    // FAQ: one <details> per question, closed by default, opens on click
+    const faqs = article.locator("details.faq");
+    expect(await faqs.count()).toBeGreaterThan(1);
+    await expect(faqs.first()).not.toHaveAttribute("open", "");
+    await faqs.first().locator("summary").click();
+    await expect(faqs.first()).toHaveAttribute("open", "");
+
+    // drop target: a small orb, not the generic upload icon
+    await page.goto("/image-compressor");
+    const dz = page.locator('[data-testid="dropzone"]:visible');
+    const orb = dz.locator(".kk-orb-mini");
+    await expect(orb).toBeVisible();
+    expect(await orb.evaluate((e) => getComputedStyle(e, "::before").backgroundImage)).toContain("conic-gradient");
+    await expect(dz.locator("svg.lucide-upload")).toHaveCount(0);
+  });
 });

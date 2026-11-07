@@ -52,11 +52,50 @@
 }
 
 /* Typography for server-rendered SEO/AEO content on tool pages */
+/* Hallmark A6: section heads in the home's voice (serif H2 under a numbered kicker). */
 .prose-klip h2 {
-  @apply mb-3 text-2xl font-semibold tracking-tight;
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(28px, 2.6vw, 40px);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin-bottom: 14px;
 }
 .prose-klip h3 {
   @apply mb-1 mt-6 text-lg font-medium;
+}
+/* FAQ as <details>, one rule per question */
+.prose-klip details.faq {
+  border-bottom: 1px solid var(--line);
+}
+.prose-klip details.faq summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 56px;
+  cursor: pointer;
+  list-style: none;
+}
+.prose-klip details.faq summary::-webkit-details-marker {
+  display: none;
+}
+.prose-klip details.faq summary::after {
+  content: "+";
+  flex: none;
+  font: 400 24px/1 var(--sans);
+  color: var(--ink2);
+  transition: transform 0.25s;
+}
+.prose-klip details.faq[open] summary::after {
+  transform: rotate(45deg);
+}
+.prose-klip details.faq summary h3 {
+  margin: 0;
+  padding: 14px 0;
+}
+.prose-klip details.faq p {
+  padding-bottom: 18px;
 }
 .prose-klip p {
   @apply leading-7 text-ink/90;
@@ -2514,6 +2553,39 @@ body.scrolled #nav::before {
   font-style: normal;
   color: #5240df;
   margin-right: 10px;
+}
+/* Left-aligned kicker for page columns (tool pages). --g-d keeps the number AA in dark mode too. */
+.eyb.eyb-l {
+  text-align: left;
+  margin-bottom: 12px;
+}
+.eyb.eyb-l i {
+  color: var(--g-d);
+}
+/* Mini orb for drop targets: the hero orb's conic colours, small (Hallmark A6). */
+.kk-orb-mini {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  overflow: hidden;
+  color: #fff;
+  box-shadow: 0 12px 30px -14px rgba(80, 60, 200, 0.6);
+}
+.kk-orb-mini::before {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  background: conic-gradient(from 200deg, #7c6bff, #b38bff, #ff9c82, #ffd27a, #8fe0be, #6fb7ff, #7c6bff);
+  filter: blur(6px) saturate(1.1);
+}
+.kk-orb-mini > * {
+  position: relative;
+}
+[data-testid="dropzone"].kk-drop {
+  background: radial-gradient(60% 90% at 50% 0%, var(--h0), transparent 70%);
 }
 .bento {
   display: grid;

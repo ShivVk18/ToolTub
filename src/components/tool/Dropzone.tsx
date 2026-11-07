@@ -1,5 +1,5 @@
 "use client";
-import { AlertTriangle, Upload } from "lucide-react";
+import { AlertTriangle, ArrowUp } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { acceptsFile } from "@/lib/engines/format";
@@ -78,11 +78,14 @@ export function Dropzone({
         take(e.dataTransfer.files);
       }}
       className={cn(
-        "flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-border px-6 py-10 text-center transition-colors",
+        // Orb-tinted drop target in the home's language (Hallmark A6).
+        "kk-drop flex flex-col items-center justify-center gap-3 rounded-[24px] border-2 border-dashed border-line2 px-6 py-10 text-center transition-colors",
         over && "border-accent bg-accent-soft",
       )}
     >
-      <Upload className="size-6 text-fg-muted" aria-hidden />
+      <span className="kk-orb-mini" aria-hidden>
+        <ArrowUp className="size-5" strokeWidth={2.5} />
+      </span>
       <div>
         <button
           type="button"
