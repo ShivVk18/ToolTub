@@ -116,6 +116,17 @@ export async function fromFile(file: File): Promise<FileInfo> {
         const txt = await file.slice(0, 8e6).text();
         const m = txt.match(/\/Type\s*\/Page[^s]/g);
         if (m) f.pages = m.length;
+        // Pages inside compressed object streams (most modern PDFs) don't show up as plain text:
+        // ask pdf-lib (loaded only for PDFs) rather than leave the card without a page count.
+        else if (file.size < 1e8)
+          try {
+            const { PDFDocument } = await import("pdf-lib");
+            const doc = await PDFDocument.load(await file.arrayBuffer(), {
+              ignoreEncryption: true,
+              updateMetadata: false,
+            });
+            f.pages = doc.getPageCount();
+          } catch {}
       } else if (f.kind === "audio" || f.kind === "video") {
         await new Promise<void>((resolve) => {
           const el = document.createElement(f.kind as "audio" | "video");
