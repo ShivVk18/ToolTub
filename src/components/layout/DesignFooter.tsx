@@ -26,7 +26,8 @@ export function DesignFooter() {
         KlipKit
       </Link>
 
-      <span>Drop anything. Done in seconds.</span>
+      {/* Hidden under 400 px: there it wrapped into a 4-line column beside the links (Hallmark F16). */}
+      <span className="max-[399px]:hidden">Drop anything. Done in seconds.</span>
 
       {/* One "·"-separated line on the right, like the reference ("© 2026 KlipKit · Privacy · Terms"). */}
       <span className="ml-auto text-right">

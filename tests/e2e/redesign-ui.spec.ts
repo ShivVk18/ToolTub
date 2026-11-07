@@ -403,6 +403,20 @@ test.describe("KlipKit Redesign UI & Visual Layer", () => {
     expect(rows).toBe(0);
   });
 
+  test("F16: footer tagline hides on narrow phones instead of wrapping into a column", async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto("/image-tools");
+    await expect(page.locator("footer").getByText("Drop anything. Done in seconds.")).toBeHidden();
+    // the right-hand links still fit in at most two lines
+    const h = await page
+      .locator("footer > span")
+      .last()
+      .evaluate((e) => e.getBoundingClientRect().height);
+    expect(h).toBeLessThanOrEqual(44);
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await expect(page.locator("footer").getByText("Drop anything. Done in seconds.")).toBeVisible();
+  });
+
   test("opening a live panel docks the orb and hides the satellites", async ({ page }) => {
     await page.goto("/#base64");
     await expect(page.locator("#panel")).toBeVisible();
