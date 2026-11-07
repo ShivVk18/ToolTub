@@ -27,10 +27,31 @@ export const jsonWorker = createWorkerClient<{ format: (job: JsonJob) => JsonRes
   () => new Worker(new URL("./json.worker.ts", import.meta.url), { type: "module" }),
 );
 
-import type { PdfCompressJob, PdfSplitJob } from "./pdf-ops";
+import type {
+  PdfCompressJob,
+  PdfSplitJob,
+  PdfMergeJob,
+  PdfSplitRangesJob,
+  ImagesToPdfJob,
+  WatermarkJob,
+  OrganizeJob,
+  SignJob,
+  ProtectJob,
+  UnlockJob,
+  FormField,
+} from "./pdf-ops";
 type PdfOps = {
   compress: (job: PdfCompressJob) => { blob: Blob; originalSize: number; keptOriginal: boolean; note?: string };
   split: (job: PdfSplitJob) => { blob: Blob; pages: number; from: number; to: number };
+  merge: (job: PdfMergeJob) => { blob: Blob; pages: number };
+  splitRanges: (job: PdfSplitRangesJob) => { files: { blob: Blob; label: string; pages: number }[]; total: number };
+  imagesToPdf: (job: ImagesToPdfJob) => { blob: Blob; pages: number };
+  watermark: (job: WatermarkJob) => { blob: Blob; pages: number };
+  organize: (job: OrganizeJob) => { blob: Blob; pages: number };
+  sign: (job: SignJob) => { blob: Blob };
+  protect: (job: ProtectJob) => { blob: Blob };
+  unlock: (job: UnlockJob) => { blob: Blob };
+  fields: (job: { bytes: ArrayBuffer }) => FormField[];
 };
 export const pdfWorker = createWorkerClient<PdfOps>(
   () => new Worker(new URL("./pdf.worker.ts", import.meta.url), { type: "module" }),

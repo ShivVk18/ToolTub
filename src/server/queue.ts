@@ -71,6 +71,17 @@ export const SERVER_TOOLS = {
     ext: "pdf",
     outExt: "docx",
     outType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    label: "a valid PDF",
+  },
+  "word-to-pdf": {
+    maxMb: 50,
+    magic: "PK\u0003\u0004", // Office and OpenDocument files are ZIPs; LibreOffice rejects ZIPs that aren't documents
+    ext: "docx",
+    /** Other accepted extensions: the file is stored as input.<ext> so LibreOffice picks the right importer. */
+    exts: ["docx", "xlsx", "pptx", "odt", "ods", "odp"],
+    outExt: "pdf",
+    outType: "application/pdf",
+    label: "a Word, Excel or PowerPoint file (.docx, .xlsx, .pptx)",
   },
 } as const;
 export type ServerTool = keyof typeof SERVER_TOOLS;

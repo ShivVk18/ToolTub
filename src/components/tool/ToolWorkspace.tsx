@@ -1,6 +1,14 @@
 "use client";
 import { AlertTriangle, Loader2 } from "lucide-react";
-import { useCallback, useState, useSyncExternalStore, type ReactNode } from "react";
+import {
+  cloneElement,
+  isValidElement,
+  useCallback,
+  useId,
+  useState,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
 import { Button } from "@/components/ui/button";
 
 export type RunStatus = "idle" | "working" | "done" | "error";
@@ -159,11 +167,24 @@ export function ToolWorkspace({
   );
 }
 
+/**
+ * A labelled control. The control is named by the label text alone (aria-labelledby): wrapping a <select> in a
+ * <label> would otherwise make screen readers read every option as part of its name.
+ */
 export function Field({ label, children }: { label: string; children: ReactNode }) {
+  const id = useId();
+  const child =
+    isValidElement<{ "aria-labelledby"?: string; "aria-label"?: string }>(children) &&
+    !children.props["aria-label"] &&
+    !children.props["aria-labelledby"]
+      ? cloneElement(children, { "aria-labelledby": id })
+      : children;
   return (
     <label className="flex flex-col gap-1.5 text-sm">
-      <span className="text-fg-muted">{label}</span>
-      {children}
+      <span id={id} className="text-fg-muted">
+        {label}
+      </span>
+      {child}
     </label>
   );
 }

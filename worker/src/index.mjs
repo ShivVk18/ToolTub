@@ -34,6 +34,11 @@ const TOOLS = {
     output: "output.docx",
     args: ["--infilter=writer_pdf_import", "--convert-to", "docx:MS Word 2007 XML"],
   },
+  "word-to-pdf": {
+    input: "input.docx",
+    output: "output.pdf",
+    args: ["--convert-to", "pdf:writer_pdf_Export"],
+  },
 };
 
 /** Job ids being converted right now; the sweeper never deletes their folders. */
@@ -52,7 +57,9 @@ async function convertJob(job) {
   const spec = TOOLS[job.data.tool];
   if (!spec) throw new Error(`Unknown tool ${job.data.tool}`);
   const dir = join(JOBS_DIR, job.data.id);
-  const produced = spec.input.replace(/\.[^.]+$/, "") + "." + spec.output.split(".").pop();
+  // The API stores the upload as input.<ext> (ext from a whitelist); older jobs carry no ext and use the default.
+  const input = job.data.ext && /^[a-z0-9]{2,5}$/.test(job.data.ext) ? `input.${job.data.ext}` : spec.input;
+  const produced = input.replace(/\.[^.]+$/, "") + "." + spec.output.split(".").pop();
   const once = async () => {
     await run(
       "soffice",
@@ -64,7 +71,7 @@ async function convertJob(job) {
         ...spec.args,
         "--outdir",
         dir,
-        join(dir, spec.input),
+        join(dir, input),
       ],
       { timeout: TIMEOUT_MS, killSignal: "SIGKILL" },
     ).catch((e) => {

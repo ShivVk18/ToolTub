@@ -34,6 +34,15 @@ const TOOLS = [
   { slug: "json-formatter", h1: "JSON Formatter & Validator", device: true, action: false },
   { slug: "jwt-decoder", h1: "JWT Decoder", device: true, action: false },
   { slug: "qr-code-generator", h1: "QR Code Generator", device: true, action: false },
+  { slug: "merge-pdf", h1: "Merge PDF", device: true, action: true },
+  { slug: "split-pdf", h1: "Split PDF", device: true, action: true },
+  { slug: "jpg-to-pdf", h1: "JPG to PDF", device: true, action: true },
+  { slug: "pdf-watermark", h1: "PDF Watermark & Page Numbers", device: true, action: true },
+  { slug: "protect-pdf", h1: "Protect / Unlock PDF", device: true, action: true },
+  { slug: "organize-pdf", h1: "Organize PDF", device: true, action: true },
+  { slug: "sign-pdf", h1: "Fill & Sign PDF", device: true, action: true },
+  { slug: "pdf-to-jpg", h1: "PDF to JPG", device: true, action: true },
+  { slug: "word-to-pdf", h1: "Word, Excel & PowerPoint to PDF", device: false, action: true },
 ];
 
 const DEVICE_BADGE = "Runs on your device — nothing uploaded";

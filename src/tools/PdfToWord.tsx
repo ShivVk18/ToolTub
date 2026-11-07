@@ -9,18 +9,68 @@ import type { ToolProps } from "./types";
 
 type JobState = { state: "waiting" | "active" | "completed" | "failed" | "unknown"; position?: number; error?: string };
 
+const DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+
+/** What differs between the server tools: the API tool id, input type and labels. */
+interface ServerSpec {
+  tool: "pdf-to-word" | "word-to-pdf";
+  accept: string;
+  inType: (t: string, name: string) => boolean;
+  typeLabel: string;
+  noun: string;
+  hint: string;
+  action: string;
+  outExt: string;
+  outType: string;
+  failFix: string;
+}
+
+const SPECS: Record<ServerSpec["tool"], ServerSpec> = {
+  "pdf-to-word": {
+    tool: "pdf-to-word",
+    accept: "application/pdf,.pdf",
+    inType: (t) => t === "application/pdf",
+    typeLabel: "a PDF",
+    noun: "PDF",
+    hint: "Text-based PDF up to 50 MB · deleted from our server after 1 hour",
+    action: "Convert to Word",
+    outExt: "docx",
+    outType: DOCX,
+    failFix: "Scanned PDFs have no text to convert: run Image to Text (OCR) first.",
+  },
+  "word-to-pdf": {
+    tool: "word-to-pdf",
+    accept: `${DOCX},application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.oasis.opendocument.text,application/vnd.oasis.opendocument.spreadsheet,application/vnd.oasis.opendocument.presentation,.docx,.xlsx,.pptx,.odt,.ods,.odp`,
+    inType: (t, n) => /\.(docx|xlsx|pptx|odt|ods|odp)$/i.test(n) || t === DOCX,
+    typeLabel: "a Word, Excel or PowerPoint file",
+    noun: "document",
+    hint: ".docx, .xlsx, .pptx (or OpenDocument) up to 50 MB · deleted from our server after 1 hour",
+    action: "Convert to PDF",
+    outExt: "pdf",
+    outType: "application/pdf",
+    failFix: "Old .doc, .xls and .ppt files aren't supported: save as .docx, .xlsx or .pptx, then try again.",
+  },
+};
+
 /**
- * [Srv] PDF to Word. The file goes to KlipKit's own server only (LibreOffice in a sandboxed,
+ * [Srv] PDF to Word and Word to PDF. The file goes to KlipKit's own server only (LibreOffice in a sandboxed,
  * network-less container), is converted via the BullMQ queue, and is deleted after 1 hour.
  */
-export function PdfToWord({ slug, next }: ToolProps) {
+export function PdfToWord(props: ToolProps) {
+  return <ServerConvert {...props} spec={SPECS["pdf-to-word"]} />;
+}
+export function WordToPdf(props: ToolProps) {
+  return <ServerConvert {...props} spec={SPECS["word-to-pdf"]} />;
+}
+
+function ServerConvert({ slug, next, spec }: ToolProps & { spec: ServerSpec }) {
   const [file, setFile] = useState<File | null>(null);
   const job = useToolRun<Blob>();
 
-  // Arrive with a PDF from the home plan or another tool ("Continue in PDF to Word").
+  // Arrive with a file from the home plan or another tool ("Continue in …").
   useHandoff((items) => {
-    const pdf = items.find((i) => i.type === "application/pdf" && i.blob);
-    if (pdf) setFile(new File([pdf.blob!], pdf.name, { type: pdf.type }));
+    const f = items.find((i) => spec.inType(i.type, i.name) && i.blob);
+    if (f) setFile(new File([f.blob!], f.name, { type: f.type }));
   });
 
   const start = () =>
@@ -29,7 +79,7 @@ export function PdfToWord({ slug, next }: ToolProps) {
         onProgress({ label: "Uploading to KlipKit's server…" });
         const form = new FormData();
         form.append("file", file!);
-        const send = () => fetch("/api/jobs?tool=pdf-to-word", { method: "POST", body: form });
+        const send = () => fetch(`/api/jobs?tool=${spec.tool}`, { method: "POST", body: form });
         let res = await send();
         // One automatic retry for a brief outage (e.g. the queue restarting) before showing an error.
         if (res.status === 503) {
@@ -60,7 +110,7 @@ export function PdfToWord({ slug, next }: ToolProps) {
           ? "Browser-based tools still work; only server conversions are paused."
           : e.message.includes("limit")
             ? "You've hit the hourly limit for server tools. Try again in a little while."
-            : "Scanned PDFs have no text to convert: run Image to Text (OCR) first.",
+            : spec.failFix,
       }),
     );
 
@@ -72,31 +122,30 @@ export function PdfToWord({ slug, next }: ToolProps) {
       onRetry={() => (setFile(null), job.reset())}
       input={
         file ? (
-          <FileChip files={[file]} noun="PDF" onChange={() => (setFile(null), job.reset())} />
+          <FileChip files={[file]} noun={spec.noun} onChange={() => (setFile(null), job.reset())} />
         ) : (
           <Dropzone
-            accept="application/pdf,.pdf"
-            typeLabel="a PDF"
+            accept={spec.accept}
+            typeLabel={spec.typeLabel}
             maxFileMb={50}
             onFiles={([f]) => (setFile(f), job.reset())}
-            hint="Text-based PDF up to 50 MB · deleted from our server after 1 hour"
+            hint={spec.hint}
           />
         )
       }
-      action={{ label: "Convert to Word", onClick: start, disabled: !file }}
+      action={{ label: spec.action, onClick: start, disabled: !file }}
       result={
         job.status === "done" &&
         job.result && (
           <div className="space-y-3">
             <p className="text-sm">
-              Done · {formatBytes(job.result.size)} · your PDF and the Word file are deleted from our server within 1
-              hour.
+              Done · {formatBytes(job.result.size)} · both files are deleted from our server within 1 hour.
             </p>
             <ResultActions
               items={[
                 {
-                  name: file!.name.replace(/\.pdf$/i, "") + ".docx",
-                  type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                  name: file!.name.replace(/\.[^.]+$/, "") + "." + spec.outExt,
+                  type: spec.outType,
                   blob: job.result,
                 },
               ]}

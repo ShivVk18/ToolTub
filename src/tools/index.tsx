@@ -21,6 +21,15 @@ const components: Record<string, ComponentType<ToolProps>> = {
   "compress-pdf": lazy(() => import("./CompressPdf").then((m) => m.CompressPdf)),
   "pdf-to-word": lazy(() => import("./PdfToWord").then((m) => m.PdfToWord)),
   "background-remover": lazy(() => import("./BackgroundRemover").then((m) => m.BackgroundRemover)),
+  "word-to-pdf": lazy(() => import("./PdfToWord").then((m) => m.WordToPdf)),
+  "merge-pdf": lazy(() => import("./PdfTools").then((m) => m.MergePdf)),
+  "split-pdf": lazy(() => import("./PdfTools").then((m) => m.SplitPdf)),
+  "jpg-to-pdf": lazy(() => import("./PdfTools").then((m) => m.JpgToPdf)),
+  "pdf-watermark": lazy(() => import("./PdfTools").then((m) => m.PdfWatermark)),
+  "protect-pdf": lazy(() => import("./PdfTools").then((m) => m.ProtectPdf)),
+  "organize-pdf": lazy(() => import("./PdfPages").then((m) => m.OrganizePdf)),
+  "sign-pdf": lazy(() => import("./PdfPages").then((m) => m.SignPdf)),
+  "pdf-to-jpg": lazy(() => import("./PdfPages").then((m) => m.PdfToJpg)),
 };
 
 export function ToolUI(props: ToolProps) {

@@ -1,7 +1,38 @@
 import { serveWorker, type Progress } from "@/lib/worker-rpc";
-import { compressPdf, splitPdf, type PdfCompressJob, type PdfSplitJob } from "./pdf-ops";
+import {
+  compressPdf,
+  splitPdf,
+  mergePdfs,
+  splitRanges,
+  imagesToPdf,
+  watermarkPdf,
+  organizePdf,
+  signPdf,
+  protectPdf,
+  unlockPdf,
+  listFields,
+  type PdfCompressJob,
+  type PdfSplitJob,
+  type PdfMergeJob,
+  type PdfSplitRangesJob,
+  type ImagesToPdfJob,
+  type WatermarkJob,
+  type OrganizeJob,
+  type SignJob,
+  type ProtectJob,
+  type UnlockJob,
+} from "./pdf-ops";
 
 serveWorker({
   compress: (job: PdfCompressJob, progress: Progress) => compressPdf(job, progress),
   split: (job: PdfSplitJob) => splitPdf(job),
+  merge: (job: PdfMergeJob, progress: Progress) => mergePdfs(job, progress),
+  splitRanges: (job: PdfSplitRangesJob, progress: Progress) => splitRanges(job, progress),
+  imagesToPdf: (job: ImagesToPdfJob, progress: Progress) => imagesToPdf(job, progress),
+  watermark: (job: WatermarkJob) => watermarkPdf(job),
+  organize: (job: OrganizeJob) => organizePdf(job),
+  sign: (job: SignJob) => signPdf(job),
+  protect: (job: ProtectJob, progress: Progress) => protectPdf(job, progress),
+  unlock: (job: UnlockJob, progress: Progress) => unlockPdf(job, progress),
+  fields: (job: { bytes: ArrayBuffer }) => listFields(job),
 });

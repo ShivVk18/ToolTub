@@ -192,3 +192,37 @@ export async function assertMobileFriendly(page: Page) {
 export async function useTheme(page: Page, theme: "dark" | "light") {
   await page.addInitScript((t) => localStorage.setItem("theme", t), theme);
 }
+
+/**
+ * Text of each page of a PDF, read in the browser with the app's own self-hosted pdf.js (also proves the
+ * file opens in a real PDF reader). `password` for encrypted files; throws the reader's error otherwise.
+ */
+export async function pdfText(
+  page: Page,
+  bytes: Buffer,
+  password?: string,
+): Promise<{ pages: string[]; sizes: [number, number][] }> {
+  return page.evaluate(
+    async ([b64, pw]) => {
+      const lib = await import(/* webpackIgnore: true */ "/vendor/pdfjs/pdf.min.mjs" as string);
+      lib.GlobalWorkerOptions.workerSrc = "/vendor/pdfjs/pdf.worker.min.mjs";
+      const data = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+      const doc = await lib.getDocument({
+        data,
+        password: pw || undefined,
+        standardFontDataUrl: "/vendor/pdfjs/standard_fonts/",
+      }).promise;
+      const pages: string[] = [];
+      const sizes: [number, number][] = [];
+      for (let i = 1; i <= doc.numPages; i++) {
+        const p = await doc.getPage(i);
+        const vp = p.getViewport({ scale: 1 });
+        sizes.push([Math.round(vp.width), Math.round(vp.height)]);
+        const tc = await p.getTextContent();
+        pages.push(tc.items.map((it: { str?: string }) => it.str ?? "").join(" "));
+      }
+      return { pages, sizes };
+    },
+    [bytes.toString("base64"), password ?? ""] as const,
+  );
+}

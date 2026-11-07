@@ -25,6 +25,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@neslinesli93/qpdf-wasm": "^0.3.1",
     "bullmq": "^6.5.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -37,6 +38,7 @@
     "next": "16.4.4",
     "onnxruntime-web": "^1.31.1",
     "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^6.5.438",
     "qrcode": "^1.5.4",
     "react": "19.3.0",
     "react-dom": "19.3.0",

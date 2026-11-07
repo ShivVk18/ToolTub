@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import { spawn, execSync, type ChildProcess } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
-import { docxText, downloadFrom, fx, gen, output, primary, upload, alert, byTestId } from "./helpers";
+import { docxText, downloadFrom, fx, gen, output, pdfText, primary, upload, alert, byTestId } from "./helpers";
 import { JOBS_DIR, REDIS_PORT } from "../../playwright.config";
 
 /**
@@ -35,6 +35,8 @@ const startRedis = async () => {
   await new Promise((r) => setTimeout(r, 600));
 };
 const startWorker = async () => {
+  // Reuse a running worker: starting a second one orphaned the first, which then kept taking jobs after stopWorker().
+  if (worker) return;
   worker = spawn(process.execPath, ["worker/src/index.mjs"], {
     env: {
       ...process.env,
@@ -115,6 +117,30 @@ test("PDF to Word: real DOCX with the PDF's text, downloaded in the browser", as
   const { name, bytes } = await downloadFrom(page, () => byTestId(page, "download").click());
   expect(name).toBe("text.docx");
   expect(docxText(bytes)).toContain("editable text in Word");
+});
+
+test("Word to PDF: a real PDF with the document's text, downloaded in the browser", async ({ page }) => {
+  await startWorker();
+  await page.goto("/word-to-pdf");
+  await upload(page, fx("doc.docx"));
+  await primary(page).click();
+  await expect(output(page)).toContainText("Done", { timeout: 60_000 });
+  const { name, bytes } = await downloadFrom(page, () => byTestId(page, "download").click());
+  expect(name).toBe("doc.pdf");
+  expect(bytes.subarray(0, 5).toString("latin1")).toBe("%PDF-");
+  const text = (await pdfText(page, bytes)).pages.join(" ");
+  expect(text).toContain("KlipKit test document");
+  expect(text).toContain("12345");
+});
+
+test("Word to PDF refuses a file that isn't an Office document", async ({ request }) => {
+  const res = await request.post("/api/jobs?tool=word-to-pdf", {
+    multipart: {
+      file: { name: "notes.docx", mimeType: "application/octet-stream", buffer: Buffer.from("plain text") },
+    },
+  });
+  expect(res.status()).toBe(415);
+  expect((await res.json()).error).toMatch(/Word, Excel or PowerPoint/);
 });
 
 test("upload validation: unknown tool, wrong content type, size limit", async ({ request }) => {

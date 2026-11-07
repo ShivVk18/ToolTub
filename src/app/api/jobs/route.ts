@@ -38,7 +38,7 @@ async function handle(req: Request) {
 
   const bytes = Buffer.from(await file.arrayBuffer());
   if (bytes.subarray(0, spec.magic.length).toString("latin1") !== spec.magic) {
-    return Response.json({ error: "That file isn't a valid PDF" }, { status: 415 });
+    return Response.json({ error: `That file isn't ${spec.label}` }, { status: 415 });
   }
 
   // Queue up but no worker alive: say so now instead of letting the job wait forever.
@@ -48,7 +48,11 @@ async function handle(req: Request) {
   const id = randomUUID();
   const dir = join(JOBS_DIR, id);
   await mkdir(dir, { recursive: true });
-  await writeFile(join(dir, `input.${spec.ext}`), bytes);
-  await getQueue().add(tool, { id, tool }, { jobId: id });
+  // Only whitelisted extensions are taken from the client's file name; anything else falls back to the default.
+  const given = /\.([a-z0-9]{2,5})$/i.exec(file.name)?.[1].toLowerCase();
+  const exts: readonly string[] = "exts" in spec ? spec.exts : [spec.ext];
+  const ext = given && exts.includes(given) ? given : spec.ext;
+  await writeFile(join(dir, `input.${ext}`), bytes);
+  await getQueue().add(tool, { id, tool, ext }, { jobId: id });
   return Response.json({ id }, { status: 202 });
 }

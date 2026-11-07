@@ -5,6 +5,24 @@ import { catalog } from "./catalog";
 export { PANEL_SLUGS, homeTools } from "./catalog";
 
 const META: Record<string, string> = {
+  "merge-pdf":
+    "Merge several PDFs into one file in the order you choose. Runs in your browser, so documents are never uploaded. Free, no sign-up, no watermark.",
+  "split-pdf":
+    "Split a PDF by page ranges, extract the pages you need, or save every page as its own PDF. Runs in your browser; nothing is uploaded. Free, no sign-up.",
+  "word-to-pdf":
+    "Convert a Word .docx document to PDF with LibreOffice on KlipKit's own server. Files are deleted within one hour. Free, no sign-up, no watermark added.",
+  "pdf-to-jpg":
+    "Turn PDF pages into JPG or PNG images at screen or print quality. Rendered in your browser, so the PDF never leaves your device. Free and no sign-up.",
+  "jpg-to-pdf":
+    "Combine JPG, PNG, WebP and other images into one PDF, one page per image, on A4, Letter or image-sized pages. Runs in your browser. Free, no sign-up.",
+  "organize-pdf":
+    "Reorder, rotate and delete PDF pages with live page previews, then save a new PDF. Everything runs in your browser; nothing is uploaded. Free, no sign-up.",
+  "sign-pdf":
+    "Sign a PDF by drawing or typing your signature and placing it on any page. Runs in your browser, so the document stays on your device. Free, no sign-up.",
+  "protect-pdf":
+    "Add a password to a PDF with AES-256 encryption and choose whether printing or copying is allowed. Runs in your browser; nothing is uploaded. Free.",
+  "pdf-watermark":
+    "Add a text watermark to a PDF: diagonal, centred or as a footer, with your colour and opacity. Runs in your browser; nothing is uploaded. Free, no sign-up.",
   "pdf-to-word":
     "Convert a text-based PDF into an editable Word (DOCX) file. Processed on KlipKit's own server and deleted within one hour. Free, no sign-up, no watermark.",
   "image-resizer":

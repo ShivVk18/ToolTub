@@ -65,7 +65,8 @@ test.describe("tool pages use the design system", () => {
   test("F14: /search has a pill input and tagged result rows; coming-soon rows are muted, not links", async ({
     page,
   }) => {
-    await page.goto("/search?q=pdf");
+    // "image" mixes live tools with one still coming soon (Image Upscaler); every PDF tool is live now.
+    await page.goto("/search?q=image");
     const input = page.getByRole("textbox", { name: "Search tools" });
     const radius = await input.evaluate((e) => parseFloat(getComputedStyle(e).borderTopLeftRadius));
     const height = await input.evaluate((e) => e.getBoundingClientRect().height);

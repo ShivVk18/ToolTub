@@ -73,7 +73,7 @@ const rows: Row[] = [
     [[PDF], [PDF]],
     ["combine pdf", "join pdf"],
     ["split-pdf", "compress-pdf", "organize-pdf"],
-    "planned",
+    "beta",
   ],
   [
     "split-pdf",
@@ -88,7 +88,7 @@ const rows: Row[] = [
     [[PDF], [PDF]],
     ["extract pages", "separate pdf"],
     ["merge-pdf", "organize-pdf"],
-    "planned",
+    "beta",
   ],
   [
     "pdf-to-word",
@@ -118,7 +118,7 @@ const rows: Row[] = [
     [[DOCX], [PDF]],
     ["docx to pdf", "excel to pdf", "ppt to pdf"],
     ["pdf-to-word", "compress-pdf", "merge-pdf"],
-    "planned",
+    "beta",
   ],
   [
     "pdf-to-jpg",
@@ -133,7 +133,7 @@ const rows: Row[] = [
     [[PDF], [IMG]],
     ["pdf to image", "pdf to png"],
     ["jpg-to-pdf", "image-compressor"],
-    "planned",
+    "beta",
   ],
   [
     "jpg-to-pdf",
@@ -148,7 +148,7 @@ const rows: Row[] = [
     [[IMG], [PDF]],
     ["image to pdf", "png to pdf", "photo to pdf"],
     ["pdf-to-jpg", "compress-pdf", "merge-pdf"],
-    "planned",
+    "beta",
   ],
   [
     "organize-pdf",
@@ -163,7 +163,7 @@ const rows: Row[] = [
     [[PDF], [PDF]],
     ["rotate pdf", "delete pdf pages", "reorder pdf"],
     ["merge-pdf", "split-pdf"],
-    "planned",
+    "beta",
   ],
   [
     "sign-pdf",
@@ -178,7 +178,7 @@ const rows: Row[] = [
     [[PDF], [PDF]],
     ["sign pdf", "e-sign", "fill pdf form"],
     ["merge-pdf", "compress-pdf"],
-    "planned",
+    "beta",
   ],
   [
     "protect-pdf",
@@ -193,7 +193,7 @@ const rows: Row[] = [
     [[PDF], [PDF]],
     ["password protect pdf", "unlock pdf", "encrypt pdf"],
     ["sign-pdf", "compress-pdf"],
-    "planned",
+    "beta",
   ],
   [
     "pdf-watermark",
@@ -208,7 +208,7 @@ const rows: Row[] = [
     [[PDF], [PDF]],
     ["add page numbers", "watermark pdf"],
     ["organize-pdf", "sign-pdf"],
-    "planned",
+    "beta",
   ],
 
   // ───────────── Productivity · Image ─────────────
