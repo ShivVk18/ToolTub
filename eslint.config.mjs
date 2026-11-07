@@ -34,6 +34,10 @@ const eslintConfig = defineConfig([
     "scripts/**",
     "reports/**",
     "coverage/**",
+    // Generated test output (gitignored): Playwright's minified trace viewer broke verify after a failed run.
+    "playwright-report/**",
+    "test-results/**",
+    ".lighthouseci/**",
   ]),
   {
     rules: {
