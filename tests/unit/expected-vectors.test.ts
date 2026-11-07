@@ -5,6 +5,10 @@ import { genParse } from "@/lib/engines/generators";
 import { runGen } from "@/lib/actions";
 import { jsonErr } from "@/lib/engines/json";
 import { parse } from "@/lib/engines/intent";
+import ts from "typescript";
+import { mkdtempSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 describe("Task 2 Section 4: Expected Test Vectors", () => {
   // 1. Hash Generator: abc
@@ -134,6 +138,19 @@ describe("Task 2 Section 4: Expected Test Vectors", () => {
     expect(res.copy).toContain("interface Root");
     expect(res.copy).toContain("tags: string[]");
     expect(res.copy).toContain("addr: Addr");
+    // §4: the output compiles with tsc (strict, no emit)
+    const dir = mkdtempSync(join(tmpdir(), "kk-ts-"));
+    const file = join(dir, "types.ts");
+    writeFileSync(file, `${res.copy}\nexport const v: Root = { id: 1, tags: ["a"], addr: { pin: 411001 } };\n`);
+    const program = ts.createProgram([file], {
+      strict: true,
+      noEmit: true,
+      target: ts.ScriptTarget.ES2020,
+      types: [],
+      skipLibCheck: true,
+    });
+    const diags = ts.getPreEmitDiagnostics(program).map((d) => ts.flattenDiagnosticMessageText(d.messageText, "\n"));
+    expect(diags).toEqual([]);
   });
 
   // 13. Cron: */15 9-18 * * 1-5
@@ -219,6 +236,8 @@ describe("Task 2 Section 4: Expected Test Vectors", () => {
     expect(res.copy).toContain("\nFROM");
     expect(res.copy).toContain("\nWHERE");
     expect(res.copy).toContain("AND");
+    // §4: AND is indented under WHERE
+    expect(res.copy).toMatch(/\n[ \t]+AND /);
   });
 
   // Section 5.1: Intent parser 6 core cases

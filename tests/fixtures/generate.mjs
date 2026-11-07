@@ -53,6 +53,21 @@ put(
   "transparent.png",
   png(256, 128, (x, y) => (x < 128 ? [0, 0, 0, 0] : [x, y * 2, 200, 255])),
 );
+// Photo-like 1600×1200 PNG (smooth colour fields + mild grain): several MB as PNG, compresses well as JPEG.
+// §4 expected value: "compress to under 200 kb" → ≤ 200 KB, valid image, same dimensions.
+{
+  let seed = 7;
+  const rnd = () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff) * 24 - 12;
+  put(
+    "photo-1600x1200.png",
+    png(1600, 1200, (x, y) => [
+      Math.max(0, Math.min(255, 128 + 90 * Math.sin(x / 140) + rnd())),
+      Math.max(0, Math.min(255, 120 + 80 * Math.cos(y / 110) + rnd())),
+      Math.max(0, Math.min(255, 140 + 70 * Math.sin((x + y) / 200) + rnd())),
+      255,
+    ]),
+  );
+}
 put(
   "tiny-1x1.png",
   png(1, 1, () => [255, 0, 0, 255]),
