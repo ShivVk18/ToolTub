@@ -37,7 +37,7 @@ export function FavouriteButton({ slug }: { slug: string }) {
       type="button"
       onClick={() => toggle(slug)}
       aria-pressed={fav}
-      className="inline-flex h-[28px] items-center gap-[6px] rounded-full border border-line bg-solid px-3 text-xs text-ink2 transition-colors hover:border-line2 hover:text-ink"
+      className="inline-flex h-11 sm:h-[28px] items-center gap-[6px] rounded-full border border-line bg-solid px-4 sm:px-3 text-sm sm:text-xs text-ink2 transition-colors hover:border-line2 hover:text-ink"
     >
       <Star className={fav ? "size-3.5 fill-amber-400 text-amber-400" : "size-3.5"} aria-hidden />
       {fav ? "Saved" : "Save"}
