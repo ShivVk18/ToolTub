@@ -15,11 +15,15 @@ import { type PasteItem, PSUG, pasteAct } from "@/lib/engines/detect";
 import { PT_TILE, PT_COLOR, ACT, runGen, ActionResult } from "@/lib/actions";
 import { genParse } from "@/lib/engines/generators";
 import { wordStats } from "@/lib/engines/text";
-import { parse, markHTML, type IntentStep } from "@/lib/engines/intent";
+import { parse, markHTML, esc as escHtml, type IntentStep } from "@/lib/engines/intent";
 import { tween, wait, ease } from "@/lib/motion/animation";
 import { useUIStore } from "@/lib/store/ui";
 import { LiveToolPanel } from "./LiveToolPanel";
 import { toolBySlug } from "@/lib/designTools";
+import { planFor, stepTag, type StepPlan } from "@/lib/engines/plan";
+import { runStep, type PlanFile } from "@/lib/plan/run";
+import { useKlip } from "@/lib/store/klip";
+import { useRouter } from "next/navigation";
 
 export interface WorkspaceProps {
   file: FileInfo | null;
@@ -35,13 +39,15 @@ export interface WorkspaceProps {
 
 interface MessageItem {
   id: string;
-  type: "bot" | "user" | "file" | "paste" | "chips" | "plan" | "results" | "resultCard";
+  type: "bot" | "user" | "file" | "paste" | "chips" | "plan" | "results" | "resultCard" | "continue";
   html?: string;
   file?: FileInfo;
   pasteItem?: PasteItem;
   chips?: [string, string][];
   onPickChip?: (cmd: string) => void;
   planSteps?: IntentStep[];
+  /** Steps with their own tool page: continue there with the plan's latest output. */
+  continueIn?: { slug: string; name: string; file: PlanFile }[];
   actionResult?: ActionResult;
   results?: Array<{
     name: string;
@@ -68,6 +74,8 @@ export function Workspace({
   const [messages, setMessages] = useState<MessageItem[]>([]);
   const [inputText, setInputText] = useState("");
   const [isBusy, setIsBusy] = useState(false);
+  const router = useRouter();
+  const setHandoff = useKlip((st) => st.setHandoff);
   const [statusText, setStatusText] = useState("Ready · runs on your device");
   const [statusColor, setStatusColor] = useState("var(--ok)");
 
@@ -294,8 +302,11 @@ export function Workspace({
 
     setInputText("");
 
-    // Check if this is a generator request (e.g. "generate 5 uuids")
-    const gen = genParse(trimmed);
+    // Check if this is a generator request (e.g. "generate 5 uuids"). With a file loaded, words that
+    // describe a step for that file win: "protect it with a password" on a PDF used to print a password.
+    const f0 = currentFileRef.current;
+    const fileSteps = f0 ? parse(trimmed, f0.kind).steps.filter((s) => s.ok) : [];
+    const gen = fileSteps.length ? null : genParse(trimmed);
     if (gen) {
       setMessages((prev) => [...prev, { id: "u-" + Date.now(), type: "user", html: trimmed }]);
       setTimeout(scrollThreadToBottom, 50);
@@ -404,96 +415,121 @@ export function Workspace({
     setTimeout(scrollThreadToBottom, 50);
   };
 
-  // Plan execution simulation & real processing
+  /**
+   * Runs a plan for real (Phase 4): each "run" step calls its worker on the previous step's output.
+   * Steps with their own tool page are offered as "Continue in …"; unbuilt steps were shown as Coming soon
+   * and are skipped. Results show the actual output files and sizes. Busy is always released.
+   */
   const executePlan = async (steps: IntentStep[], cardEl: HTMLElement) => {
-    setIsBusy(true);
+    const f = currentFileRef.current;
+    if (!f || isBusy) return;
     const runBtn = cardEl.querySelector(".run") as HTMLButtonElement | null;
+    const stepEls = cardEl.querySelectorAll<HTMLElement>(".step");
+    setIsBusy(true);
     if (runBtn) {
       runBtn.disabled = true;
-      runBtn.innerHTML = "Running…";
+      runBtn.textContent = "Running…";
+    }
+    const t0 = performance.now();
+    const plans = steps.map((s) => planFor(s, { kind: f.kind, name: f.name }));
+    let failed: string | null = null;
+    let cur: PlanFile | null = f.file ? { blob: f.file, name: f.name, type: f.type, kind: f.kind } : null;
+    const outputs: { file: PlanFile; note?: string; input: number }[] = [];
+    let ran = 0;
+    try {
+      if (!cur) throw new Error("This sample has no file behind it. Drop your own file to run the plan.");
+      for (let i = 0; i < steps.length; i++) {
+        if (plans[i].how !== "run") continue;
+        const s = steps[i];
+        const el = stepEls[i];
+        updateStatus(`Step ${i + 1} of ${steps.length} · ${s.t}`, "var(--accent)", true);
+        const bar = el?.querySelector<HTMLElement>(".bar b");
+        if (bar) bar.style.width = "35%";
+        try {
+          const inSize = cur.blob.size;
+          const out = await runStep(s, cur);
+          cur = out;
+          outputs.push({ file: out, note: out.note, input: inSize });
+          ran++;
+        } catch (e) {
+          failed = `Step ${i + 1} (${s.t}) didn't work: ${(e as Error).message}`;
+          break;
+        }
+        if (bar) await tween(250, (p) => (bar.style.width = `${35 + p * 65}%`), ease.io);
+        const ok = el?.querySelector<HTMLElement>(".ok");
+        if (ok) ok.style.transform = "scale(1)";
+      }
+    } catch (e) {
+      failed = (e as Error).message;
+    } finally {
+      setIsBusy(false);
+      const done = ran > 0 && !failed;
+      updateStatus(done ? "Done · nothing left your device" : "Ready · runs on your device", "var(--ok)", false);
+      if (runBtn) {
+        runBtn.disabled = done; // as in the reference: a finished plan shows "Done ✓"
+        runBtn.textContent = done ? "Done ✓" : "Run";
+        if (done) runBtn.style.background = "var(--ok)";
+      }
     }
 
-    const stepEls = cardEl.querySelectorAll<HTMLElement>(".step");
-    const f = currentFileRef.current;
-    if (!f) return;
-
-    for (let i = 0; i < steps.length; i++) {
-      const s = steps[i];
-      const el = stepEls[i];
-      if (!el) continue;
-
-      updateStatus(`Step ${i + 1} of ${steps.length} · ${s.t}`, "var(--accent)", true);
-      const bar = el.querySelector<HTMLElement>(".bar b");
-      const ok = el.querySelector<HTMLElement>(".ok");
-
-      if (bar) {
-        await tween(
-          650,
-          (p) => {
-            bar.style.width = `${p * 100}%`;
-          },
-          ease.io,
-        );
-      }
-
-      if (ok) {
-        ok.style.transform = "scale(1)";
-      }
-      await wait(180);
+    const msgs: MessageItem[] = [];
+    if (failed) msgs.push({ id: "bot-fail-" + Date.now(), type: "bot", html: escHtml(failed) });
+    if (ran > 0 && cur && !failed) {
+      const secs = ((performance.now() - t0) / 1000).toFixed(1);
+      msgs.push(
+        {
+          id: "bot-done-" + Date.now(),
+          type: "bot",
+          html: `Done in ${secs} s — your ${outputs.length > 1 ? "files are" : "file is"} ready.`,
+        },
+        {
+          id: "results-" + Date.now(),
+          type: "results",
+          // One row per step, as in the reference; each is that step's real output.
+          results: outputs.map((o) => ({
+            name: o.file.name,
+            size: o.file.blob.size,
+            gain: o.file.blob.size < o.input ? Math.round((1 - o.file.blob.size / o.input) * 100) : 0,
+            m: o.note,
+            blob: o.file.blob,
+            url: o.file.kind === "image" ? URL.createObjectURL(o.file.blob) : undefined,
+            real: true,
+          })),
+        },
+      );
     }
-
-    updateStatus("Ready · runs on your device", "var(--ok)", false);
-    setIsBusy(false);
-
-    // Results
-    const secs = (steps.length * 0.7).toFixed(1);
-    const base = f.name.replace(/\.[^.]+$/, "");
-    const ext = f.kind === "pdf" ? "pdf" : f.kind === "image" ? "jpg" : "bin";
-
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: "bot-done-" + Date.now(),
-        type: "bot",
-        html: `Done in ${secs} s — your file is ready.`,
-      },
-      {
-        id: "results-" + Date.now(),
-        type: "results",
-        results: [
-          {
-            name: `${base}-klipkit.${ext}`,
-            size: Math.round(f.size * 0.42),
-            gain: 58,
-            m: "Compressed · on your device",
-          },
-        ],
-      },
-      {
-        id: "next-bot-" + Date.now(),
-        type: "bot",
-        html: '<span class="text-muted">What next?</span>',
-      },
-      {
-        id: "next-chips-" + Date.now(),
-        type: "chips",
-        chips: NEXT[f.kind] || [],
-      },
-    ]);
-
+    const opens = steps
+      .map((s, i) => [s, plans[i]] as const)
+      .filter((x): x is readonly [IntentStep, Extract<StepPlan, { how: "open" }>] => x[1].how === "open");
+    if (opens.length && cur && !failed)
+      msgs.push({
+        id: "continue-" + Date.now(),
+        type: "continue",
+        continueIn: opens.map(([, p]) => ({ slug: p.slug, name: toolBySlug(p.slug)?.n ?? p.slug, file: cur! })),
+      });
+    if (ran > 0 && !failed)
+      msgs.push(
+        { id: "next-bot-" + Date.now(), type: "bot", html: '<span class="text-muted">What next?</span>' },
+        { id: "next-chips-" + Date.now(), type: "chips", chips: NEXT[f.kind] || [] },
+      );
+    setMessages((prev) => [...prev, ...msgs]);
     setTimeout(scrollThreadToBottom, 100);
   };
 
+  const continueIn = (slug: string, file: PlanFile) => {
+    setHandoff({ from: "home", items: [{ name: file.name, type: file.type, blob: file.blob }] });
+    router.push(`/${slug}`);
+  };
+
   const handleDownload = (res: { name: string; url?: string; blob?: Blob; real?: boolean }) => {
-    if (res.real && res.url) {
-      const a = document.createElement("a");
-      a.href = res.url;
-      a.download = res.name;
-      a.click();
-      toast("Saved " + res.name);
-    } else {
-      toast("Saved " + res.name + " ✓");
-    }
+    if (!res.blob) return;
+    const url = URL.createObjectURL(res.blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = res.name;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    toast("Saved " + res.name);
   };
 
   const { steps: previewSteps, spans: mirrorSpans } = parse(inputText, currentFileRef.current?.kind);
@@ -743,7 +779,11 @@ export function Workspace({
                 // Plan Card
                 if (m.type === "plan" && m.planSteps) {
                   const steps = m.planSteps;
-                  const hasServer = steps.some((s) => ["word", "pdf", "protect"].includes(s.id));
+                  const kindNow = currentFileRef.current?.kind ?? "other";
+                  const nameNow = currentFileRef.current?.name ?? "";
+                  const stepPlans = steps.map((s) => planFor(s, { kind: kindNow, name: nameNow }));
+                  const hasServer = stepPlans.some((p) => p.how === "open" && p.where === "server");
+                  const canRun = stepPlans.some((p) => p.how !== "soon");
                   return (
                     <div
                       key={m.id}
@@ -783,7 +823,7 @@ export function Workspace({
                                 </svg>
                               </div>
                               <div className="tag absolute right-[14px] top-[16px] text-[12px] font-semibold text-muted">
-                                {["word", "pdf", "protect"].includes(s.id) ? "Private server" : "On device"}
+                                {stepTag(planFor(s, { kind: kindNow, name: nameNow }))}
                               </div>
                             </div>
                           </React.Fragment>
@@ -810,7 +850,9 @@ export function Workspace({
                         </span>
                         <button
                           type="button"
-                          className="run ml-auto h-[46px] px-[22px] rounded-full bg-ink text-bg font-semibold text-[16px] inline-flex items-center gap-[10px] relative overflow-hidden transition-[transform,background] active:scale-[0.96]"
+                          disabled={!canRun}
+                          title={canRun ? undefined : "These steps are coming soon"}
+                          className="run ml-auto disabled:opacity-40 disabled:cursor-not-allowed h-[46px] px-[22px] rounded-full bg-ink text-bg font-semibold text-[16px] inline-flex items-center gap-[10px] relative overflow-hidden transition-[transform,background] active:scale-[0.96]"
                           onClick={(e) => {
                             const card = e.currentTarget.closest(".card") as HTMLElement;
                             if (card) executePlan(steps, card);
@@ -824,6 +866,23 @@ export function Workspace({
                 }
 
                 // File Results Card
+                if (m.type === "continue" && m.continueIn) {
+                  return (
+                    <div key={m.id} className="flex flex-wrap gap-[10px] mb-[22px] ml-[48px] max-[640px]:ml-0">
+                      {m.continueIn.map((c) => (
+                        <button
+                          key={c.slug}
+                          type="button"
+                          onClick={() => continueIn(c.slug, c.file)}
+                          className="pill inline-flex items-center gap-[8px] h-[42px] px-[18px] rounded-full bg-ink text-bg text-[15px] font-semibold"
+                        >
+                          Continue in {c.name} →
+                        </button>
+                      ))}
+                    </div>
+                  );
+                }
+
                 if (m.type === "results" && m.results) {
                   return (
                     <div

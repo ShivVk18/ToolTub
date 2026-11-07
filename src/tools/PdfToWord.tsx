@@ -1,7 +1,8 @@
 "use client";
 import { useState } from "react";
 import { Dropzone } from "@/components/tool/Dropzone";
-import { ResultActions } from "@/components/tool/ToolChrome";
+import { ResultActions, useHandoff } from "@/components/tool/ToolChrome";
+import { FileChip } from "@/components/tool/FileChip";
 import { ToolWorkspace, useToolRun } from "@/components/tool/ToolWorkspace";
 import { formatBytes } from "@/lib/utils";
 import type { ToolProps } from "./types";
@@ -15,6 +16,12 @@ type JobState = { state: "waiting" | "active" | "completed" | "failed" | "unknow
 export function PdfToWord({ slug, next }: ToolProps) {
   const [file, setFile] = useState<File | null>(null);
   const job = useToolRun<Blob>();
+
+  // Arrive with a PDF from the home plan or another tool ("Continue in PDF to Word").
+  useHandoff((items) => {
+    const pdf = items.find((i) => i.type === "application/pdf" && i.blob);
+    if (pdf) setFile(new File([pdf.blob!], pdf.name, { type: pdf.type }));
+  });
 
   const start = () =>
     job.run(
@@ -62,18 +69,19 @@ export function PdfToWord({ slug, next }: ToolProps) {
       status={job.status}
       progress={job.progress}
       error={job.error}
+      onRetry={() => (setFile(null), job.reset())}
       input={
-        <Dropzone
-          accept="application/pdf,.pdf"
-          typeLabel="a PDF"
-          maxFileMb={50}
-          onFiles={([f]) => (setFile(f), job.reset())}
-          hint={
-            file
-              ? `${file.name} · ${formatBytes(file.size)}`
-              : "Text-based PDF up to 50 MB · deleted from our server after 1 hour"
-          }
-        />
+        file ? (
+          <FileChip files={[file]} noun="PDF" onChange={() => (setFile(null), job.reset())} />
+        ) : (
+          <Dropzone
+            accept="application/pdf,.pdf"
+            typeLabel="a PDF"
+            maxFileMb={50}
+            onFiles={([f]) => (setFile(f), job.reset())}
+            hint="Text-based PDF up to 50 MB · deleted from our server after 1 hour"
+          />
+        )
       }
       action={{ label: "Convert to Word", onClick: start, disabled: !file }}
       result={

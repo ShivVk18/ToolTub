@@ -99,3 +99,34 @@ export async function compressPdf(job: PdfCompressJob, progress: Progress) {
   const out = keptOriginal ? new Uint8Array(job.bytes) : best!;
   return { blob: new Blob([out as BlobPart], { type: "application/pdf" }), originalSize, keptOriginal, note };
 }
+
+export interface PdfSplitJob {
+  bytes: ArrayBuffer;
+  /** First and last page to keep, 1-based and inclusive. */
+  a: number;
+  b: number;
+}
+
+/** [Lib] Keeps pages a..b (clamped to the document) as a new PDF. pdf-lib copies the pages as-is. */
+export async function splitPdf({ bytes, a, b }: PdfSplitJob) {
+  let src: PDFDocument;
+  try {
+    src = await PDFDocument.load(bytes, { updateMetadata: false });
+  } catch (e) {
+    if (String(e).includes("encrypted"))
+      throw new Error("This PDF is password-protected. Unlock it first, then split it.");
+    throw new Error("This file isn't a readable PDF.");
+  }
+  const n = src.getPageCount();
+  const from = Math.max(1, Math.min(a, b));
+  if (from > n) throw new Error(`This PDF has only ${n} pages, so pages ${a}–${b} don't exist.`);
+  const to = Math.min(n, Math.max(a, b));
+  const out = await PDFDocument.create();
+  const pages = await out.copyPages(
+    src,
+    Array.from({ length: to - from + 1 }, (_, i) => from - 1 + i),
+  );
+  pages.forEach((p) => out.addPage(p));
+  const saved = await out.save({ useObjectStreams: true });
+  return { blob: new Blob([saved as BlobPart], { type: "application/pdf" }), pages: pages.length, from, to };
+}

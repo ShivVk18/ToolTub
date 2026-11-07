@@ -31,7 +31,6 @@ export interface FileInfo {
   text?: string;
   sample?: number;
   multi?: FileInfo[];
-  realSize?: number;
 }
 
 export function kindOf(name: string, type: string = ""): FileKind {
@@ -193,20 +192,16 @@ export interface SampleDefinition {
   f: () => Promise<FileInfo> | FileInfo;
 }
 
+// Samples with a tool behind them are real files, so a plan run on them gives real output (Phase 4).
+// Song and video stay descriptions only: none of their steps run here yet (they show as Coming soon).
 export const SAMPLES: Record<string, SampleDefinition> = {
   pdf: {
     label: "PDF",
-    f: () => ({ name: "Q3-report.pdf", size: 12.4e6, type: "application/pdf", kind: "pdf", pages: 24, sample: 1 }),
+    f: async () => fromFile(await makeSamplePdf()),
   },
   image: {
     label: "Photo",
-    f: async () => {
-      const file = await makePhoto();
-      const f = await fromFile(file);
-      f.size = Math.max(f.size, 2.1e6);
-      f.realSize = f.file?.size ?? f.size;
-      return f;
-    },
+    f: async () => fromFile(await makePhoto()),
   },
   audio: {
     label: "Song",
@@ -218,16 +213,48 @@ export const SAMPLES: Record<string, SampleDefinition> = {
   },
   data: {
     label: "JSON",
-    f: () => ({
-      name: "api-response.json",
-      size: 2.3e6,
-      type: "application/json",
-      kind: "data",
-      lines: 41208,
-      sample: 1,
-    }),
+    f: async () => fromFile(makeSampleJson()),
   },
 };
+
+/** A 24-page sample report, made on the device with pdf-lib (loaded only when the sample is picked). */
+async function makeSamplePdf(): Promise<File> {
+  const { PDFDocument, StandardFonts, rgb } = await import("pdf-lib");
+  const doc = await PDFDocument.create();
+  const font = await doc.embedFont(StandardFonts.Helvetica);
+  const bold = await doc.embedFont(StandardFonts.HelveticaBold);
+  for (let n = 1; n <= 24; n++) {
+    const page = doc.addPage([595, 842]);
+    page.drawText("Q3 report", { x: 56, y: 770, size: 26, font: bold });
+    page.drawText(`Page ${n} of 24`, { x: 56, y: 740, size: 12, font, color: rgb(0.4, 0.4, 0.4) });
+    for (let l = 0; l < 24; l++)
+      page.drawText(`Line ${l + 1}: revenue, costs and notes for section ${n}.`, {
+        x: 56,
+        y: 700 - l * 24,
+        size: 11,
+        font,
+      });
+  }
+  // No object streams, so the file card can count pages without parsing the PDF.
+  const bytes = await doc.save({ useObjectStreams: false });
+  return new File([bytes as BlobPart], "Q3-report.pdf", { type: "application/pdf" });
+}
+
+/** A sample API response: 400 users, pretty-printed. */
+function makeSampleJson(): File {
+  const names = ["Asha Rao", "Rohan Mehta", "Isha Kapoor", "Kabir Singh", "Meera Iyer"];
+  const users = Array.from({ length: 400 }, (_, i) => ({
+    id: i + 1,
+    name: names[i % names.length],
+    email: `user${i + 1}@example.in`,
+    roles: i % 7 === 0 ? ["admin"] : ["member"],
+    active: i % 3 !== 0,
+    address: { city: ["Pune", "Delhi", "Bengaluru", "Mumbai"][i % 4], pin: 411001 + i },
+  }));
+  return new File([JSON.stringify({ users, total: users.length }, null, 2)], "api-response.json", {
+    type: "application/json",
+  });
+}
 
 export const SUG: Record<FileKind, [string, string][]> = {
   pdf: [

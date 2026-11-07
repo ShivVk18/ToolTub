@@ -27,9 +27,10 @@ export const jsonWorker = createWorkerClient<{ format: (job: JsonJob) => JsonRes
   () => new Worker(new URL("./json.worker.ts", import.meta.url), { type: "module" }),
 );
 
-import type { PdfCompressJob } from "./pdf-ops";
+import type { PdfCompressJob, PdfSplitJob } from "./pdf-ops";
 type PdfOps = {
   compress: (job: PdfCompressJob) => { blob: Blob; originalSize: number; keptOriginal: boolean; note?: string };
+  split: (job: PdfSplitJob) => { blob: Blob; pages: number; from: number; to: number };
 };
 export const pdfWorker = createWorkerClient<PdfOps>(
   () => new Worker(new URL("./pdf.worker.ts", import.meta.url), { type: "module" }),
