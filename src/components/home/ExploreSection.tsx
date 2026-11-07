@@ -83,7 +83,7 @@ export function ExploreSection({ onSelectTool }: ExploreSectionProps) {
   };
 
   return (
-    <section id="explore" className="sec relative z-[2] px-[clamp(20px,6vw,140px)] py-[clamp(80px,12vh,140px)]">
+    <section id="explore" className="sec sec-l relative z-[2] px-[clamp(20px,6vw,140px)] py-[clamp(80px,12vh,140px)]">
       <span className="eyb">
         <i>02</i>Tools
       </span>

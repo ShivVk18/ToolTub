@@ -12,13 +12,11 @@ import { siteGraph } from "@/lib/seo/schema";
 import { ENTITY_DEFINITION, SITE_URL, THEME_COLOR } from "@/lib/site";
 import { searchIndex } from "@/registry/search-index";
 
-const inter = localFont({
-  src: [
-    { path: "../fonts/Inter-Regular.woff2", weight: "400", style: "normal" },
-    { path: "../fonts/Inter-Medium.woff2", weight: "500", style: "normal" },
-    { path: "../fonts/Inter-SemiBold.woff2", weight: "600", style: "normal" },
-  ],
-  variable: "--font-sans",
+// Hallmark A2: Geist (OFL, self-hosted, one 70 KB variable file) instead of Inter (three files, 129 KB).
+const sans = localFont({
+  src: [{ path: "../fonts/Geist-Variable.woff2", weight: "100 900", style: "normal" }],
+  // Own name: the theme's --font-sans refers to this, so it must not be --font-sans itself (that was a cycle).
+  variable: "--kk-sans",
   display: "swap",
 });
 
@@ -56,7 +54,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="en"
       data-theme="light"
-      className={`${inter.variable} ${kkSerif.variable} antialiased`}
+      className={`${sans.variable} ${kkSerif.variable} antialiased`}
       suppressHydrationWarning
     >
       <head>

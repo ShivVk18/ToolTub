@@ -28,7 +28,7 @@
   --color-ring: var(--ring);
 
   --font-serif: var(--font-serif), "KKSerif", Georgia, serif;
-  --font-sans: var(--font-sans), "Inter", system-ui, -apple-system, sans-serif;
+  --font-sans: var(--kk-sans), system-ui, -apple-system, sans-serif;
   /* System monospace (as the reference). No next/font variable exists for mono, and var(--font-mono)
      here referred to itself, which made the declaration invalid (code rendered in Inter). */
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "DejaVu Sans Mono", monospace;
@@ -166,7 +166,7 @@
   --blobC: #cbebdc;
   --blobOp: 0.6;
   --serif: "KKSerif", Georgia, "Times New Roman", serif;
-  --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --sans: var(--kk-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 [data-theme="dark"] {
   --g-p: #e96266;
@@ -2978,4 +2978,17 @@ body.scrolled #nav::before {
 }
 #main > main {
   padding-top: calc(84px + 1.5rem);
+}
+
+/* Hallmark A3: Explore's header left-aligned (over its full-width grid) for rhythm against the centred hero. */
+.sec-l .eyb,
+.sec-l .sh,
+.sec-l .sp {
+  text-align: left;
+  max-width: 1500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.sec-l #tabs {
+  margin-left: 0;
 }

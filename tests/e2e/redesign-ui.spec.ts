@@ -466,6 +466,33 @@ test.describe("KlipKit Redesign UI & Visual Layer", () => {
     expect(op).toBeGreaterThan(0.2);
   });
 
+  test("A2: UI text is Geist, self-hosted, and the theme's sans variable resolves (no self-reference)", async ({
+    page,
+  }) => {
+    const fonts: string[] = [];
+    page.on("response", (r) => r.url().endsWith(".woff2") && fonts.push(r.url()));
+    await page.goto("/");
+    await page.evaluate(() => document.fonts.ready);
+    const v = await page.evaluate(() => ({
+      fontSans: getComputedStyle(document.documentElement).getPropertyValue("--font-sans").trim(),
+      body: getComputedStyle(document.body).fontFamily,
+    }));
+    expect(v.fontSans).not.toBe(""); // was empty: --font-sans: var(--font-sans), … is a cycle
+    expect(v.body).not.toMatch(/^Times/);
+    expect(fonts.some((u) => /Geist/i.test(u) && new URL(u).origin === new URL(page.url()).origin)).toBe(true);
+    expect(fonts.some((u) => /Inter-/i.test(u))).toBe(false);
+  });
+
+  test("A3: Explore's header is left-aligned for rhythm; Pricing stays centred over its centred cards", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const align = (sel: string) => page.locator(sel).evaluate((e) => getComputedStyle(e).textAlign);
+    expect(await align("#explore .sh")).toBe("left");
+    expect(await align("#explore .eyb")).toBe("left");
+    expect(await align("#pricing .sh")).toBe("center");
+  });
+
   test("opening a live panel docks the orb and hides the satellites", async ({ page }) => {
     await page.goto("/#base64");
     await expect(page.locator("#panel")).toBeVisible();
