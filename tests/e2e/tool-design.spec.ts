@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { primary } from "./helpers";
+import { assertAccessible, primary } from "./helpers";
 
 /** Design-system checks for tool pages (Phase 3 audit). */
 test.describe("tool pages use the design system", () => {
@@ -59,5 +59,44 @@ test.describe("tool pages use the design system", () => {
     await expect(page.getByRole("heading", { name: "About JSON Formatter & Validator", exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: /about json formatter/ })).toHaveCount(0);
     await expect(page.getByText(/Guide \(coming soon\)/)).toHaveCount(0);
+  });
+
+  test("F14: /search has a pill input and tagged result rows; coming-soon rows are muted, not links", async ({
+    page,
+  }) => {
+    await page.goto("/search?q=pdf");
+    const input = page.getByRole("textbox", { name: "Search tools" });
+    const radius = await input.evaluate((e) => parseFloat(getComputedStyle(e).borderTopLeftRadius));
+    const height = await input.evaluate((e) => e.getBoundingClientRect().height);
+    expect(radius).toBeGreaterThanOrEqual(height / 2 - 1);
+
+    const rows = page.locator("[data-search-row]");
+    await expect(rows.first()).toBeVisible();
+    // live rows: a link, no underline, with a category tag
+    const live = rows.filter({ has: page.locator("a") }).first();
+    await expect(live.locator("a")).toHaveCSS("text-decoration-line", "none");
+    await expect(live.locator("[data-cat]")).toHaveText(/Productivity|Developer|Creator/);
+    // coming-soon rows: no link, tagged and muted
+    const soon = rows.filter({ hasText: "Coming soon" }).first();
+    await expect(soon).toBeVisible();
+    await expect(soon.locator("a")).toHaveCount(0);
+    // muted without fading text (that fails AA): grey, dimmed icon and a secondary-colour name
+    const m = await soon.evaluate((e) => {
+      const icon = e.querySelector("[aria-hidden]")!;
+      const name = e.querySelector(".font-semibold")!;
+      return { op: Number(getComputedStyle(icon).opacity), name: getComputedStyle(name).color };
+    });
+    expect(m.op).toBeLessThan(1);
+    expect(m.name).not.toBe(
+      await page.locator("body").evaluate(() => {
+        const d = document.createElement("i");
+        d.style.color = "var(--ink)";
+        document.body.append(d);
+        const c = getComputedStyle(d).color;
+        d.remove();
+        return c;
+      }),
+    );
+    await assertAccessible(page, "/search");
   });
 });

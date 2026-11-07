@@ -15,7 +15,7 @@ export function useToolSearch(index: SearchEntry[]) {
   return useMemo(() => createToolSearch(index), [index]);
 }
 
-const CAT_KEY = { productivity: "p", developer: "d", creator: "c" } as const;
+export const CAT_KEY = { productivity: "p", developer: "d", creator: "c" } as const;
 
 function hlName(n: string, q: string): string {
   const w = q.trim().split(/\s+/)[0];
