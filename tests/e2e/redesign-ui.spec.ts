@@ -248,6 +248,9 @@ test.describe("KlipKit Redesign UI & Visual Layer", () => {
       browser,
       baseURL,
     }) => {
+      // Opens the reference page too. Under a full parallel run its teardown alone took up to 61 s (it is a
+      // heavy page drawn without a GPU), so the 90 s default wasn't enough; same budget as other heavy tests.
+      test.setTimeout(240_000);
       // Offset of the squiggle from the word "just", once the entrance animation has finished.
       const measure = async (url: string) => {
         const page = await browser.newPage({ viewport: { width, height: 900 } });
@@ -333,6 +336,9 @@ test.describe("KlipKit Redesign UI & Visual Layer", () => {
   });
 
   test("home text boxes have the reference's line heights", async ({ browser, baseURL }) => {
+    // Opens the reference page too. Under a full parallel run its teardown alone took up to 61 s (it is a
+    // heavy page drawn without a GPU), so the 90 s default wasn't enough; same budget as other heavy tests.
+    test.setTimeout(240_000);
     const sels = [".eyebrow", "#hint", "#samples .chip", ".plan li", ".plan .pe", "#explore .tcard p", ".band"];
     const heights = async (url: string) => {
       const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
