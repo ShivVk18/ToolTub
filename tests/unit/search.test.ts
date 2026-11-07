@@ -16,6 +16,10 @@ describe("tool search", () => {
     ["reduce image size", "image-compressor"],
     ["wifi qr", "qr-code-generator"],
     ["pdf to docx", "pdf-to-word"],
+    // §5.8 expected synonyms (the single words, as typed into ⌘K)
+    ["shrink", "compress-pdf"],
+    ["bg", "background-remover"],
+    ["iphone", "heic-to-jpg"],
   ])("%s → %s", (q, slug) => expect(top(q)).toBe(slug));
 
   it("ranks available tools above coming-soon ones", () => {
