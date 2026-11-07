@@ -4,6 +4,7 @@ Every change landed as its own branch, squash-merged into `integration/ui-restor
 
 | # | Title | Branch | PR notes |
 |---|---|---|---|
+| 78 | docs: README (architecture diagram, add a tool in 5 steps), ADRs 0005–0007, CLAUDE.md gotchas | `docs/readme-adrs-handover` | [reports/prs/docs-readme-adrs-handover.md](reports/prs/docs-readme-adrs-handover.md) |
 | 77 | docs: Phase 4 tools end-to-end report (md, HTML, JSON) and its generator; changelog through #77 | `docs/tools-e2e-report` | [reports/prs/docs-tools-e2e-report.md](reports/prs/docs-tools-e2e-report.md) |
 | 76 | test: longer time limit for tests that open the reference page (teardown is slow under load) | `test/reference-page-timeout` | [reports/prs/test-reference-page-timeout.md](reports/prs/test-reference-page-timeout.md) |
 | 75 | fix(home): bento cards keep one height while their demos cycle (no layout shift on phones) | `fix/bento-height-cycle` | [reports/prs/fix-bento-height-cycle.md](reports/prs/fix-bento-height-cycle.md) |

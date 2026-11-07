@@ -158,7 +158,7 @@ A network guard (`tests/e2e/helpers.ts`) records every request. `assertClean()` 
 - **Third-party domains seen: none**, in every guarded test, on all 4 browser projects.
 - **Live panels (18):** one page, every panel run 5 times: **0 requests with a body**, 0 third-party, 0 failed requests, 0 console errors (`perf-privacy.spec.ts`).
 - **On-device tools** (image ×4, Compress PDF, QR, JSON, JWT, Background Remover): **0 uploads**. The only requests are the page's own assets, plus the self-hosted model for Background Remover.
-- **PDF to Word** is the only tool that uploads, to KlipKit's own server (`/api/convert`). Files are deleted within the retention window (sweeper tested in `worker-sweep.test.ts` and `server-tools.spec.ts`).
+- **PDF to Word** is the only tool that uploads, to KlipKit's own server (`/api/jobs`). Files are deleted within the retention window (sweeper tested in `worker-sweep.test.ts` and `server-tools.spec.ts`).
 - **Fonts** are self-hosted (`next/font/local`); no CDN requests.
 
 ---
