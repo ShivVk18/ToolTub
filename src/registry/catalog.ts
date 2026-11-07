@@ -380,7 +380,7 @@ const rows: Row[] = [
     [[TXT], [TXT]],
     ["compare text", "text diff", "find differences"],
     ["json-formatter", "clean-text"],
-    "planned",
+    "beta",
   ],
   [
     "case-converter",
@@ -425,7 +425,7 @@ const rows: Row[] = [
     [[TXT], [PDF]],
     ["cv maker", "ats resume", "resume template"],
     ["word-to-pdf", "compress-pdf", "passport-photo-maker"],
-    "planned",
+    "beta",
   ],
   [
     "lorem-ipsum",
@@ -735,7 +735,7 @@ const rows: Row[] = [
     [[TXT], [TXT]],
     ["html editor", "codepen alternative", "online html"],
     ["code-minifier", "color-converter"],
-    "planned",
+    "beta",
   ],
   [
     "color-converter",
@@ -1180,7 +1180,7 @@ const rows: Row[] = [
     [[TXT], []],
     ["tts", "read aloud"],
     ["word-counter"],
-    "planned",
+    "beta",
   ],
   [
     "meme-generator",
@@ -1295,6 +1295,7 @@ export const PANEL_SLUGS: ReadonlySet<string> = new Set([
   "bio-formatter",
   "markdown-editor",
   "barcode-generator",
+  "code-minifier",
 ]);
 
 export const catalog: ToolCore[] = rows.map(

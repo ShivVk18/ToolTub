@@ -33,6 +33,12 @@ const POPULAR = [
 ];
 const ICONS = { productivity: FileText, developer: Code2, creator: Sparkles };
 
+/**
+ * A paste in the first moments after load (before React hydrates and attaches its listener) used to be lost.
+ * This runs immediately and keeps such pastes (outside text fields) until HomeStage is ready to replay them.
+ */
+const EARLY_PASTE = `window.__kkPaste=[];addEventListener("paste",function(e){if(window.__kkPasteReady)return;var t=e.target;if(t&&t.closest&&t.closest("input,textarea,[contenteditable]"))return;var d=e.clipboardData;if(!d)return;var f=[].slice.call(d.files||[]);var x=d.getData("text")||"";if(f.length||x.trim())window.__kkPaste.push({files:f,text:x})},true);`;
+
 const FAQ = [
   {
     q: "Is KlipKit really free?",
@@ -70,6 +76,7 @@ export default function Home() {
       />
 
       {/* Main Interactive Stage matching KlipKit_UI.html */}
+      <script dangerouslySetInnerHTML={{ __html: EARLY_PASTE }} />
       <HomeStage />
 
       {/* Server-Rendered SEO Content, FAQ, Tool Chains and Categories preserved for search/screen-readers */}

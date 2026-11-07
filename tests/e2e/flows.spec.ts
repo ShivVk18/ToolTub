@@ -76,6 +76,18 @@ test.describe("global paste", () => {
   const JWT =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyXzQyIiwibmFtZSI6IkFzaGEgUmFvIiwiaWF0IjoxNzMwNTAwMDAwLCJleHAiOjE5MDAwMDAwMDB9.c2lnbmF0dXJl";
 
+  test("a paste in the first instant after load (before the app is ready) isn't lost", async ({ page }) => {
+    await page.addInitScript(() => {
+      document.addEventListener("DOMContentLoaded", () => {
+        const dt = new DataTransfer();
+        dt.setData("text", '{"early":true,"items":[1,2,3]}');
+        document.body.dispatchEvent(new ClipboardEvent("paste", { clipboardData: dt, bubbles: true }));
+      });
+    });
+    await page.goto("/");
+    await expect(page.locator("#work")).toContainText("early", { timeout: 20_000 });
+  });
+
   test("an image file pasted on the page opens it as a file", async ({ page }) => {
     await page.goto("/");
     const b64 = readFileSync(fx("photo.jpg")).toString("base64");

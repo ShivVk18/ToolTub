@@ -5,6 +5,14 @@ import { catalog } from "./catalog";
 export { PANEL_SLUGS, homeTools } from "./catalog";
 
 const META: Record<string, string> = {
+  "diff-checker":
+    "Compare two texts side by side with changed words highlighted, or as a unified patch. Ignore whitespace or case. Runs in your browser; nothing is uploaded.",
+  "html-playground":
+    "Write HTML, CSS and JavaScript and see the result live in a sandboxed preview with a console. Saved in your browser; download as one HTML file. Free, no signup.",
+  "text-to-speech":
+    "Read any text aloud with your device's voices, with speed and pitch controls and the current word highlighted. Runs in your browser; nothing is uploaded. Free.",
+  "resume-builder":
+    "Build a clean résumé from a simple form, pick a classic or modern template, and download a real text PDF. Your draft stays in your browser. Free, no sign-up.",
   transcription:
     "Turn speech in audio or video into text with Whisper running on your device, in English, Hindi and 15 more languages. Nothing is uploaded. Free and no sign-up.",
   "subtitle-generator":

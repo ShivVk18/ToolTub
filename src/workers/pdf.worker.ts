@@ -11,6 +11,8 @@ import {
   protectPdf,
   unlockPdf,
   listFields,
+  resumePdf,
+  type Resume,
   type PdfCompressJob,
   type PdfSplitJob,
   type PdfMergeJob,
@@ -35,4 +37,5 @@ serveWorker({
   protect: (job: ProtectJob, progress: Progress) => protectPdf(job, progress),
   unlock: (job: UnlockJob, progress: Progress) => unlockPdf(job, progress),
   fields: (job: { bytes: ArrayBuffer }) => listFields(job),
+  resume: (job: { r: Resume; template: "classic" | "modern"; accent: string }) => resumePdf(job),
 });

@@ -24,15 +24,27 @@ describe("plan capabilities: every step either runs for real, opens its tool, or
     expect(bg).toEqual({ how: "open", slug: "background-remover", where: "device" });
     expect(stepTag(bg)).toBe("On device");
   });
-  it("never pretends: unbuilt steps are Coming soon (Protect was labelled 'Private server')", () => {
+  it("steps whose tool now exists open that tool with the file (no longer Coming soon)", () => {
+    for (const [text, kind, name, slug, where] of [
+      ["protect it with a password", "pdf", "a.pdf", "protect-pdf", "device"],
+      ["sign it", "pdf", "a.pdf", "sign-pdf", "device"],
+      ["merge them", "pdf", "a.pdf", "merge-pdf", "device"],
+      ["make a gif", "video", "a.mp4", "video-to-gif", "device"],
+      ["extract the audio", "video", "a.mp4", "extract-audio", "device"],
+      ["transcribe it", "audio", "a.mp3", "transcription", "device"],
+      ["trim 0:10 to 0:30", "audio", "a.mp3", "video-trimmer", "device"],
+      ["compress it", "video", "a.mp4", "video-compressor", "device"],
+      ["convert to pdf", "image", "a.jpg", "jpg-to-pdf", "device"],
+      ["convert to pdf", "doc", "a.docx", "word-to-pdf", "server"],
+    ] as const) {
+      expect(planFor(step(text, kind), { kind, name }), text).toEqual({ how: "open", slug, where });
+    }
+  });
+  it("never pretends: steps with no tool are Coming soon", () => {
     for (const [text, kind, name] of [
-      ["protect it with a password", "pdf", "a.pdf"],
-      ["sign it", "pdf", "a.pdf"],
-      ["make a gif", "video", "a.mp4"],
-      ["transcribe it", "audio", "a.mp3"],
-      ["trim 0:10 to 0:30", "audio", "a.mp3"],
-      ["compress it", "video", "a.mp4"],
       ["format and validate", "data", "a.csv"], // only JSON is formatted here
+      ["convert to pdf", "data", "a.json"],
+      ["convert to pdf", "doc", "a.doc"], // old binary .doc isn't supported by Word to PDF
     ] as const) {
       const p = planFor(step(text, kind), { kind, name });
       expect(p, text).toEqual({ how: "soon" });

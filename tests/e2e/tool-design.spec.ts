@@ -65,7 +65,7 @@ test.describe("tool pages use the design system", () => {
   test("F14: /search has a pill input and tagged result rows; coming-soon rows are muted, not links", async ({
     page,
   }) => {
-    // "image" mixes live tools with one still coming soon (Image Upscaler); every PDF tool is live now.
+    // every image and PDF tool is live now: live rows from "image", coming-soon rows from "hashtag" below
     await page.goto("/search?q=image");
     const input = page.getByRole("textbox", { name: "Search tools" });
     const radius = await input.evaluate((e) => parseFloat(getComputedStyle(e).borderTopLeftRadius));
@@ -78,7 +78,8 @@ test.describe("tool pages use the design system", () => {
     const live = rows.filter({ has: page.locator("a") }).first();
     await expect(live.locator("a")).toHaveCSS("text-decoration-line", "none");
     await expect(live.locator("[data-cat]")).toHaveText(/Productivity|Developer|Creator/);
-    // coming-soon rows: no link, tagged and muted
+    // coming-soon rows: no link, tagged and muted ("hashtag" finds Hashtag Finder, still unbuilt)
+    await page.goto("/search?q=hashtag");
     const soon = rows.filter({ hasText: "Coming soon" }).first();
     await expect(soon).toBeVisible();
     await expect(soon.locator("a")).toHaveCount(0);

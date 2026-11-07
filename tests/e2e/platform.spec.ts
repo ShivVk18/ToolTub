@@ -185,10 +185,11 @@ test.describe("Tool Chains", () => {
 
 test.describe("hubs and 404", () => {
   test("category hub lists live tools and coming-soon ones separately", async ({ page }) => {
-    await page.goto("/image-tools");
+    // every image tool is live now; the creator hub still has unbuilt ones (Image Upscaler, Hashtag Finder)
+    await page.goto("/creator-tools");
     await assertAccessible(page, "hub");
-    await expect(page.locator("h1")).toHaveText("Free Image Tools");
-    await expect(page.getByRole("link", { name: /Image Compressor/ })).toBeVisible();
+    await expect(page.locator("h1")).toHaveText("Free Tools for Content Creators");
+    await expect(page.getByRole("link", { name: /Meme Generator/ })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Coming soon" })).toBeVisible();
   });
   test("unknown URL returns a real 404 with a way back", async ({ page }) => {

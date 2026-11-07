@@ -1,8 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { PANELS } from "@/lib/livePanels";
 
-describe("PANELS - 33 Live Tools", () => {
-  it("has all 33 live panel tools defined", () => {
+describe("PANELS - 34 Live Tools", () => {
+  it("has all 34 live panel tools defined", () => {
     const expected = [
       "json-formatter",
       "jwt-decoder",
@@ -37,6 +37,7 @@ describe("PANELS - 33 Live Tools", () => {
       "bio-formatter",
       "markdown-editor",
       "barcode-generator",
+      "code-minifier",
     ];
     for (const name of expected) {
       expect(PANELS[name], `Expected tool ${name} to be defined`).toBeDefined();
@@ -155,5 +156,27 @@ describe("new panels: every sample runs, every option gives a different result",
   it("Markdown preview never carries script", async () => {
     const r = await PANELS["markdown-editor"].run("<img src=x onerror=alert(1)>\n[a](javascript:alert(1))", "p");
     expect(r.html).not.toMatch(/<img src=x|javascript:/);
+  });
+});
+
+describe("code minifier panel", () => {
+  const run = (v: string, o: string) => PANELS["code-minifier"].run(v, o);
+  it("JS: terser minifies to valid, smaller code; prettier formats", async () => {
+    const src = "function add(first, second) {\n  // sum\n  return first + second;\n}\nconsole.log(add(1, 2));";
+    const min = await run(src, "min");
+    expect(min.copy!.length).toBeLessThan(src.length);
+    expect(min.copy).not.toContain("// sum");
+    expect(new Function(min.copy!.replace("console.log", "return "))()).toBe(3);
+    const fmt = await run("const a={b:1,c:[1,2]}", "fmt");
+    expect(fmt.copy).toBe("const a = { b: 1, c: [1, 2] };");
+  });
+  it("CSS, HTML and JSON are detected; broken code says why", async () => {
+    expect((await run(".a { color : red ; }", "min")).copy).toBe(".a{color:red}");
+    expect((await run(".a{color:red}", "fmt")).copy).toBe(".a {\n  color: red;\n}");
+    expect((await run("<div>\n  <p>hi</p>\n</div>", "min")).copy).toBe("<div><p>hi</p></div>");
+    expect((await run('{ "a" : 1 }', "min")).copy).toBe('{"a":1}');
+    const bad = await run("function (", "min");
+    expect(bad.bad).toBeTruthy();
+    expect(bad.status).toContain("JavaScript");
   });
 });

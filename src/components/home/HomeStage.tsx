@@ -313,7 +313,17 @@ export function HomeStage() {
     };
 
     window.addEventListener("paste", handleGlobalPaste);
-    return () => window.removeEventListener("paste", handleGlobalPaste);
+    // Replay pastes that happened before this listener existed (kept by the inline script in app/page.tsx).
+    const w = window as unknown as { __kkPaste?: { files: File[]; text: string }[]; __kkPasteReady?: boolean };
+    w.__kkPasteReady = true;
+    const early = w.__kkPaste?.splice(0) ?? [];
+    const last = early[early.length - 1];
+    if (last?.files.length) Promise.all(last.files.map(fromFile)).then((infos) => handleIngest(infos, null));
+    else if (last?.text.trim()) handlePasteIn(last.text);
+    return () => {
+      window.removeEventListener("paste", handleGlobalPaste);
+      w.__kkPasteReady = false;
+    };
   }, []);
 
   const handleSelectTool = async (t: ToolItem) => {

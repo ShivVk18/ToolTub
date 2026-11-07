@@ -51,6 +51,10 @@ const components: Record<string, ComponentType<ToolProps>> = {
   "screen-recorder": lazy(() => import("./VideoTools").then((m) => m.ScreenRecorder)),
   transcription: lazy(() => import("./Speech").then((m) => m.Transcription)),
   "subtitle-generator": lazy(() => import("./Speech").then((m) => m.SubtitleGenerator)),
+  "diff-checker": lazy(() => import("./DevTools").then((m) => m.DiffChecker)),
+  "html-playground": lazy(() => import("./DevTools").then((m) => m.HtmlPlayground)),
+  "text-to-speech": lazy(() => import("./DevTools").then((m) => m.TextToSpeech)),
+  "resume-builder": lazy(() => import("./DevTools").then((m) => m.ResumeBuilder)),
 };
 
 export function ToolUI(props: ToolProps) {

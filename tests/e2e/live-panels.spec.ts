@@ -31,9 +31,12 @@ for (const slug of [...PANEL_SLUGS]) {
     if (n > 1) {
       const seen: string[] = [];
       for (let i = 0; i < n; i++) {
+        const before = await text(page);
         await opts.nth(i).click();
         await expect(opts.nth(i)).toHaveClass(/\bon\b/);
-        await page.waitForTimeout(150);
+        // async panels (Prettier, YAML) load their library on first use: wait for the new output, not a fixed delay
+        if (i > 0) await expect.poll(() => text(page), { timeout: 10_000 }).not.toBe(before);
+        else await page.waitForTimeout(150);
         seen.push(await text(page));
       }
       expect(new Set(seen).size, `${slug} options: ${JSON.stringify(seen.map((s) => s.slice(0, 40)))}`).toBe(n);

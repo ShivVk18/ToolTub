@@ -31,6 +31,7 @@ import {
 } from "./engines/creator";
 import { renderMarkdown } from "./engines/markdown";
 import { toYaml, fromYaml } from "./engines/yaml";
+import { detectLang, minifyCss, minifyHtml, type CodeLang } from "./engines/minify";
 import { code128, ean13, upcA, barcodeSvg } from "./engines/barcode";
 
 export { fmtSize };
@@ -791,6 +792,67 @@ export const PANELS: Record<string, PanelConfig> = {
         };
       } catch (e) {
         return { html: `<span class="perr">${esc((e as Error).message)}</span>`, status: "✕", bad: 1 };
+      }
+    },
+  },
+
+  "code-minifier": {
+    opts: [
+      ["Minify", "min"],
+      ["Format", "fmt"],
+    ],
+    sample:
+      "// Greets a user\nfunction greet(name) {\n  const message = `Hello, ${name}!`;\n  console.log(message);\n  return message;\n}\ngreet('KlipKit');",
+    run: async (v, o) => {
+      if (!v.trim()) return {};
+      const lang: CodeLang = detectLang(v);
+      const label = { js: "JavaScript", css: "CSS", html: "HTML", json: "JSON" }[lang];
+      try {
+        let out: string;
+        if (o === "fmt") {
+          if (lang === "json") out = JSON.stringify(JSON.parse(v), null, 2);
+          else {
+            const prettier = await import("prettier/standalone");
+            const plugins =
+              lang === "css"
+                ? [await import("prettier/plugins/postcss")]
+                : lang === "html"
+                  ? [
+                      await import("prettier/plugins/html"),
+                      await import("prettier/plugins/postcss"),
+                      await import("prettier/plugins/babel"),
+                      await import("prettier/plugins/estree"),
+                    ]
+                  : [await import("prettier/plugins/babel"), await import("prettier/plugins/estree")];
+            out = (
+              await prettier.format(v, {
+                parser: lang === "css" ? "css" : lang === "html" ? "html" : "babel",
+                plugins: plugins as never[],
+              })
+            ).trimEnd();
+          }
+        } else if (lang === "json") out = JSON.stringify(JSON.parse(v));
+        else if (lang === "css") out = minifyCss(v);
+        else if (lang === "html") out = minifyHtml(v);
+        else {
+          const { minify } = await import("terser");
+          const r = await minify(v, { compress: true, mangle: true, format: { comments: /^!/ } });
+          out = r.code ?? "";
+        }
+        const before = byteLength(v);
+        const after = byteLength(out);
+        return {
+          html: esc(out),
+          copy: out,
+          status: `${label} · ${o === "fmt" ? "formatted" : `${fmtSize(before)} → ${fmtSize(after)} (−${Math.max(0, Math.round((1 - after / before) * 100))}%)`}`,
+        };
+      } catch (e) {
+        const msg = (e as Error).message.split("\n")[0];
+        return {
+          html: `<span class="perr">${esc(`${label}: ${msg}`)}</span>`,
+          status: `✕ Couldn't parse this ${label}`,
+          bad: 1,
+        };
       }
     },
   },

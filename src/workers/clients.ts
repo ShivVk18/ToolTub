@@ -39,6 +39,7 @@ import type {
   ProtectJob,
   UnlockJob,
   FormField,
+  Resume,
 } from "./pdf-ops";
 type PdfOps = {
   compress: (job: PdfCompressJob) => { blob: Blob; originalSize: number; keptOriginal: boolean; note?: string };
@@ -52,6 +53,7 @@ type PdfOps = {
   protect: (job: ProtectJob) => { blob: Blob };
   unlock: (job: UnlockJob) => { blob: Blob };
   fields: (job: { bytes: ArrayBuffer }) => FormField[];
+  resume: (job: { r: Resume; template: "classic" | "modern"; accent: string }) => { blob: Blob; pages: number };
 };
 export const pdfWorker = createWorkerClient<PdfOps>(
   () => new Worker(new URL("./pdf.worker.ts", import.meta.url), { type: "module" }),

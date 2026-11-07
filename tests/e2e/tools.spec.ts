@@ -64,6 +64,10 @@ const TOOLS = [
   { slug: "screen-recorder", h1: "Screen Recorder", device: true, action: false },
   { slug: "transcription", h1: "Transcription (Short Clips)", device: true, action: true },
   { slug: "subtitle-generator", h1: "Subtitle Generator & Editor", device: true, action: false },
+  { slug: "diff-checker", h1: "Text Compare (Diff Checker)", device: true, action: false },
+  { slug: "html-playground", h1: "HTML / CSS / JS Playground", device: true, action: false },
+  { slug: "text-to-speech", h1: "Text to Speech", device: true, action: false },
+  { slug: "resume-builder", h1: "Resume Builder", device: true, action: false },
 ];
 
 const DEVICE_BADGE = "Runs on your device — nothing uploaded";

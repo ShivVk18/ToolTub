@@ -614,3 +614,176 @@ export async function unlockPdf(job: UnlockJob, progress: Progress) {
   q.FS.unlink("/out.pdf");
   return { blob: pdfBlob(out.slice()) };
 }
+
+// ───────────────────────── Résumé ─────────────────────────
+export interface Resume {
+  name: string;
+  headline: string;
+  email: string;
+  phone: string;
+  location: string;
+  links: string;
+  summary: string;
+  experience: { role: string; company: string; dates: string; bullets: string }[];
+  education: { degree: string; school: string; dates: string }[];
+  skills: string;
+}
+
+/** Builds an A4 résumé with real (selectable, searchable) text. Templates: classic (black rules) or modern (accent). */
+export async function resumePdf({
+  r,
+  template,
+  accent,
+}: {
+  r: Resume;
+  template: "classic" | "modern";
+  accent: string;
+}) {
+  const all = JSON.stringify(r);
+  if (!winAnsiOk(all.replace(/\\n|\\"|\\\\/g, " ")))
+    throw new Error(
+      "The résumé can use Latin letters, digits and common symbols. Other scripts and emoji aren't supported in the PDF yet.",
+    );
+  if (!r.name.trim()) throw new Error("Add your name.");
+  const doc = await PDFDocument.create();
+  doc.setTitle(`${r.name} – Résumé`);
+  doc.setAuthor(r.name);
+  const font = await doc.embedFont(StandardFonts.Helvetica);
+  const bold = await doc.embedFont(StandardFonts.HelveticaBold);
+  const hex = /^#?([0-9a-f]{6})$/i.exec(accent)?.[1] ?? "6d5df5";
+  const acc = rgb(
+    parseInt(hex.slice(0, 2), 16) / 255,
+    parseInt(hex.slice(2, 4), 16) / 255,
+    parseInt(hex.slice(4, 6), 16) / 255,
+  );
+  const ink = rgb(0.1, 0.1, 0.12);
+  const grey = rgb(0.35, 0.35, 0.38);
+  const [W, H] = PageSizes.A4;
+  const M = 50;
+  let page = doc.addPage([W, H]);
+  let y = H - M;
+  const need = (h: number) => {
+    if (y - h < M) {
+      page = doc.addPage([W, H]);
+      y = H - M;
+    }
+  };
+  const wrap = (text: string, f: typeof font, size: number, width: number) => {
+    const out: string[] = [];
+    for (const para of text.split(/\n/)) {
+      let line = "";
+      for (const word of para.split(/\s+/).filter(Boolean)) {
+        const t = line ? `${line} ${word}` : word;
+        if (f.widthOfTextAtSize(t, size) <= width) line = t;
+        else {
+          if (line) out.push(line);
+          line = word;
+        }
+      }
+      out.push(line);
+    }
+    return out;
+  };
+  const text = (s: string, x: number, size: number, f = font, color = ink, width = W - M - x) => {
+    for (const l of wrap(s, f, size, width)) {
+      need(size * 1.35);
+      page.drawText(l, { x, y: y - size, size, font: f, color });
+      y -= size * 1.35;
+    }
+  };
+  const heading = (s: string) => {
+    need(40);
+    y -= 10;
+    page.drawText(s.toUpperCase(), { x: M, y: y - 11, size: 11, font: bold, color: template === "modern" ? acc : ink });
+    y -= 16;
+    page.drawLine({
+      start: { x: M, y },
+      end: { x: W - M, y },
+      thickness: template === "modern" ? 1.2 : 0.6,
+      color: template === "modern" ? acc : grey,
+    });
+    y -= 8;
+  };
+
+  if (template === "modern") {
+    page.drawRectangle({ x: 0, y: H - 110, width: W, height: 110, color: acc });
+    page.drawText(r.name, { x: M, y: H - 58, size: 26, font: bold, color: rgb(1, 1, 1) });
+    if (r.headline) page.drawText(r.headline, { x: M, y: H - 80, size: 12, font, color: rgb(1, 1, 1) });
+    y = H - 130;
+  } else {
+    text(r.name, M, 24, bold);
+    if (r.headline) text(r.headline, M, 12, font, grey);
+  }
+  const contact = [r.email, r.phone, r.location, ...r.links.split(/\n|,/).map((s) => s.trim())]
+    .filter(Boolean)
+    .join("  ·  ");
+  if (contact) text(contact, M, 9.5, font, grey);
+  if (r.summary.trim()) {
+    heading("Summary");
+    text(r.summary.trim(), M, 10.5);
+  }
+  const jobs = r.experience.filter((e) => e.role || e.company);
+  if (jobs.length) {
+    heading("Experience");
+    for (const e of jobs) {
+      need(30);
+      const left = [e.role, e.company].filter(Boolean).join(" — ");
+      page.drawText(left, { x: M, y: y - 11, size: 11, font: bold, color: ink });
+      if (e.dates)
+        page.drawText(e.dates, {
+          x: W - M - font.widthOfTextAtSize(e.dates, 9.5),
+          y: y - 11,
+          size: 9.5,
+          font,
+          color: grey,
+        });
+      y -= 16;
+      for (const b of e.bullets
+        .split("\n")
+        .map((s) => s.replace(/^[-•*]\s*/, "").trim())
+        .filter(Boolean)) {
+        need(14);
+        page.drawText("•", { x: M + 4, y: y - 10, size: 10, font, color: template === "modern" ? acc : ink });
+        text(b, M + 16, 10);
+      }
+      y -= 6;
+    }
+  }
+  const edu = r.education.filter((e) => e.degree || e.school);
+  if (edu.length) {
+    heading("Education");
+    for (const e of edu) {
+      need(30);
+      page.drawText([e.degree, e.school].filter(Boolean).join(" — "), {
+        x: M,
+        y: y - 11,
+        size: 11,
+        font: bold,
+        color: ink,
+      });
+      if (e.dates)
+        page.drawText(e.dates, {
+          x: W - M - font.widthOfTextAtSize(e.dates, 9.5),
+          y: y - 11,
+          size: 9.5,
+          font,
+          color: grey,
+        });
+      y -= 18;
+    }
+  }
+  if (r.skills.trim()) {
+    heading("Skills");
+    text(
+      r.skills
+        .split(/\n|,/)
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .join("  ·  "),
+      M,
+      10.5,
+    );
+  }
+  const saved = await doc.save({ useObjectStreams: true });
+  return { blob: pdfBlob(saved), pages: doc.getPageCount() };
+}

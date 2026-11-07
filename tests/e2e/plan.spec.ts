@@ -47,11 +47,19 @@ test.describe("Plan → Run → Results is real", () => {
     g.assertClean();
   });
 
-  test("steps that aren't built say so instead of pretending; 'password' on a PDF isn't the password generator", async ({
-    page,
-  }) => {
+  test("'password' on a PDF opens Protect PDF (not the password generator)", async ({ page }) => {
     await dropOnHome(page, gen("twenty-pages.pdf"));
-    await composer(page).fill("protect it with a password");
+    await runPlan(page, "protect it with a password");
+    const go = work(page).getByRole("button", { name: /Continue in Protect PDF/ });
+    await expect(go).toBeVisible();
+    await go.click();
+    await expect(page).toHaveURL(/\/protect-pdf$/);
+    await expect(page.locator('[data-testid="file-chip"]:visible')).toContainText("twenty-pages.pdf");
+  });
+
+  test("steps that aren't built say so instead of pretending", async ({ page }) => {
+    await dropOnHome(page, gen("valid.json"));
+    await composer(page).fill("convert to pdf");
     await composer(page).press("Enter");
     const card = work(page).locator(".card").last();
     await expect(card.locator(".step .tag")).toHaveText("Coming soon");

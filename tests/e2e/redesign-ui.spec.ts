@@ -627,13 +627,15 @@ test.describe("KlipKit Redesign UI & Visual Layer", () => {
   test("A1/F5: unbuilt tools say Coming soon; page tools open their page", async ({ page }) => {
     await page.goto("/");
     await page.locator("#explore").scrollIntoViewIfNeeded();
-    const merge = page.locator("#grid button", { hasText: "Merge PDF" });
-    await expect(merge.locator(".tg")).toHaveText("Coming soon");
-    await merge.click();
-    await expect(page.locator("#toast")).toHaveText("Merge PDF is coming soon.");
+    // Hashtag Finder is still unbuilt (needs a curated dataset); Merge PDF has its own page now
+    await page.locator("#more").click();
+    const soon = page.locator("#grid button", { hasText: "Hashtag Finder" });
+    await expect(soon.locator(".tg")).toHaveText("Coming soon");
+    await soon.click();
+    await expect(page.locator("#toast")).toHaveText("Hashtag Finder is coming soon.");
     await expect(page.locator("body")).not.toHaveClass(/is-work/);
-    await page.locator("#grid button", { hasText: "Compress PDF" }).click();
-    await expect(page).toHaveURL(/\/compress-pdf$/);
+    await page.locator("#grid button", { hasText: "Merge PDF" }).click();
+    await expect(page).toHaveURL(/\/merge-pdf$/);
   });
 
   for (const width of [1440, 1100, 390]) {

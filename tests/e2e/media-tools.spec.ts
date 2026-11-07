@@ -41,7 +41,8 @@ async function clip(browser: Browser, project: string, kind: "av" | "silent") {
   const page = await browser.newPage();
   const { bytes, ext } = await recordClip(page, 3, kind === "av");
   await page.close();
-  const path = join(TMP, `${key}.${ext}`);
+  // one file per worker: parallel workers recording the same clip used to write the same path at once
+  const path = join(TMP, `${key}-w${process.env.TEST_WORKER_INDEX ?? 0}.${ext}`);
   writeFileSync(path, bytes);
   return (clips[key] = path);
 }
