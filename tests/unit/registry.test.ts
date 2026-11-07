@@ -6,7 +6,7 @@ import { people } from "@/registry/people";
 import { deps, platformDeps } from "@/registry/dependencies";
 import { catalog, PANEL_SLUGS } from "@/registry/catalog";
 import { HOME } from "@/registry/home";
-import { TOOLS } from "@/lib/designTools";
+import { TOOLS, toolBySlug } from "@/lib/designTools";
 import { PANELS } from "@/lib/livePanels";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -168,5 +168,15 @@ describe("single source of truth (ADR 0002)", () => {
   });
   it("the client catalog carries no SEO copy", () => {
     for (const t of catalog) expect("seo" in t, t.slug).toBe(false);
+  });
+  it("Hallmark F11: developer and PDF/document tools each have their own glyph, no shared icon", () => {
+    const shared = TOOLS.filter((t) => t.c === "d" || ["pdf", "doc", "lock"].includes(t.i));
+    const marks = shared.map((t) => t.g ?? `icon:${t.i}`);
+    const dupes = marks.filter((m, i) => marks.indexOf(m) !== i);
+    expect(dupes).toEqual([]);
+    for (const t of shared) if (t.g) expect(t.g.length, t.slug).toBeLessThanOrEqual(4);
+    expect(toolBySlug("json-formatter")!.g).toBe("{ }");
+    expect(toolBySlug("jwt-decoder")!.g).toBe("JWT");
+    expect(toolBySlug("hash-generator")!.g).toBe("#");
   });
 });

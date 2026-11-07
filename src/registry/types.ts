@@ -113,6 +113,8 @@ export interface HomeCard {
   /** Short display name on the card, e.g. "Word to PDF". */
   name: string;
   icon: HomeIcon;
+  /** Short mono mark shown instead of the icon (≤ 4 chars), so tools that share an icon stay distinct. */
+  glyph?: string;
   blurb: string;
 }
 

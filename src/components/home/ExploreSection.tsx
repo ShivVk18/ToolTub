@@ -165,18 +165,30 @@ export function ExploreSection({ onSelectTool }: ExploreSectionProps) {
                   className="ti w-[46px] h-[46px] rounded-[14px] grid place-items-center flex-none"
                   style={{ background: tint(cat.c) }}
                 >
-                  <svg
-                    width="22"
-                    height="22"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke={cat.c}
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d={TOOL_ICON_PATHS[t.i] || TOOL_ICON_PATHS.code} />
-                  </svg>
+                  {t.g ? (
+                    // Mono glyph in the satellites' style, so tools that share an icon stay distinct (F11).
+                    <span
+                      data-glyph
+                      aria-hidden
+                      className="font-mono font-semibold leading-none tracking-[-0.02em]"
+                      style={{ color: cat.c, fontSize: t.g.length > 3 ? 12 : t.g.length > 2 ? 14 : 17 }}
+                    >
+                      {t.g}
+                    </span>
+                  ) : (
+                    <svg
+                      width="22"
+                      height="22"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke={cat.c}
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d={TOOL_ICON_PATHS[t.i] || TOOL_ICON_PATHS.code} />
+                    </svg>
+                  )}
                 </div>
 
                 <span className="tg absolute right-0 top-0 text-[12px] text-ink2 font-medium">

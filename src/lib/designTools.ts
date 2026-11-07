@@ -6,6 +6,7 @@ export interface ToolItem {
   n: string; // short display name
   c: "p" | "d" | "c"; // category key: Productivity, Developer, Creator
   i: string; // icon key
+  g?: string; // mono glyph shown instead of the icon (dev and PDF tools)
   d: string; // one-line blurb
   s?: string; // 'server' if processed on KlipKit's own server
   slug: string; // registry slug
@@ -31,6 +32,7 @@ export const TOOLS: ToolItem[] = homeTools().map((t) => ({
   n: t.home!.name,
   c: CAT_KEY[t.category],
   i: t.home!.icon,
+  g: t.home!.glyph,
   d: t.home!.blurb,
   s: t.processing.where === "own-server" ? "server" : undefined,
   slug: t.slug,

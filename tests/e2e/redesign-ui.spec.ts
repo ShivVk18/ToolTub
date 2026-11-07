@@ -417,6 +417,25 @@ test.describe("KlipKit Redesign UI & Visual Layer", () => {
     await expect(page.locator("footer").getByText("Drop anything. Done in seconds.")).toBeVisible();
   });
 
+  test("F11: Explore cards show per-tool mono glyphs instead of one shared icon", async ({ page }) => {
+    await page.goto("/");
+    await page.locator("#tabs .tab", { hasText: "Developer" }).click();
+    const card = (name: string) => page.locator("#grid .tcard", { has: page.locator("h3", { hasText: name }) });
+    for (const [name, glyph] of [
+      ["JSON Formatter", "{ }"],
+      ["JWT Decoder", "JWT"],
+      ["Hash Generator", "#"],
+    ]) {
+      const g = card(name).locator(".ti [data-glyph]");
+      await expect(g).toHaveText(glyph);
+      expect(await g.evaluate((e) => getComputedStyle(e).fontFamily)).toMatch(/mono|Menlo|Consolas|Courier/i);
+    }
+    // tools without a glyph keep their icon
+    await page.locator("#tabs .tab", { hasText: "Creator" }).click();
+    await page.locator("#more").click();
+    await expect(card("Audio Converter").locator(".ti svg")).toBeVisible();
+  });
+
   test("opening a live panel docks the orb and hides the satellites", async ({ page }) => {
     await page.goto("/#base64");
     await expect(page.locator("#panel")).toBeVisible();
