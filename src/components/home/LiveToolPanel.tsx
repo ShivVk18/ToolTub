@@ -75,7 +75,9 @@ export function LiveToolPanel({ onReturnToChat }: LiveToolPanelProps) {
     const seq = ++runSeqRef.current;
     const t0 = performance.now();
 
-    const res = await P.run(inputValue, selectedOpt, patValue, flValue);
+    // Right after switching panels, `selectedOpt` can still hold the previous panel's option for one run.
+    const opt = P.opts ? (P.opts.some((x) => x[1] === selectedOpt) ? selectedOpt : P.opts[0][1]) : null;
+    const res = await P.run(inputValue, opt, patValue, flValue);
     if (seq !== runSeqRef.current) return;
 
     const dt = Math.max(0.1, performance.now() - t0);

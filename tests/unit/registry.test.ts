@@ -160,7 +160,8 @@ describe("single source of truth (ADR 0002)", () => {
     const protect = TOOLS.find((t) => t.slug === "protect-pdf")!;
     expect(protect.s).toBeUndefined(); // runs on the device (qpdf wasm), so no "Private server" tag
     expect(TOOLS.find((t) => t.slug === "pdf-to-word")!.s).toBe("server");
-    expect(TOOLS.filter((t) => t.live)).toHaveLength(18);
+    // 33 live panels; 32 have a home card (Time Zone Converter is reached from Unit Converter's card and ⌘K).
+    expect(TOOLS.filter((t) => t.live)).toHaveLength(32);
   });
   it("every routed tool has a page component", () => {
     const src = readFileSync(join(__dirname, "../../src/tools/index.tsx"), "utf8");

@@ -4,6 +4,7 @@ Every change landed as its own branch, squash-merged into `integration/ui-restor
 
 | # | Title | Branch | PR notes |
 |---|---|---|---|
+| 80 | feat: 15 new live tools (unit/time zone, YAML, .env, meta, schema, chmod, entities, bases, CSS, post/caption/bio, Markdown, barcode) | `feat/panels-text-dev-tools` | [reports/prs/feat-panels-text-dev-tools.md](reports/prs/feat-panels-text-dev-tools.md) |
 | 79 | docs: release PR description (integration/ui-restore → main, v1.0.0-rc1) | `docs/release-pr-body` | [reports/prs/integration-ui-restore-to-main.md](reports/prs/integration-ui-restore-to-main.md) |
 | 78 | docs: README (architecture diagram, add a tool in 5 steps), ADRs 0005–0007, CLAUDE.md gotchas | `docs/readme-adrs-handover` | [reports/prs/docs-readme-adrs-handover.md](reports/prs/docs-readme-adrs-handover.md) |
 | 77 | docs: Phase 4 tools end-to-end report (md, HTML, JSON) and its generator; changelog through #77 | `docs/tools-e2e-report` | [reports/prs/docs-tools-e2e-report.md](reports/prs/docs-tools-e2e-report.md) |

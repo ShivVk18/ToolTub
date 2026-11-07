@@ -2299,6 +2299,87 @@ body.panel-full .col {
   color: var(--ink2);
   min-height: 200px;
 }
+/* Rich panel output: Markdown preview, CSS swatch, barcode (the output box is pre-wrap monospace by default). */
+#pnOut .pmd {
+  white-space: normal;
+  font: 400 16px/1.6 var(--sans);
+  color: var(--ink);
+}
+#pnOut .pmd :is(h1, h2, h3, h4) {
+  font-family: var(--serif);
+  font-weight: 500;
+  line-height: 1.2;
+  margin: 0.8em 0 0.4em;
+}
+#pnOut .pmd h1 {
+  font-size: 30px;
+}
+#pnOut .pmd h2 {
+  font-size: 24px;
+}
+#pnOut .pmd :is(p, ul, ol, blockquote, pre, table) {
+  margin: 0 0 0.8em;
+}
+#pnOut .pmd :is(ul, ol) {
+  padding-left: 1.4em;
+}
+#pnOut .pmd ul {
+  list-style: disc;
+}
+#pnOut .pmd ol {
+  list-style: decimal;
+}
+#pnOut .pmd blockquote {
+  border-left: 3px solid var(--line2);
+  padding-left: 14px;
+  color: var(--ink2);
+}
+#pnOut .pmd code {
+  font: 400 14px var(--mono);
+  background: var(--soft);
+  border-radius: 6px;
+  padding: 1px 5px;
+}
+#pnOut .pmd pre {
+  background: var(--soft);
+  border-radius: 12px;
+  padding: 12px 14px;
+  overflow: auto;
+}
+#pnOut .pmd pre code {
+  padding: 0;
+  background: none;
+}
+#pnOut .pmd a {
+  color: var(--accent);
+  text-decoration: underline;
+}
+#pnOut .pmd :is(th, td) {
+  border: 1px solid var(--line);
+  padding: 4px 10px;
+}
+#pnOut .pmd img {
+  max-width: 100%;
+}
+#pnOut .pswatch {
+  height: 96px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  margin-bottom: 14px;
+}
+#pnOut .pbar {
+  display: inline-block;
+  background: #fff;
+  border-radius: 12px;
+  padding: 8px;
+  max-width: 100%;
+  overflow: auto;
+}
+#pnOut .pbar svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
 #pnOut.flash {
   animation: flash 0.6s ease;
 }

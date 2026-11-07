@@ -13,6 +13,7 @@ const results: Record<string, number> = {};
 test.describe.configure({ mode: "serial" });
 
 test("every live panel: runs in under 50 ms, nothing uploaded, nothing third-party", async ({ page }) => {
+  test.setTimeout(PANEL_SLUGS.size * 6_000); // one page visits every panel in turn: ~3 s each, so scale with the count
   const g = guard(page);
   for (const slug of [...PANEL_SLUGS]) {
     await page.goto(`/#${slug}`);

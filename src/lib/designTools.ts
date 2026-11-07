@@ -1,4 +1,4 @@
-import { homeTools } from "@/registry/catalog";
+import { homeTools, catalog } from "@/registry/catalog";
 import type { CategoryId } from "@/registry/types";
 
 /** A home-page tool card. Built from the registry; never edit tool data here. */
@@ -54,7 +54,15 @@ export const TOOL_COUNTS = {
 };
 
 /** Look up a home card by registry slug. */
-export const toolBySlug = (slug: string): ToolItem | undefined => TOOLS.find((t) => t.slug === slug);
+/** Home card by slug; a live panel without a home card (e.g. Time Zone Converter) gets one built from the registry. */
+export const toolBySlug = (slug: string): ToolItem | undefined => {
+  const home = TOOLS.find((t) => t.slug === slug);
+  if (home) return home;
+  const t = catalog.find((x) => x.slug === slug && x.panel);
+  return t
+    ? { n: t.name, c: CAT_KEY[t.category], i: "code", d: t.tagline, slug: t.slug, live: true, routed: false }
+    : undefined;
+};
 
 export const TOOL_ICON_PATHS: Record<string, string> = {
   pdf: "M7 3h7l5 5v13H7z M14 3v5h5",

@@ -13,6 +13,25 @@ import { fmtSQL } from "./engines/sql";
 import { toCSV, parseCSV } from "./engines/csv";
 import { uuidV4 } from "./engines/random";
 import { byteLength, fmtSize } from "./engines/format";
+import { parseConversion, fmtNum } from "./engines/units";
+import { parseTimeZone } from "./engines/timezone";
+import { parseChmod, encodeEntities, decodeEntities, parseBase, groupDigits, type Base } from "./engines/devconv";
+import { redactEnv, metaTags, jsonLd, type RedactMode, type SchemaType } from "./engines/webdev";
+import {
+  cssGen,
+  styleText,
+  graphemes,
+  captions,
+  fitBio,
+  LIMITS,
+  BIO_LIMITS,
+  type CssKind,
+  type TextStyle,
+  type CaptionStyle,
+} from "./engines/creator";
+import { renderMarkdown } from "./engines/markdown";
+import { toYaml, fromYaml } from "./engines/yaml";
+import { code128, ean13, upcA, barcodeSvg } from "./engines/barcode";
 
 export { fmtSize };
 
@@ -435,6 +454,344 @@ export const PANELS: Record<string, PanelConfig> = {
         copy: list.map((m) => m[0]).join("\n"),
         status: `${list.length} match${list.length === 1 ? "" : "es"}`,
       };
+    },
+  },
+
+  "unit-converter": {
+    sample: "5 km to mi",
+    run: (v) => {
+      if (!v.trim()) return {};
+      try {
+        const r = parseConversion(v);
+        const w = Math.max(...r.rows.map((x) => x[0].length));
+        const s = r.rows.map(([u, n]) => `${u.padEnd(w)}  ${fmtNum(n)}`).join("\n");
+        return {
+          html: `<span class="pc">${esc(fmtNum(r.value) + " " + r.from)} =</span>\n${esc(s)}`,
+          copy: r.rows.length === 1 ? `${fmtNum(r.rows[0][1])} ${r.rows[0][0]}` : s,
+          status: `${cap(r.kind)} · ${r.rows.length} unit${r.rows.length > 1 ? "s" : ""}`,
+        };
+      } catch (e) {
+        return { html: `<span class="perr">${esc((e as Error).message)}</span>`, status: "✕", bad: 1 };
+      }
+    },
+  },
+
+  "time-zone-converter": {
+    sample: "10:30 IST to PST, London, Tokyo",
+    run: (v) => {
+      if (!v.trim()) return {};
+      try {
+        const r = parseTimeZone(v, Date.now());
+        const city = (z: string) => z.split("/").pop()!.replace(/_/g, " ");
+        const w = Math.max(...r.rows.map((x) => city(x.zone).length));
+        const s = r.rows
+          .map(
+            (x) =>
+              `${city(x.zone).padEnd(w)}  ${x.time}  ${x.date.padEnd(10)} ${x.offset.replace("UTC", "")}${x.dayShift ? `  ${x.dayShift > 0 ? "+" : ""}${x.dayShift}d` : ""}`,
+          )
+          .join("\n");
+        return { html: esc(s), copy: s, status: `${r.rows.length} zones · daylight saving included` };
+      } catch (e) {
+        return { html: `<span class="perr">${esc((e as Error).message)}</span>`, status: "✕", bad: 1 };
+      }
+    },
+  },
+
+  "json-to-yaml": {
+    opts: [
+      ["JSON → YAML", "y"],
+      ["YAML → JSON", "j"],
+    ],
+    sample:
+      '{"name":"klipkit","version":"1.0","private":true,"tools":["json","yaml"],"port":3000,"on":"yes","zip":"007"}',
+    run: async (v, o) => {
+      if (!v.trim()) return {};
+      const YAML = await import("yaml");
+      try {
+        if (o === "j") {
+          const x = fromYaml(YAML, v);
+          const s = JSON.stringify(x, null, 2) ?? "null";
+          return { html: hlJSON(s), copy: s, status: "✓ YAML → JSON" };
+        }
+        const x = JSON.parse(v);
+        const s = toYaml(YAML, x);
+        return { html: esc(s), copy: s, status: `✓ JSON → YAML · ${s.split("\n").length - 1} lines` };
+      } catch (e) {
+        return {
+          html: `<span class="perr">${esc((e as Error).message.split("\n")[0])}</span>`,
+          status: o === "j" ? "✕ Invalid YAML" : "✕ Invalid JSON",
+          bad: 1,
+        };
+      }
+    },
+  },
+
+  "env-redactor": {
+    opts: [
+      ["Hide secrets", "smart"],
+      ["Hide all values", "all"],
+      ["Keys only", "keys"],
+    ],
+    sample:
+      "# app\nDATABASE_URL=postgres://app:hunter2@db:5432/main\nSTRIPE_SECRET_KEY=sk_live_51HxYzABCDEF0123456789\nPORT=3000\nNEXT_PUBLIC_SITE=https://klipkit.com",
+    run: (v, o) => {
+      if (!v.trim()) return {};
+      const r = redactEnv(v, (o || "smart") as RedactMode);
+      return { html: esc(r.text), copy: r.text, status: `${r.redacted} hidden · ${r.kept} kept` };
+    },
+  },
+
+  "meta-tag-generator": {
+    sample:
+      "title: KlipKit — free tools that run on your device\ndescription: Compress, convert and format files in your browser. Nothing is uploaded.\nurl: https://klipkit.com\nimage: https://klipkit.com/og.png\nsite: KlipKit\ntwitter: @klipkit",
+    run: (v) => {
+      if (!v.trim()) return {};
+      try {
+        const r = metaTags(v);
+        return {
+          html:
+            esc(r.html) +
+            (r.warnings.length ? `\n\n<span class="pc">// ${r.warnings.map(esc).join("\n// ")}</span>` : ""),
+          copy: r.html,
+          status: r.warnings.length
+            ? `${r.warnings.length} suggestion${r.warnings.length > 1 ? "s" : ""}`
+            : "✓ Ready to paste into <head>",
+        };
+      } catch (e) {
+        return { html: `<span class="perr">${esc((e as Error).message)}</span>`, status: "✕", bad: 1 };
+      }
+    },
+  },
+
+  "schema-generator": {
+    opts: [
+      ["Article", "Article"],
+      ["Product", "Product"],
+      ["FAQ", "FAQPage"],
+      ["Organization", "Organization"],
+    ],
+    sample:
+      "name: KlipKit\ndescription: Free tools that run on your device.\nurl: https://klipkit.com\nauthor: Asha Rao\ndate: 2026-11-07\nprice: 0\nq: Is KlipKit free?\na: Yes. Every tool has a free plan.",
+    run: (v, o) => {
+      if (!v.trim()) return {};
+      try {
+        const r = jsonLd(v, (o || "Article") as SchemaType);
+        return {
+          html:
+            esc(r.json) +
+            (r.warnings.length ? `\n\n<span class="pc">// ${r.warnings.map(esc).join("\n// ")}</span>` : ""),
+          copy: r.json,
+          status: r.warnings.length
+            ? `${r.warnings.length} suggestion${r.warnings.length > 1 ? "s" : ""}`
+            : "✓ Valid JSON-LD",
+        };
+      } catch (e) {
+        return { html: `<span class="perr">${esc((e as Error).message)}</span>`, status: "✕", bad: 1 };
+      }
+    },
+  },
+
+  "chmod-calculator": {
+    sample: "755",
+    run: (v) => {
+      if (!v.trim()) return {};
+      try {
+        const r = parseChmod(v);
+        const row = (t: (typeof r.table)[number]) =>
+          `${t.who.padEnd(7)} ${t.read ? "read " : "-    "} ${t.write ? "write " : "-     "} ${t.execute ? "execute" : "-"}`;
+        const s = `${r.octal}  ${r.symbolic}\n\n${r.table.map(row).join("\n")}${r.special.length ? `\n\nSpecial: ${r.special.join(", ")}` : ""}\n\nchmod ${r.octal} file`;
+        return { html: esc(s), copy: `chmod ${r.octal}`, status: `${r.octal} = ${r.symbolic}` };
+      } catch (e) {
+        return { html: `<span class="perr">${esc((e as Error).message)}</span>`, status: "✕", bad: 1 };
+      }
+    },
+  },
+
+  "html-entities": {
+    opts: [
+      ["Encode", "e"],
+      ["Encode all", "a"],
+      ["Decode", "d"],
+    ],
+    sample: "<p>Café “KlipKit” & co — 5 > 3 ✓</p>",
+    run: (v, o) => {
+      if (!v) return {};
+      if (o === "d") {
+        const r = decodeEntities(v);
+        return {
+          html: esc(r.text),
+          copy: r.text,
+          status: r.unknown ? `Decoded · ${r.unknown} unknown left as is` : "Decoded",
+        };
+      }
+      const s = encodeEntities(v, o === "a" ? "all" : "minimal");
+      return { html: esc(s), copy: s, status: `Encoded · ${s.length} characters` };
+    },
+  },
+
+  "number-base-converter": {
+    opts: [
+      ["Auto", "auto"],
+      ["From binary", "2"],
+      ["From octal", "8"],
+      ["From hex", "16"],
+    ],
+    sample: "101",
+    run: (v, o) => {
+      if (!v.trim()) return {};
+      try {
+        const r = parseBase(v, o === "auto" || !o ? "auto" : (+o as Base));
+        const s = [
+          `Binary   ${groupDigits(r.bin, 4, " ")}`,
+          `Octal    ${r.oct}`,
+          `Decimal  ${groupDigits(r.dec, 3, ",")}`,
+          `Hex      ${groupDigits(r.hex, 4, " ")}`,
+        ].join("\n");
+        return { html: esc(s), copy: s, status: `Read as base ${r.from}` };
+      } catch (e) {
+        return { html: `<span class="perr">${esc((e as Error).message)}</span>`, status: "✕", bad: 1 };
+      }
+    },
+  },
+
+  "css-generator": {
+    opts: [
+      ["Linear", "linear"],
+      ["Radial", "radial"],
+      ["Shadow", "shadow"],
+    ],
+    sample: "#6d5df5 #ff9c82 135deg",
+    run: (v, o) => {
+      if (!v.trim()) return {};
+      try {
+        const r = cssGen(v, (o || "linear") as CssKind);
+        return {
+          html: `<div class="pswatch" style="${esc(r.preview)}"></div>${esc(r.css)}`,
+          copy: r.css,
+          status: "✓ CSS ready",
+        };
+      } catch (e) {
+        return { html: `<span class="perr">${esc((e as Error).message)}</span>`, status: "✕", bad: 1 };
+      }
+    },
+  },
+
+  "social-post-formatter": {
+    opts: [
+      ["Bold", "bold"],
+      ["Italic", "italic"],
+      ["Bold italic", "bolditalic"],
+      ["Mono", "mono"],
+      ["Script", "script"],
+    ],
+    sample: "Big news 🎉\n\nKlipKit now has 40 more free tools.\nNo sign-up. Nothing uploaded.",
+    run: (v, o) => {
+      if (!v) return {};
+      // Empty lines get an invisible character so apps that collapse blank lines keep the spacing.
+      const s = styleText(v, (o || "bold") as TextStyle).replace(/\n(?=\n)/g, "\n\u2800");
+      const n = graphemes(s);
+      const over = LIMITS.filter(([, max]) => n > max).map(([p]) => p);
+      return {
+        html: esc(s),
+        copy: s,
+        status: `${n} characters${over.length ? ` · too long for ${over.join(", ")}` : " · fits every platform"}`,
+        bad: over.length > 0 && over.length === LIMITS.length,
+      };
+    },
+  },
+
+  "title-builder": {
+    opts: [
+      ["YouTube", "youtube"],
+      ["Instagram", "instagram"],
+      ["LinkedIn", "linkedin"],
+    ],
+    sample: "home workouts",
+    run: (v, o) => {
+      if (!v.trim()) return {};
+      try {
+        const r = captions(v, (o || "youtube") as CaptionStyle);
+        const s = r.map((c, i) => `${String(i + 1).padStart(2)}. ${c.text}`).join("\n");
+        const notes = r.filter((c) => c.warn).length;
+        return {
+          html: r
+            .map(
+              (c, i) =>
+                `${String(i + 1).padStart(2)}. ${esc(c.text)} <span class="pc">${c.length}${c.warn ? " · " + c.warn : ""}</span>`,
+            )
+            .join("\n"),
+          copy: s,
+          status: `${r.length} ideas${notes ? ` · ${notes} may be cut off` : ""}`,
+        };
+      } catch (e) {
+        return { html: `<span class="perr">${esc((e as Error).message)}</span>`, status: "✕", bad: 1 };
+      }
+    },
+  },
+
+  "bio-formatter": {
+    sample: "Product designer at KlipKit\nMaking tools that feel calm and fast\nBengaluru 🇮🇳 · she/her\nklipkit.com",
+    run: (v) => {
+      if (!v.trim()) return {};
+      const rows = BIO_LIMITS.map(([p, max]) => {
+        const r = fitBio(v, max, p === "Instagram" || p === "YouTube");
+        return { p, max, ...r };
+      });
+      const cut = rows.filter((r) => r.cut).length;
+      return {
+        html: rows
+          .map(
+            (r) =>
+              `<span class="pc">// ${r.p} · ${r.length}/${r.max}${r.cut ? " · shortened" : ""}</span>\n${esc(r.text)}`,
+          )
+          .join("\n\n"),
+        copy: rows.map((r) => `${r.p}:\n${r.text}`).join("\n\n"),
+        status: cut ? `Shortened for ${cut} platform${cut > 1 ? "s" : ""}` : "Fits every platform",
+      };
+    },
+  },
+
+  "markdown-editor": {
+    opts: [
+      ["Preview", "p"],
+      ["HTML", "h"],
+    ],
+    sample:
+      "# Release notes\n\nKlipKit now has **40 more tools**, all running _on your device_.\n\n- [x] Unit converter\n- [ ] Video tools\n\n> Nothing is uploaded.\n\n```js\nconst ok = true;\n```\n\n[Open KlipKit](https://klipkit.com)",
+    run: (v, o) => {
+      if (!v.trim()) return {};
+      const h = renderMarkdown(v);
+      const words = v.trim().split(/\s+/).length;
+      return o === "h"
+        ? { html: esc(h), copy: h, status: `HTML · ${h.length} characters` }
+        : {
+            html: `<div class="pmd">${h}</div>`,
+            copy: v,
+            status: `${words} words · ${Math.max(1, Math.round(words / 230))} min read`,
+          };
+    },
+  },
+
+  "barcode-generator": {
+    opts: [
+      ["Code 128", "c"],
+      ["EAN-13", "e"],
+      ["UPC-A", "u"],
+    ],
+    sample: "036000291452",
+    run: (v, o) => {
+      if (!v.trim()) return {};
+      try {
+        const b = o === "e" ? ean13(v) : o === "u" ? upcA(v) : code128(v.trim());
+        const svg = barcodeSvg(b);
+        return {
+          html: `<div class="pbar">${svg}</div>\n<span class="pc">${b.kind} · ${esc(b.text)} · copy gives the SVG</span>`,
+          copy: svg,
+          status: `✓ ${b.kind} · ${b.text}`,
+        };
+      } catch (e) {
+        return { html: `<span class="perr">${esc((e as Error).message)}</span>`, status: "✕", bad: 1 };
+      }
     },
   },
 };

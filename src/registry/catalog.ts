@@ -1280,6 +1280,21 @@ export const PANEL_SLUGS: ReadonlySet<string> = new Set([
   "json-to-typescript",
   "clean-text",
   "regex-tester",
+  "unit-converter",
+  "time-zone-converter",
+  "json-to-yaml",
+  "env-redactor",
+  "meta-tag-generator",
+  "schema-generator",
+  "chmod-calculator",
+  "html-entities",
+  "number-base-converter",
+  "css-generator",
+  "social-post-formatter",
+  "title-builder",
+  "bio-formatter",
+  "markdown-editor",
+  "barcode-generator",
 ]);
 
 export const catalog: ToolCore[] = rows.map(

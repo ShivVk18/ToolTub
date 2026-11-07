@@ -334,14 +334,15 @@ export function HomeStage() {
     const routeHash = () => {
       const h = window.location.hash.slice(1);
       if (!h) return;
-      const t = TOOLS.find(
-        (x) =>
-          x.slug === h ||
-          x.n
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/^-|-$/g, "") === h,
-      );
+      const t =
+        toolBySlug(h) ??
+        TOOLS.find(
+          (x) =>
+            x.n
+              .toLowerCase()
+              .replace(/[^a-z0-9]+/g, "-")
+              .replace(/^-|-$/g, "") === h,
+        );
       if (t) {
         if (PANELS[t.slug]) {
           openPanel(t, "");
